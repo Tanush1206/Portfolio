@@ -14,12 +14,13 @@ const Projects: React.FC = () => {
     },
     {
       id: 2,
-      title: "Demystifying Legal Document",
+      title: "PactPal",
       description: "Built an AI-powered agent to simplify legal documents for non-legal users, reducing comprehension time by ~30% and empowering faster, more informed decision-making.",
       image: "https://images.pexels.com/photos/5668772/pexels-photo-5668772.jpeg?auto=compress&cs=tinysrgb&w=800",
       tech: ["Python", "AI/ML", "NLP", "React", "FastAPI"],
-      github: "https://github.com/Tanush1206/PactPal",
-      live: "#",
+      githubFrontend: "https://github.com/Tanush1206/PactPal-Frontend",
+      githubBackend: "https://github.com/Tanush1206/PactPal-Backend",
+      live: "https://pactpal-frontend.onrender.com/",
     },
     {
       id: 3,
@@ -76,7 +77,7 @@ const Projects: React.FC = () => {
                 </div>
                 
                 <div className="flex gap-4">
-                  {project.github !== "#" && (
+                  {project.github && project.github !== "#" && (
                     <a
                       href={project.github}
                       target="_blank"
@@ -85,6 +86,28 @@ const Projects: React.FC = () => {
                     >
                       <Github size={20} />
                       <span>Code</span>
+                    </a>
+                  )}
+                  {project.githubFrontend && (
+                    <a
+                      href={project.githubFrontend}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-300"
+                    >
+                      <Github size={20} />
+                      <span>Frontend</span>
+                    </a>
+                  )}
+                  {project.githubBackend && (
+                    <a
+                      href={project.githubBackend}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-300"
+                    >
+                      <Github size={20} />
+                      <span>Backend</span>
                     </a>
                   )}
                   {project.live !== "#" && (
