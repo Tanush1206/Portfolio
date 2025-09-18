@@ -1,19 +1,19 @@
-import React from 'react';
+import React from "react";
 
 const Skills: React.FC = () => {
   const skills = [
-    { name: "React", level: 90 },
-    { name: "Python", level: 85 },
-    { name: "UI/UX Design", level: 88 },
-    { name: "Java", level: 80 },
-    { name: "JavaScript", level: 92 },
-    { name: "Tailwind CSS", level: 95 },
-    { name: "CSS", level: 90 },
+    { name: "React", level: 78 },
+    { name: "Python", level: 80 },
+    { name: "UI/UX Design", level: 90 },
+    { name: "Java", level: 75 },
+    { name: "Tailwind CSS", level: 92 },
+    { name: "JavaScript", level: 75 },
+    { name: "CSS", level: 88 },
   ];
 
   return (
     <section id="skills" className="py-20 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-wider">
             SKILLS
@@ -23,26 +23,58 @@ const Skills: React.FC = () => {
           </p>
         </div>
 
-        <div className="space-y-8">
-          {skills.map((skill, index) => (
-            <div key={skill.name} className="group">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-xl font-semibold text-white">{skill.name}</h3>
-                <span className="text-white/60 font-medium">{skill.level}%</span>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
+          {skills.map((skill, index) => {
+            const radius = 50;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (skill.level / 100) * circumference;
+
+            return (
+              <div key={index} className="flex flex-col items-center space-y-4">
+                <div className="relative w-32 h-32">
+                  <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={radius}
+                      stroke="white"
+                      strokeOpacity="0.2"
+                      strokeWidth="10"
+                      fill="transparent"
+                    />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r={radius}
+                      stroke="url(#grad)"
+                      strokeWidth="10"
+                      fill="transparent"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={offset}
+                      strokeLinecap="round"
+                      style={{ transition: "stroke-dashoffset 1s ease" }}
+                    />
+                    <defs>
+                      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#3b82f6" />
+                        <stop offset="50%" stopColor="#9333ea" />
+                        <stop offset="100%" stopColor="#ec4899" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+
+                  {/* Centered percentage label */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-white">
+                      {skill.level}%
+                    </span>
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-semibold text-white">{skill.name}</h3>
               </div>
-              
-              <div className="relative h-3 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
-                <div
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: `${skill.level}%`,
-                    animationDelay: `${index * 200}ms`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 animate-shimmer" />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

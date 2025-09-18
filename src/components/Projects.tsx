@@ -1,13 +1,15 @@
-import React from 'react';
-import { ExternalLink, Github, FileText } from 'lucide-react';
+import React from "react";
+import { ExternalLink, Github, FileText } from "lucide-react";
 
 const Projects: React.FC = () => {
   const projects = [
     {
       id: 1,
       title: "AASRAH",
-      description: "Developed a platform connecting users with NGOs to provide real-time assistance for people and animals in distress, integrating Google Maps/GSI for accurate location tracking to ensure timely support and impactful interventions.",
-      image: "https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800",
+      description:
+        "Developed a platform connecting users with NGOs to provide real-time assistance for people and animals in distress, integrating Google Maps/GSI for accurate location tracking to ensure timely support and impactful interventions.",
+      image:
+        "https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800",
       tech: ["React", "Google Maps API", "Node.js", "MongoDB"],
       github: "https://github.com/NoiceHax/Aasrah",
       live: "#",
@@ -15,8 +17,10 @@ const Projects: React.FC = () => {
     {
       id: 2,
       title: "PactPal",
-      description: "Built an AI-powered agent to simplify legal documents for non-legal users, reducing comprehension time by ~30% and empowering faster, more informed decision-making.",
-      image: "https://images.pexels.com/photos/5668772/pexels-photo-5668772.jpeg?auto=compress&cs=tinysrgb&w=800",
+      description:
+        "Built an AI-powered agent to simplify legal documents for non-legal users, reducing comprehension time by ~30% and empowering faster, more informed decision-making.",
+      image:
+        "https://images.pexels.com/photos/5668772/pexels-photo-5668772.jpeg?auto=compress&cs=tinysrgb&w=800",
       tech: ["Python", "AI/ML", "NLP", "React", "FastAPI"],
       githubFrontend: "https://github.com/Tanush1206/PactPal-Frontend",
       githubBackend: "https://github.com/Tanush1206/PactPal-Backend",
@@ -25,11 +29,36 @@ const Projects: React.FC = () => {
     {
       id: 3,
       title: "Case Study (Urban Company)",
-      description: "Analyzed business strategy and market positioning, uncovering gaps in scalability, retention, and revenue; conducted competitive benchmarking and field research to propose a 5-year fixed-deposit service model offering builders a 10% benefit.",
-      image: "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=800",
-      tech: ["Business Analysis", "Market Research", "Strategy", "Financial Modeling"],
+      description:
+        "Analyzed business strategy and market positioning, uncovering gaps in scalability, retention, and revenue; conducted competitive benchmarking and field research to propose a 5-year fixed-deposit service model offering builders a 10% benefit.",
+      image:
+        "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=800",
+      tech: [
+        "Business Analysis",
+        "Market Research",
+        "Strategy",
+        "Financial Modeling",
+      ],
       github: "#",
       live: "https://docs.google.com/document/d/1f3hW2TAc8VsnFCNyycK5vNI6NNOHrO4gd_f7H0T2gF4/edit?usp=sharing",
+      isStudy: true,
+    },
+    {
+      id: 4,
+      title: "Clique (on-going)",
+      description:
+        "Developed a web app for Scaler students to securely access and track upcoming events in one place, eliminating the need to search through multiple channels.",
+      image:
+        "https://assets-v2.scaler.com/assets/programs/undergrad/webp/campus_life/culture/culture-05-1b13879faa5250ae7c3239d2dfd0a3d1d823869147753652bd22c6d6bba60bf6.webp.gz",
+      tech: [
+        "Problem Solving",
+        "User-Centric Design",
+        "Operational Efficiency",
+        "Event Coordination",
+        "Process Optimization",
+      ],
+      githubFrontend: "https://github.com/Tanush1206/CLIQUE",
+      live: "#",
       isStudy: true,
     },
   ];
@@ -46,7 +75,13 @@ const Projects: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          className={`grid gap-8 ${
+            projects.length % 2 === 0
+              ? "md:grid-cols-2 lg:grid-cols-2" // Even: 2 columns
+              : "md:grid-cols-2 lg:grid-cols-3" // Odd: 3 columns
+          }`}
+        >
           {projects.map((project) => (
             <div
               key={project.id}
@@ -60,11 +95,15 @@ const Projects: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              
+
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-white mb-3">{project.title}</h3>
-                <p className="text-white/70 mb-4 leading-relaxed">{project.description}</p>
-                
+                <h3 className="text-2xl font-bold text-white mb-3">
+                  {project.title}
+                </h3>
+                <p className="text-white/70 mb-4 leading-relaxed">
+                  {project.description}
+                </p>
+
                 <div className="flex flex-wrap gap-2 mb-6">
                   {project.tech.map((tech) => (
                     <span
@@ -75,7 +114,7 @@ const Projects: React.FC = () => {
                     </span>
                   ))}
                 </div>
-                
+
                 <div className="flex gap-4">
                   {project.github && project.github !== "#" && (
                     <a
@@ -117,8 +156,12 @@ const Projects: React.FC = () => {
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-white/80 hover:text-white transition-colors duration-300"
                     >
-                      {project.isStudy ? <FileText size={20} /> : <ExternalLink size={20} />}
-                      <span>{project.isStudy ? 'Study' : 'Live'}</span>
+                      {project.isStudy ? (
+                        <FileText size={20} />
+                      ) : (
+                        <ExternalLink size={20} />
+                      )}
+                      <span>{project.isStudy ? "Study" : "Live"}</span>
                     </a>
                   )}
                 </div>
