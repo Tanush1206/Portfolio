@@ -57,7 +57,7 @@ const Projects: React.FC = () => {
         "Event Coordination",
         "Process Optimization",
       ],
-      githubFrontend: "https://github.com/Tanush1206/CLIQUE",
+      github: "https://github.com/Tanush1206/CLIQUE",
       live: "https://frontend-clique-1.onrender.com/",
       isStudy: false,
     },
