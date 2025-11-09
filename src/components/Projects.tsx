@@ -45,7 +45,7 @@ const Projects: React.FC = () => {
     },
     {
       id: 4,
-      title: "Clique (on-going)",
+      title: "Clique",
       description:
         "Developed a web app for Scaler students to securely access and track upcoming events in one place, eliminating the need to search through multiple channels.",
       image:
@@ -58,7 +58,7 @@ const Projects: React.FC = () => {
         "Process Optimization",
       ],
       githubFrontend: "https://github.com/Tanush1206/CLIQUE",
-      live: "#",
+      live: "https://frontend-clique-1.onrender.com/",
       isStudy: true,
     },
   ];
