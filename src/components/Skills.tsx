@@ -1,81 +1,129 @@
 import React from "react";
+import { FaJava, FaNodeJs, FaCss3Alt, FaGithub, FaPython } from "react-icons/fa";
+import { SiJavascript, SiHtml5, SiReact, SiTailwindcss, SiExpress, SiNodedotjs, SiNumpy, SiPandas, SiVercel, SiNetlify, SiRender } from "react-icons/si";
+import { FaGitAlt } from "react-icons/fa6";
+
+interface HexagonProps {
+  icon: React.ReactNode;
+  name: string;
+}
+
+const Hexagon: React.FC<HexagonProps> = ({ icon, name }) => {
+  // Create a smooth hexagon path with curves
+  const hexPath = "M50,5 C55,5 85,20 90,25 C95,30 95,70 90,75 C85,80 55,95 50,95 C45,95 15,80 10,75 C5,70 5,30 10,25 C15,20 45,5 50,5 Z";
+
+  return (
+    <div className="relative w-32 h-36 flex items-center justify-center group">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          {/* Hexagon outline */}
+          <path 
+            d={hexPath} 
+            fill="none" 
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-indigo-500/30 group-hover:text-indigo-500/50 transition-colors duration-300"
+          />
+          
+          {/* Secondary border for depth */}
+          <path 
+            d={hexPath}
+            className="fill-transparent"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              color: 'rgba(99, 102, 241, 0.4)', // Lighter indigo for depth
+              filter: 'blur(0.5px)'
+            }}
+          />
+        </svg>
+      </div>
+      
+      {/* Content */}
+      <div className="z-10 flex flex-col items-center">
+        <div className="text-3xl mb-2">
+          {icon}
+        </div>
+        <div className="text-sm font-medium text-gray-700 dark:text-gray-200 mt-1">
+          {name}
+        </div>
+      </div>
+      
+    </div>
+  );
+};
 
 const Skills: React.FC = () => {
-  const skills = [
-    { name: "React", level: 78 },
-    { name: "Python", level: 80 },
-    { name: "UI/UX Design", level: 90 },
-    { name: "Java", level: 75 },
-    { name: "Tailwind CSS", level: 92 },
-    { name: "JavaScript", level: 75 },
-    { name: "CSS", level: 88 },
+  const skillCategories = [
+    {
+      title: "Languages",
+      skills: [
+        { name: "Java", icon: <FaJava className="text-red-500" /> },
+        { name: "JavaScript", icon: <SiJavascript className="text-yellow-400" /> },
+        { name: "Python", icon: <FaPython className="text-blue-400" /> },
+        { name: "HTML", icon: <SiHtml5 className="text-orange-500" /> },
+        { name: "CSS", icon: <FaCss3Alt className="text-blue-300" /> },
+      ]
+    },
+    {
+      title: "Frameworks & Libraries",
+      skills: [
+        { name: "React", icon: <SiReact className="text-blue-500" /> },
+        { name: "Tailwind CSS", icon: <SiTailwindcss className="text-cyan-400" /> },
+        { name: "Node.js", icon: <SiNodedotjs className="text-green-500" /> },
+        { name: "Express.js", icon: <SiExpress className="text-gray-800 dark:text-gray-200" /> },
+        { name: "NumPy", icon: <SiNumpy className="text-blue-600" /> },
+        { name: "Pandas", icon: <SiPandas className="text-red-500" /> },
+      ]
+    },
+    {
+      title: "Developer & AI Tools",
+      skills: [
+        { name: "Git", icon: <FaGitAlt className="text-orange-500" /> },
+        { name: "GitHub", icon: <FaGithub className="text-black dark:text-white" /> },
+        { name: "Vercel", icon: <SiVercel className="text-black dark:text-white" /> },
+        { name: "Netlify", icon: <SiNetlify className="text-teal-500" /> },
+        { name: "Render", icon: <SiRender className="text-blue-500" /> },
+        { name: "Cursor", icon: <span className="text-lg">⌨️</span> },
+        { name: "Copilot", icon: <span className="text-lg">🤖</span> },
+        { name: "Windsurf", icon: <span className="text-lg">🏄</span> },
+      ]
+    }
   ];
 
   return (
-    <section id="skills" className="py-20 px-4">
+    <section id="skills" className="py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-wider">
-            SKILLS
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4">
+            My <span className="text-indigo-600 dark:text-indigo-400">Skills</span>
           </h2>
-          <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
-            Technologies and tools I use to bring ideas to life
+          <div className="w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto mb-6 rounded-full"></div>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Here's a visual representation of my technical expertise
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
-          {skills.map((skill, index) => {
-            const radius = 50;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (skill.level / 100) * circumference;
-
-            return (
-              <div key={index} className="flex flex-col items-center space-y-4">
-                <div className="relative w-32 h-32">
-                  <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r={radius}
-                      stroke="white"
-                      strokeOpacity="0.2"
-                      strokeWidth="10"
-                      fill="transparent"
-                    />
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r={radius}
-                      stroke="url(#grad)"
-                      strokeWidth="10"
-                      fill="transparent"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={offset}
-                      strokeLinecap="round"
-                      style={{ transition: "stroke-dashoffset 1s ease" }}
-                    />
-                    <defs>
-                      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="50%" stopColor="#9333ea" />
-                        <stop offset="100%" stopColor="#ec4899" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-
-                  {/* Centered percentage label */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-white">
-                      {skill.level}%
-                    </span>
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-semibold text-white">{skill.name}</h3>
-              </div>
-            );
-          })}
-        </div>
+        {skillCategories.map((category, index) => (
+          <div key={index} className="mb-12">
+            <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+              {category.title}
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 justify-items-center">
+              {category.skills.map((skill, skillIndex) => (
+                <Hexagon 
+                  key={`${index}-${skillIndex}`}
+                  icon={skill.icon}
+                  name={skill.name}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
