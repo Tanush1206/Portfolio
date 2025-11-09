@@ -2,8 +2,8 @@ import React from 'react';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 
 const Hero: React.FC = () => {
-  const scrollToAbout = () => {
-    document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToProjects = () => {
+    document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -42,7 +42,7 @@ const Hero: React.FC = () => {
         
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up animation-delay-1500">
           <button
-            onClick={scrollToAbout}
+            onClick={scrollToProjects}
             className="group bg-white/10 backdrop-blur-lg border border-white/20 text-white px-8 py-4 rounded-full font-medium hover:bg-white/20 transition-all duration-300 flex items-center gap-2"
           >
             View My Work
@@ -65,7 +65,7 @@ const Hero: React.FC = () => {
 
       {/* Scroll indicator */}
       <button 
-        onClick={scrollToAbout}
+        onClick={scrollToProjects}
         className="absolute bottom-8 right-8 md:bottom-16 md:right-16 w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center text-white/60 hover:text-white hover:border-white/60 transition-all duration-300 group"
       >
         <ChevronDown size={20} className="group-hover:animate-bounce" />
