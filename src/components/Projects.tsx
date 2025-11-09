@@ -49,7 +49,7 @@ const Projects: React.FC = () => {
       description:
         "Developed a web app for Scaler students to securely access and track upcoming events in one place, eliminating the need to search through multiple channels.",
       image:
-        "https://assets-v2.scaler.com/assets/programs/undergrad/webp/campus_life/culture/culture-05-1b13879faa5250ae7c3239d2dfd0a3d1d823869147753652bd22c6d6bba60bf6.webp.gz",
+        "https://bsmedia.business-standard.com/_media/bs/img/article/2025-04/22/full/1745322158-1979.jpg",
       tech: [
         "Problem Solving",
         "User-Centric Design",
