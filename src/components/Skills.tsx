@@ -1,5 +1,5 @@
 import React from "react";
-import { FaJava, FaNodeJs, FaCss3Alt, FaGithub, FaPython } from "react-icons/fa";
+import { FaJava, FaCss3Alt, FaGithub, FaPython } from "react-icons/fa";
 import { SiJavascript, SiHtml5, SiReact, SiTailwindcss, SiExpress, SiNodedotjs, SiNumpy, SiPandas, SiVercel, SiNetlify, SiRender } from "react-icons/si";
 import { FaGitAlt } from "react-icons/fa6";
 
