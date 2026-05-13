@@ -1,76 +1,80 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Experience', href: '#experience' },
-    { name: 'Education', href: '#education' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'PROJ', href: '/projects' },
+    { name: 'EXP', href: '/experience' },
+    { name: 'STACK', href: '/skills' },
+    { name: 'EDU', href: '/education' },
+    { name: 'LOG', href: '/about' },
   ];
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: 'smooth' });
-    setIsOpen(false);
-  };
-
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0">
-            <span className="text-2xl font-bold text-white tracking-wider">PORTFOLIO</span>
-          </div>
-          
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
-              {navItems.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => scrollToSection(item.href)}
-                  className="text-white/80 hover:text-white px-3 py-2 text-sm font-medium transition-all duration-300 hover:bg-white/10 rounded-lg"
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          </div>
+    <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-safe py-4 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-[0_0_20px_rgba(79,70,229,0.15)]">
+      <Link to="/" className="font-headline-md text-headline-md text-primary tracking-tighter">
+        TERMINAL_LUXE
+      </Link>
+      
+      <nav className="hidden md:flex items-center space-x-8 font-code-snippet text-code-snippet">
+        {navItems.map((item) => (
+          <Link
+            key={item.name}
+            to={item.href}
+            className={`transition-colors hover:bg-primary/10 transition-all duration-300 px-2 py-1 ${
+              location.pathname === item.href ? 'text-primary bg-primary/5' : 'text-on-surface-variant hover:text-primary'
+            }`}
+          >
+            {item.name}
+          </Link>
+        ))}
+      </nav>
 
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-white/80 hover:text-white p-2"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
+      <Link 
+        to="/contact"
+        className="hidden md:block font-code-snippet text-code-snippet border border-primary px-6 py-2 text-primary hover:bg-primary hover:text-background transition-all duration-300 active:scale-95"
+      >
+        CONTACT_INIT
+      </Link>
+
+      <div className="md:hidden">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-white hover:text-primary transition-colors p-2"
+        >
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-black/40 backdrop-blur-lg border-t border-white/10">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+        <div className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-white/5 py-8 animate-fade-in">
+          <div className="flex flex-col items-center space-y-6 font-code-snippet">
             {navItems.map((item) => (
-              <button
+              <Link
                 key={item.name}
-                onClick={() => scrollToSection(item.href)}
-                className="text-white/80 hover:text-white block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-300"
+                to={item.href}
+                onClick={() => setIsOpen(false)}
+                className="text-xl font-bold text-white hover:text-primary transition-colors"
               >
                 {item.name}
-              </button>
+              </Link>
             ))}
+            <Link 
+              to="/contact"
+              onClick={() => setIsOpen(false)}
+              className="border border-primary px-8 py-3 text-primary hover:bg-primary hover:text-background transition-all"
+            >
+              CONTACT_INIT
+            </Link>
           </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 };
 
