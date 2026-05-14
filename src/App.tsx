@@ -13,11 +13,12 @@ import { Github, Linkedin, Twitter, Instagram } from 'lucide-react';
 import ScrollToTop from './components/ScrollToTop';
 import NotFound from './components/NotFound';
 
-import { SECURITY_CONFIG } from './config/security';
+// Security Master Switch: Defaults to true if not set.
+const SECURITY_ENABLED = import.meta.env.VITE_SECURITY_ENABLED !== 'false';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   React.useEffect(() => {
-    if (!SECURITY_CONFIG.enabled) return;
+    if (!SECURITY_ENABLED) return;
 
     // Disable right-click
     const handleContextMenu = (e: MouseEvent) => {
@@ -45,7 +46,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, []);
 
   return (
-    <div className={`min-h-screen bg-black text-on-surface font-body-lg selection:bg-primary/30 overflow-x-hidden w-full relative ${SECURITY_CONFIG.enabled ? 'select-none' : ''}`}>
+    <div className={`min-h-screen bg-black text-on-surface font-body-lg selection:bg-primary/30 overflow-x-hidden w-full relative ${SECURITY_ENABLED ? 'select-none' : ''}`}>
       <Navigation />
 
       <main className="relative z-10">
