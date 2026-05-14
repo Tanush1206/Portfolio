@@ -60,9 +60,13 @@ const ProjectCard: React.FC<{
               ))}
             </div>
             <div className="flex gap-6 pt-4">
-              <a className="font-code-snippet text-label-caps text-on-surface hover:text-primary transition-colors border-b border-white/10 pb-1" href={project.sourceUrl} target="_blank" rel="noopener noreferrer">[VIEW_SOURCE]</a>
+              {project.sourceUrl !== '#' && (
+                <a className="font-code-snippet text-label-caps text-on-surface hover:text-primary transition-colors border-b border-white/10 pb-1" href={project.sourceUrl} target="_blank" rel="noopener noreferrer">[VIEW_SOURCE]</a>
+              )}
               {project.demoUrl !== '#' && (
-                <a className="font-code-snippet text-label-caps text-on-surface hover:text-primary transition-colors border-b border-white/10 pb-1" href={project.demoUrl} target="_blank" rel="noopener noreferrer">[LIVE_DEMO]</a>
+                <a className="font-code-snippet text-label-caps text-on-surface hover:text-primary transition-colors border-b border-white/10 pb-1" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+                  {project.status === 'Strategy' || project.title.toLowerCase().includes('case study') ? '[VIEW_CASE_STUDY]' : '[LIVE_DEMO]'}
+                </a>
               )}
             </div>
           </div>

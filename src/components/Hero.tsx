@@ -147,7 +147,7 @@ const Hero: React.FC = () => {
               <span className="text-primary tracking-tighter">_</span>
               <span className="uppercase">Ready to build the future?</span>
             </div>
-            <p className="text-on-surface-variant max-w-lg font-body-lg">
+            <p className="text-on-surface max-w-lg font-body-lg">
               {personalInfo.statusText}
             </p>
             <div className="pt-8 flex flex-col sm:flex-row flex-wrap gap-6 md:gap-8">

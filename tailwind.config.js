@@ -67,21 +67,21 @@ export default {
         "headline": ["Space Grotesk", "sans-serif"],
       },
       fontSize: {
-        "headline-md": ["clamp(16px, 5vw, 32px)", { lineHeight: "1.3", fontWeight: "500" }],
-        "body-sm": ["13px", { lineHeight: "1.5", fontWeight: "400" }],
-        "code-snippet": ["13px", { lineHeight: "1.7", fontWeight: "400" }],
-        "body-lg": ["clamp(13px, 2vw, 18px)", { lineHeight: "1.6", fontWeight: "400" }],
-        "headline-lg-mobile": ["clamp(20px, 8vw, 40px)", { lineHeight: "1.2", fontWeight: "600" }],
-        "label-caps": ["10px", { lineHeight: "1", letterSpacing: "0.1em", fontWeight: "700" }],
-        "display-lg": ["clamp(22px, 15vw, 120px)", { lineHeight: "110%", letterSpacing: "-0.04em", fontWeight: "700" }],
-        "headline-lg": ["clamp(20px, 6vw, 64px)", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "600" }]
+        "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "500" }],
+        "body-sm": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+        "code-snippet": ["14px", { lineHeight: "1.7", fontWeight: "400" }],
+        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+        "headline-lg-mobile": ["40px", { lineHeight: "1.2", fontWeight: "600" }],
+        "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.1em", fontWeight: "700" }],
+        "display-lg": ["120px", { lineHeight: "110%", letterSpacing: "-0.04em", fontWeight: "700" }],
+        "headline-lg": ["64px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "600" }]
       },
       spacing: {
         "unit": "8px",
         "container-max": "1440px",
-        "margin-safe": "var(--margin-safe)",
-        "section-gap": "var(--section-gap)",
-        "gutter": "var(--gutter)"
+        "margin-safe": "64px",
+        "section-gap": "160px",
+        "gutter": "32px"
       },
       animation: {
         'blink': 'blink 1s step-end infinite',

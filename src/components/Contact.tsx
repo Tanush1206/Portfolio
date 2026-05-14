@@ -67,7 +67,7 @@ const Contact: React.FC = () => {
           <span className="w-3 h-3 rounded-full bg-red-500"></span>
           <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
           <span className="w-3 h-3 rounded-full bg-green-500"></span>
-          <span className="font-code-snippet text-on-surface-variant ml-4 opacity-50 uppercase">root@terminal_luxe: ~/contact</span>
+          <span className="font-code-snippet text-on-surface-variant ml-4 opacity-80 uppercase">root@terminal_luxe: ~/contact</span>
         </div>
         <div className="space-y-4">
           <h1 className="font-display-lg text-headline-lg-mobile md:text-display-lg text-primary uppercase">CONTACT_<wbr/>INIT</h1>
@@ -121,7 +121,7 @@ const Contact: React.FC = () => {
               <>
                 <div className="space-y-2">
                   <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-widest">Transmission_Data</h2>
-                  <p className="font-body-sm text-on-surface-variant opacity-70 italic">Messages are dispatched directly through our secure gateway.</p>
+                  <p className="font-body-sm text-on-surface-variant opacity-90 italic">Messages are dispatched directly through our secure gateway.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
@@ -130,7 +130,7 @@ const Contact: React.FC = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-surface-variant transition-all outline-none uppercase"
+                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-on-surface-variant/40 transition-all outline-none uppercase"
                       placeholder="ID_IDENTIFIER"
                       type="text"
                     />
@@ -141,7 +141,7 @@ const Contact: React.FC = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-surface-variant transition-all outline-none uppercase"
+                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-on-surface-variant/40 transition-all outline-none uppercase"
                       placeholder="ADDR_LOCATOR"
                       type="email"
                     />
@@ -223,7 +223,7 @@ const Contact: React.FC = () => {
             <p className="font-body-sm text-on-surface-variant opacity-80 mb-4">
               If there's any suitable role for me, don't hesitate. I'm open to communication on all channels. Let's discuss how I can contribute to your team or project.
             </p>
-            <div className="pt-4 border-t border-white/5 text-[10px] font-code-snippet text-on-surface-variant/40 uppercase">
+            <div className="pt-4 border-t border-white/5 text-[10px] font-code-snippet text-on-surface-variant/70 uppercase">
               LOC: NEW_DELHI // TIMEZONE: GMT+5:30
             </div>
           </div>

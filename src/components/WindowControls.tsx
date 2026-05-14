@@ -9,29 +9,37 @@ interface WindowControlsProps {
 
 const WindowControls: React.FC<WindowControlsProps> = ({ onClose, onMinimize, onMaximize, title }) => {
   return (
-    <div className="bg-surface-container-low px-4 py-2 flex items-center border-b border-white/10 select-none">
-      <div className="flex gap-1.5">
+    <div className="bg-black px-4 py-2 flex items-center justify-between border-b border-white/5 select-none w-full min-h-[38px]">
+      {/* Left: macOS Dots */}
+      <div className="flex gap-2 flex-shrink-0">
         <button 
           onClick={onClose}
-          className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] hover:brightness-125 transition-all shadow-[0_0_5px_rgba(255,95,86,0.3)]"
-          title="Close"
+          className="w-3 h-3 rounded-full bg-[#FF5F57] hover:brightness-110 transition-all flex-shrink-0"
+          aria-label="Close"
         />
         <button 
           onClick={onMinimize}
-          className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] hover:brightness-125 transition-all shadow-[0_0_5px_rgba(255,189,46,0.3)]"
-          title="Minimize"
+          className="w-3 h-3 rounded-full bg-[#FEBC2E] hover:brightness-110 transition-all flex-shrink-0"
+          aria-label="Minimize"
         />
         <button 
           onClick={onMaximize}
-          className="w-2.5 h-2.5 rounded-full bg-[#27c93f] hover:brightness-125 transition-all shadow-[0_0_5px_rgba(39,201,63,0.3)]"
-          title="Maximize"
+          className="w-3 h-3 rounded-full bg-[#28C840] hover:brightness-110 transition-all flex-shrink-0"
+          aria-label="Maximize"
         />
       </div>
+
+      {/* Center: Title */}
       {title && (
-        <div className="mx-auto text-[10px] font-code-snippet opacity-40 uppercase tracking-widest pl-2 truncate max-w-[150px] md:max-w-none">
-          {title}
+        <div className="flex-1 text-center truncate px-4">
+          <span className="text-[10px] font-code-snippet opacity-40 text-white uppercase tracking-widest">
+            {title}
+          </span>
         </div>
       )}
+
+      {/* Right: Spacer for balance (matches dots width) */}
+      <div className="w-12 flex-shrink-0 hidden md:block" />
     </div>
   );
 };
