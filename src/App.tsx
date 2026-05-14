@@ -13,7 +13,7 @@ import NotFound from './components/NotFound';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-black text-on-surface font-body-lg selection:bg-primary/30">
+    <div className="min-h-screen bg-black text-on-surface font-body-lg selection:bg-primary/30 overflow-x-hidden w-full relative">
       <Navigation />
       
       <main className="relative z-10">
@@ -21,27 +21,27 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </main>
       
       {/* Floating Action Button - Direct Email */}
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50">
         <a 
           href="mailto:tanushthakran.work@gmail.com"
-          className="bg-primary text-background p-4 flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all rounded-none"
+          className="bg-primary text-background p-3 md:p-4 flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all rounded-none"
           title="Direct Email"
         >
-          <span className="material-symbols-outlined">mail</span>
+          <span className="material-symbols-outlined text-sm md:text-base">mail</span>
         </a>
       </div>
 
-      <footer className="w-full bg-surface border-t border-white/5 py-section-gap mt-section-gap">
-        <div className="w-full flex flex-col md:flex-row justify-between items-center px-margin-safe max-w-container-max mx-auto">
-          <div className="text-on-surface font-bold font-headline-md text-headline-md tracking-tighter mb-8 md:mb-0 uppercase">
+      <footer className="w-full bg-surface border-t border-white/5 py-12 md:py-section-gap mt-12 md:mt-section-gap">
+        <div className="w-full flex flex-col md:flex-row justify-between items-center px-margin-safe max-w-container-max mx-auto text-center md:text-left gap-8">
+          <div className="text-on-surface font-bold font-headline-md text-xl md:text-headline-md tracking-tighter uppercase">
             TERMINAL_LUXE
           </div>
-          <div className="flex gap-12 font-code-snippet text-label-caps text-on-surface-variant uppercase tracking-widest font-bold">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-12 font-code-snippet text-[10px] md:text-label-caps text-on-surface-variant uppercase tracking-widest font-bold">
             <a className="hover:text-tertiary transition-colors cursor-pointer opacity-80 hover:opacity-100" href="https://github.com/Tanush1206" target="_blank" rel="noopener noreferrer">GITHUB</a>
             <a className="hover:text-tertiary transition-colors cursor-pointer opacity-80 hover:opacity-100" href="https://linkedin.com/in/tanush-thakran-1b54a8327" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
             <a className="hover:text-tertiary transition-colors cursor-pointer opacity-80 hover:opacity-100" href="#">SOURCE</a>
           </div>
-          <div className="mt-8 md:mt-0 font-code-snippet text-label-caps text-tertiary opacity-50 uppercase tracking-widest font-bold">
+          <div className="font-code-snippet text-[8px] md:text-label-caps text-tertiary opacity-50 uppercase tracking-widest font-bold">
             © 2024 DEV_ARCHITECT. ALL RIGHTS RESERVED.
           </div>
         </div>

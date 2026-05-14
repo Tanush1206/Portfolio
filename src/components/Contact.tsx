@@ -70,7 +70,7 @@ const Contact: React.FC = () => {
           <span className="font-code-snippet text-on-surface-variant ml-4 opacity-50 uppercase">root@terminal_luxe: ~/contact</span>
         </div>
         <div className="space-y-4">
-          <h1 className="font-display-lg text-display-lg text-primary uppercase">Contact_Init</h1>
+          <h1 className="font-display-lg text-headline-lg-mobile md:text-display-lg text-primary uppercase">CONTACT_<wbr/>INIT</h1>
           <div className="flex items-center font-code-snippet text-headline-md text-tertiary">
             <span className="mr-4 uppercase">&gt;</span>
             <span className="uppercase">initiate --contact --direct</span>
@@ -162,11 +162,11 @@ const Contact: React.FC = () => {
                       type="button"
                       onClick={handleManualSubmit}
                       disabled={status === 'sending'}
-                      className={`group relative inline-flex items-center justify-center px-12 py-4 border border-primary font-code-snippet text-primary overflow-hidden transition-all duration-300 ${status === 'sending' ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-surface-container-lowest'} uppercase`}
+                      className={`group relative inline-flex items-center justify-center px-4 md:px-12 py-4 border border-primary font-code-snippet text-primary overflow-hidden transition-all duration-300 ${status === 'sending' ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-surface-container-lowest'} uppercase text-xs md:text-base w-full md:w-auto`}
                     >
-                      <span className="relative z-10 flex items-center gap-4">
-                        {status === 'sending' ? 'DISPATCHING_DATA...' : 'Execute_Dispatch.sh'}
-                        <span className={`material-symbols-outlined text-[18px] ${status === 'sending' ? 'animate-bounce' : ''}`}>send</span>
+                      <span className="relative z-10 flex items-center gap-2 md:gap-4 break-all">
+                        {status === 'sending' ? 'DISPATCHING...' : 'EXECUTE_DISPATCH.SH'}
+                        <span className={`material-symbols-outlined text-[14px] md:text-[18px] ${status === 'sending' ? 'animate-bounce' : ''}`}>send</span>
                       </span>
                     </button>
                   </div>

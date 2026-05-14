@@ -16,7 +16,7 @@ const Navigation: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-safe py-4 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-[0_0_20px_rgba(79,70,229,0.15)]">
-      <Link to="/" className="font-headline-md text-headline-md text-primary tracking-tighter">
+      <Link to="/" className="font-headline-md text-xl md:text-headline-md text-primary tracking-tighter truncate max-w-[60%] md:max-w-none">
         TERMINAL_LUXE
       </Link>
       
