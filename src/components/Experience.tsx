@@ -13,6 +13,20 @@ const formatTerminalString = (str: string) => {
   ));
 };
 
+const renderHighlightedText = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={i} className="text-primary font-bold">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+};
+
 const ExperienceCard: React.FC<{ exp: ExperienceEntry }> = ({ exp }) => {
   const [isClosed, setIsClosed] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -65,7 +79,9 @@ const ExperienceCard: React.FC<{ exp: ExperienceEntry }> = ({ exp }) => {
                 {exp.highlights.map((point, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span className="font-code-snippet text-primary mt-1">&gt;</span>
-                    <p className="font-body-sm text-body-sm text-on-surface-variant">{point}</p>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant">
+                      {renderHighlightedText(point)}
+                    </p>
                   </div>
                 ))}
               </div>

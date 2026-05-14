@@ -14,6 +14,20 @@ export interface ExperienceEntry {
 
 export const experiences: ExperienceEntry[] = [
   {
+    period:   '2025.10 // 2026.03',
+    role:     'Junior_Manager',
+    company:  '@AIESEC_in_Bengaluru',
+    location: 'Bengaluru, India',
+    highlights: [
+      '[OCT-JAN] Managed operations for the **Outgoing Global Volunteer** department, facilitating international leadership opportunities.',
+      '[FEB-MAR] Transitioned to the **Incoming Global Volunteer** department, overseeing project management and intern integration.',
+      'Facilitated recruitment, selection, and preparation for global exchange programs.',
+      'Coordinated with international partners to ensure quality delivery of volunteer experiences.',
+      'Led a team to achieve departmental goals and enhance organizational reach within Bengaluru.',
+    ],
+    tech: ['LEADERSHIP', 'OPERATIONS', 'OGV_DEPT', 'IGV_DEPT', 'TEAM_MANAGEMENT'],
+  },
+  {
     period:   '2025.12 // 2026.01',
     role:     'App_Developer_Intern',
     company:  '@CYPARTA',
