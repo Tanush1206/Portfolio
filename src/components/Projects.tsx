@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { projects, Project } from '../data/projects';
 import WindowControls from './WindowControls';
 
@@ -15,19 +16,29 @@ const formatTerminalString = (str: string) => {
 const ProjectCard: React.FC<{ 
   project: Project, 
   onClose: (id: string) => void,
-  isClosed: boolean 
-}> = ({ project, onClose, isClosed }) => {
+  isClosed: boolean,
+  isHighlighted?: boolean
+}> = ({ project, onClose, isClosed, isHighlighted }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isFullWidth, setIsFullWidth] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isHighlighted && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isHighlighted]);
 
   if (isClosed) return null;
 
-  const cardClasses = `glass-card p-0 overflow-hidden border border-white/10 group transition-all duration-500 hover:border-primary/50 ${
+  const cardClasses = `glass-card p-0 overflow-hidden border transition-all duration-500 group ${
+    isHighlighted ? 'border-primary shadow-[0_0_30px_rgba(39,201,63,0.3)] ring-1 ring-primary/50 scale-[1.02]' : 'border-white/10 hover:border-primary/50'
+  } ${
     isFullWidth ? 'md:col-span-12' : project.layout === 'featured' || project.layout === 'wide' ? 'md:col-span-8' : project.layout === 'terminal' ? 'md:col-span-12' : 'md:col-span-4'
-  } ${isMinimized ? 'h-fit' : ''}`;
+  } ${isMinimized ? 'h-fit self-start' : 'h-full'}`;
 
   return (
-    <div className={cardClasses}>
+    <div id={project.id} ref={cardRef} className={cardClasses}>
       <WindowControls 
         onClose={() => onClose(project.id)}
         onMinimize={() => setIsMinimized(!isMinimized)}
@@ -72,6 +83,18 @@ const ProjectCard: React.FC<{
 
 const Projects: React.FC = () => {
   const [closedIds, setClosedIds] = useState<string[]>([]);
+  const location = useLocation();
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+      setHighlightedId(hash);
+      // Remove highlight after 3 seconds
+      const timer = setTimeout(() => setHighlightedId(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   const handleClose = (id: string) => {
     setClosedIds(prev => [...prev, id]);
@@ -114,6 +137,7 @@ const Projects: React.FC = () => {
             project={project} 
             onClose={handleClose}
             isClosed={closedIds.includes(project.id)}
+            isHighlighted={highlightedId === project.id}
           />
         ))}
       </div>

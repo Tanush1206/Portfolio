@@ -18,7 +18,7 @@ export const experiences: ExperienceEntry[] = [
     role:     'App_Developer_Intern',
     company:  '@CYPARTA',
     location: 'Cairo , EGYPT',
-    projectLink: '/projects', // Linking to the projects page where ATW is detailed
+    projectLink: '/projects#atw', // Linking to the projects page with a hash to trigger highlighting
     highlights: [
       'Developed the **Driver & Medic** mobile application, focusing on high-criticality logistics and real-time coordination.',
       'Implemented end-to-end trip workflows including request acceptance, live status tracking, and navigation integration.',
