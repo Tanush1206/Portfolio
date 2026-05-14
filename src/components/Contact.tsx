@@ -56,7 +56,7 @@ const Contact: React.FC = () => {
   return (
     <div className="relative z-10 pt-section-gap px-margin-safe max-w-container-max mx-auto min-h-screen flex flex-col overflow-hidden">
       {/* Background Layer (Grid) */}
-      <div className="fixed inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(to right, #4f46e5 1px, transparent 1px), linear-gradient(to bottom, #4f46e5 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background"></div>
       </div>

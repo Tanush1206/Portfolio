@@ -93,6 +93,24 @@ const About: React.FC = () => {
                 <p className="font-body-sm text-xs text-on-surface-variant uppercase">Clean code and optimized systems.</p>
               </div>
             </div>
+            <div className="pt-12 flex flex-col sm:flex-row gap-6">
+              <a 
+                href="/docs/tanush_thakran_resume.pdf" 
+                download 
+                className="flex-1 flex items-center justify-center gap-4 py-4 px-6 bg-primary/10 border border-primary/20 text-primary font-code-snippet uppercase hover:bg-primary hover:text-black transition-all group"
+              >
+                <span className="material-symbols-outlined group-hover:animate-bounce">download</span>
+                DOWNLOAD_RESUME.EXE
+              </a>
+              <a 
+                href="/docs/Portfolio ft. Tanush Thakran.pdf" 
+                download 
+                className="flex-1 flex items-center justify-center gap-4 py-4 px-6 bg-tertiary/10 border border-tertiary/20 text-tertiary font-code-snippet uppercase hover:bg-tertiary hover:text-black transition-all group"
+              >
+                <span className="material-symbols-outlined group-hover:rotate-12 transition-transform">download</span>
+                DOWNLOAD_PORTFOLIO.EXE
+              </a>
+            </div>
           </div>
 
           <div className="flex gap-gutter">
