@@ -21,7 +21,6 @@ coverage/
 !.env.example
 !.env.sample
 # Private certificate assets used locally, not meant for the repo
-public/certs/
 
 # Editor directories and files
 .vscode/*
