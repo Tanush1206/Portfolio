@@ -14,7 +14,7 @@ export const certificates: CertificateEntry[] = [
     issuer: "Scrimba",
     date: "FEB 2026",
     id: "SCRIMBA-JS-2026",
-    link: "https://scrimba.com/certificate",
+    link: "/certs/scrimba_js.jpeg",
     image: "/certs/scrimba_js.jpeg",
     logo: "/certs/scrimba_logo.webp"
   },
@@ -23,8 +23,26 @@ export const certificates: CertificateEntry[] = [
     issuer: "Tutedude",
     date: "APR 2026",
     id: "TD-TANU-PY-0908",
-    link: "https://tutedude.com/verify",
+    link: "/certs/tutedude_py.jpeg",
     image: "/certs/tutedude_py.jpeg",
     logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgtsoUhhVZ5dXNqJmc_MnlJ_dHCZr0ZTwLTQ&s"
+  },
+  {
+    title: "Data Science",
+    issuer: "CWH Official",
+    date: "JUL 2026",
+    id: "CWH-DS-2026",
+    link: "/certs/data_science.jpg",
+    image: "/certs/data_science.jpg",
+    logo: "/certs/cwhofficial_logo.jpg"
+  },
+  {
+    title: "AI Fluency",
+    issuer: "Anthropic",
+    date: "JUL 2026",
+    id: "ANTHROPIC-AI-FLUENCY-2026",
+    link: "/certs/ai_fluency.png",
+    image: "/certs/ai_fluency.png",
+    logo: "/certs/anthropic_logo.png"
   }
 ];
