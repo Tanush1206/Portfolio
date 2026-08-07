@@ -18,6 +18,17 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: 'rag-based-ai',
+    title: 'RAG_BASED_AI',
+    description: `A fully offline Retrieval-Augmented QA pipeline that turns course videos into a searchable knowledge base and answers natural-language questions grounded strictly in retrieved transcript context — no external APIs, every model runs locally. The end-to-end flow chains ffmpeg audio extraction, timestamped Whisper transcription, embedding generation via a local bge-m3 model, and top-k retrieval over cosine similarity. Only the highest-scoring chunks are fed to a local deepseek-r1 LLM through Ollama, with prompts that constrain every answer to a cited video, title, and timestamp — making responses traceable and hallucination-resistant by construction. Embedding throughput was tuned by batching chunk requests to keep the runner stable across large transcript sets.`,
+    tags: ['PYTHON', 'RAG', 'WHISPER', 'OLLAMA', 'EMBEDDINGS', 'VECTOR_RETRIEVAL', 'LOCAL_LLM'],
+    sourceUrl: 'https://github.com/Tanush1206/rag_based_ai',
+    demoUrl: '#',
+    status: 'Offline_Pipeline',
+    pathLabel: 'SRC: /ai/rag-based-ai',
+    layout: 'terminal', // Lead project: full-width row at the top of the grid
+  },
+  {
     id: 'atw',
     title: 'ATW_MOBILE',
     description: `Built an AI-driven platform designed to help non-legal users understand complex legal documents by automatically converting legal jargon into clear, concise, and easy-to-read language. The solution empowers individuals, startups, and small businesses to make faster, more informed decisions without requiring deep legal expertise.`,
@@ -25,7 +36,7 @@ export const projects: Project[] = [
     sourceUrl: 'https://github.com/NeuralSynth/cyparta-atw-frontend-android',
     demoUrl: '#',
     status: 'Mobile_Solution',
-    layout: 'featured', // Making it the featured project since it's now first
+    layout: 'featured', // Lead card of the second row
     pathLabel: 'SRC: /deploy/atw-mobile',
   },
   {
@@ -37,7 +48,7 @@ export const projects: Project[] = [
     demoUrl: 'https://pactpal-frontend.onrender.com/',
     status: 'Production_Ready',
     pathLabel: 'SRC: /ai/pactpal',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDhaVr6zepBbECJoBkQCDSoIBuTj9DoRvFfruivGECB1cwzAhuKYWMeaSPdhx27sE2wmyrLz07D5zlYaQMQ92VJCDGYzZm1xwdv5dmlNLOsjSj1kydF3u0hy-GTy6mcCSp5nkPbPa7p9aBFQSdFQcpdAEP4qBG_1FmzvBQnv5DMNh-L5099NMUkKKoTX1Asv51_PSRjdRX64sb3CHL3IK4U_Qq9JcUFVJwnlX6T7DzGewHahZPLttg-gPO_uOmijHWLLt8Mi1TXkYl9',
+    imgSrc: '/images/project-pactpal.png',
     imgAlt: 'PactPal',
     layout: 'card',
   },
@@ -60,7 +71,7 @@ export const projects: Project[] = [
     demoUrl: '#',
     status: 'Production_Ready',
     pathLabel: 'SRC: /deploy/aasrah-platform',
-    imgSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuChN7oU87d5xxkSWine-9Lms2zmz2XBhUzJcY86c-7ttKH5aKqAWadOSzLN-XBlmnUkSPt6qrgnJbyAKaDmUzNO1-Q7CsMglKqpeTM0QDbSNP4hk2GSbRqaQmtlwd2kBruzW99O6wVwo296DlZMOTG2ehb7fKrGG4ZbdFJa2HiS75Junk8c49fUTMefP5K9D3hEhDl4RCyKYY3bBJTeRICSv2VIvoc0XfsMdzIR5j5YBbuUmBKP-EJ60HOU5uSuNnZVb-9SivAbiTMD',
+    imgSrc: '/images/project-aasrah.png',
     imgAlt: 'AASRAH',
     layout: 'wide', // Swapping AASRAH to the wide layout position
   },

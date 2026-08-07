@@ -2,16 +2,6 @@ import React, { useState } from 'react';
 import { certificates, CertificateEntry } from '../data/certificates';
 import WindowControls from './WindowControls';
 
-const formatTerminalString = (str: string) => {
-  if (typeof str !== 'string') return str;
-  return str.split('_').map((part, i, arr) => (
-    <React.Fragment key={i}>
-      {part}
-      {i < arr.length - 1 && <>_<wbr /></>}
-    </React.Fragment>
-  ));
-};
-
 const CertificateCard: React.FC<{
   cert: CertificateEntry,
   onClose: (id: string) => void,
@@ -61,9 +51,9 @@ const CertificateCard: React.FC<{
 
           <div className="mt-auto space-y-4">
             <div className="p-4 bg-black/40 border border-white/5 font-code-snippet text-[10px] text-on-surface-variant flex flex-col gap-2">
-              <div className="flex justify-between">
-                <span className="opacity-40">DOC_ID:</span>
-                <span>{cert.id}</span>
+              <div className="flex justify-between gap-2">
+                <span className="opacity-40 flex-shrink-0">DOC_ID:</span>
+                <span className="break-all text-right min-w-0">{cert.id}</span>
               </div>
               <div className="flex justify-between">
                 <span className="opacity-40">STATUS:</span>
@@ -111,7 +101,7 @@ const Certificates: React.FC = () => {
         </div>
         <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface uppercase">
           VERIFIED_<wbr />CREDENTIALS
-          <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+          <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
           A cryptographic record of specialized training, technical certifications, and validated skill-modules.

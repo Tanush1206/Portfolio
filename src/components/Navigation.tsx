@@ -27,12 +27,13 @@ const Navigation: React.FC = () => {
         </div>
       </Link>
 
-      <nav className="hidden md:flex items-center space-x-8 font-code-snippet text-code-snippet">
+      <nav aria-label="Main navigation" className="hidden md:flex items-center space-x-8 font-code-snippet text-code-snippet">
         {navItems.map((item) => (
           <Link
             key={item.name}
             to={item.href}
-            className={`transition-colors hover:bg-primary/10 transition-all duration-300 px-2 py-1 ${location.pathname === item.href ? 'text-primary bg-primary/5' : 'text-on-surface-variant hover:text-primary'
+            aria-current={location.pathname === item.href ? 'page' : undefined}
+            className={`hover:bg-primary/10 transition-all duration-300 px-2 py-1 ${location.pathname === item.href ? 'text-primary bg-primary/5' : 'text-on-surface-variant hover:text-primary'
               }`}
           >
             {item.name}
@@ -51,15 +52,18 @@ const Navigation: React.FC = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="text-white hover:text-primary transition-colors p-2"
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isOpen}
+          aria-controls="mobile-menu"
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-white/5 py-8 animate-fade-in">
-          <div className="flex flex-col items-center space-y-6 font-code-snippet">
+        <div id="mobile-menu" className="md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-white/5 py-8 animate-fade-in">
+          <nav aria-label="Mobile navigation" className="flex flex-col items-center space-y-6 font-code-snippet">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -77,7 +81,7 @@ const Navigation: React.FC = () => {
             >
               CONTACT_INIT
             </Link>
-          </div>
+          </nav>
         </div>
       )}
     </header>

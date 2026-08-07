@@ -50,7 +50,7 @@ const Skills: React.FC = () => {
         </div>
         <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface mb-6 uppercase">
           STACK_<wbr/>ANALYSIS
-          <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+          <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
           A comprehensive breakdown of technical proficiencies, specialized frameworks, and engineering tools utilized in my development pipeline.

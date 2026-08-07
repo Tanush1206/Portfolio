@@ -21,20 +21,20 @@ const NotFound: React.FC = () => {
             ERROR_SYSTEM_FAILURE
           </h1>
           
-          <div className="glass-panel p-8 bg-surface-container-lowest/50 border-l-4 border-l-primary flex flex-col gap-4">
-            <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+          <div className="glass-panel p-6 sm:p-8 bg-surface-container-lowest/50 border-l-4 border-l-primary flex flex-col gap-4">
+            <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed break-words">
               &gt; The requested module could not be located in the current directory. <br/>
               &gt; Data packet lost in transit through hyper-thread protocols.
             </p>
-            <div className="flex items-center gap-2 font-code-snippet text-code-snippet text-tertiary">
-              <span className="material-symbols-outlined">terminal</span>
-              <span>ERR_CODE: 0x00000404_NULL_REF</span>
+            <div className="flex items-center gap-2 font-code-snippet text-code-snippet text-tertiary min-w-0">
+              <span className="material-symbols-outlined flex-shrink-0">terminal</span>
+              <span className="break-all">ERR_CODE: 0x00000404_NULL_REF</span>
             </div>
           </div>
-          
+
           <div className="mt-4">
-            <Link className="group relative inline-flex items-center justify-center px-10 py-5 font-code-snippet text-code-snippet bg-transparent border border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black active:scale-95 glow-indigo" to="/">
-              <span className="mr-2">_</span> RETURNING_TO_MAIN_FRAME
+            <Link className="group relative inline-flex max-w-full items-center justify-center px-6 sm:px-10 py-4 sm:py-5 font-code-snippet text-code-snippet bg-transparent border border-primary text-primary transition-all duration-300 hover:bg-primary hover:text-black active:scale-95 glow-indigo text-center break-words" to="/">
+              <span className="mr-2 flex-shrink-0">_</span> RETURNING_TO_MAIN_FRAME
             </Link>
           </div>
         </div>
@@ -44,7 +44,7 @@ const NotFound: React.FC = () => {
           <div className="relative w-full aspect-square max-w-[500px]">
             {/* Wireframe Cube Glitch Visual */}
             <div className="absolute inset-0 border border-primary/20 rotate-12 flex items-center justify-center overflow-hidden">
-              <img alt="3D Wireframe Glitch" className="w-full h-full object-cover opacity-60 mix-blend-screen grayscale contrast-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHZEuz-m63nVU8HKv0eYXjoJ2-cDR40thwi2j_ptYSCHZrHw0w8MdPauXuPHyqveFxADGBc6bjnNrFdMIAkLfaVBttUHbiyIwgT40lXW2XZScja7XPVobYOG1XVXukrXcUwsI73GPDdNSNhVpdgx7v2-WWJA7qC4ziGWj0JiYTzrwtJ9jYYo8KrCfpiEftIQS3mPa3nMMqVSusCfcbc0NmCymAKmL8uXyj6xbQxV2HeBF3zd3Xhd0qGPjxpVEgAcTXiJZo4UKKv0K0"/>
+              <img alt="3D Wireframe Glitch" className="w-full h-full object-cover opacity-60 mix-blend-screen grayscale contrast-150" src="/images/glitch-404.png"/>
             </div>
             {/* Status Indicators in corners */}
             <div className="absolute top-0 left-0 p-4 font-code-snippet text-[10px] text-primary/40 uppercase">Sector_7G</div>
@@ -59,7 +59,7 @@ const NotFound: React.FC = () => {
       
       {/* Terminal Output Log */}
       <div className="w-full max-w-container-max mx-auto mt-20 border-t border-white/5 pt-12 overflow-hidden">
-        <div className="font-code-snippet text-[12px] text-on-surface-variant/40 flex flex-col gap-1">
+        <div className="font-code-snippet text-[10px] sm:text-[12px] text-on-surface-variant/40 flex flex-col gap-1 break-words">
           <div>[14:23:01] INITIALIZING SEARCH FOR MODULE 'PAGE_IDENTITY'...</div>
           <div>[14:23:01] CHECKING CACHE: MISS</div>
           <div>[14:23:02] CHECKING CLUSTER_B: MISS</div>

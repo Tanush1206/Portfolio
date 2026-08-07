@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { personalInfo, heroStats } from '../data/personal';
+import { projects } from '../data/projects';
 import WindowControls from './WindowControls';
+
+// The three most recent builds get a preview card on the landing page.
+const featuredProjects = projects.slice(0, 3);
 
 const Hero: React.FC = () => {
   const [isAboutClosed, setIsAboutClosed] = useState(false);
@@ -19,7 +23,7 @@ const Hero: React.FC = () => {
           <img
             alt="Mascot"
             className="w-[300px] md:w-[600px] h-auto object-contain filter grayscale invert brightness-500"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOS3LfqMSZ5rp1d1Hvt26XXcJOHwF2tnr9jQasdGBSokSSftSK6Q-fYn9sqbLq8xBqpUgyRn-0ZvRDvStGAaFK-mQNAWYsdj7NBrTlpCxL1t_UnmbgvK6O93XEEf2dB4_6ztjE9uaeNnmsFw3owAb22ik9g8N770yhPaDNTQ97S-pWv9JKE02YAL35n3UKtVYc7f7q2kFwwmMYNI4BtD-CwyqRTtLLlQP49AH89GiQ2o6uDOyTTyHYWuwXCCDwStiMDIswtcnDmr6s"
+            src="/images/mascot-hero.png"
           />
         </div>
 
@@ -43,9 +47,22 @@ const Hero: React.FC = () => {
             <Link to="/projects" className="w-full md:w-auto px-10 py-4 border border-primary bg-transparent text-primary font-code-snippet text-sm md:text-lg uppercase tracking-widest hover:bg-primary hover:text-background transition-all duration-300 text-center">
               View Work
             </Link>
-            <div className="font-code-snippet text-on-surface-variant flex items-center gap-2 text-xs md:text-base">
-              <span className="text-primary">&gt;</span> run setup_meeting.sh <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle"></span>
-            </div>
+            <a
+              href={personalInfo.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full md:w-auto px-10 py-4 border border-white/20 bg-transparent text-on-surface font-code-snippet text-sm md:text-lg uppercase tracking-widest hover:border-tertiary hover:text-tertiary transition-all duration-300 text-center"
+            >
+              Resume
+            </a>
+            <Link
+              to="/contact"
+              className="font-code-snippet text-on-surface-variant hover:text-primary flex items-center gap-2 text-xs md:text-base transition-colors group"
+            >
+              <span className="text-primary">&gt;</span>
+              <span className="group-hover:underline">run setup_meeting.sh</span>
+              <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle"></span>
+            </Link>
           </div>
         </div>
 
@@ -121,16 +138,45 @@ const Hero: React.FC = () => {
             SCROLL_TO_EXPLORE_WORKSPACE.sh
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-8 h-auto">
-          <div className="md:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-            {heroStats.map((stat, i) => (
-              <div key={i} className="glass-card p-8 flex flex-col items-center justify-center text-center space-y-2 border border-white/5 hover:border-primary/30 transition-all">
-                <div className="text-display-md font-display-lg text-primary">{stat.value}</div>
-                <div className="font-code-snippet text-label-caps text-on-surface-variant uppercase">{stat.label}</div>
+        {/* Featured project cards — deep-link into the highlighted card on /projects */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {featuredProjects.map((project) => (
+            <Link
+              key={project.id}
+              to={`/projects#${project.id}`}
+              className="glass-card p-8 flex flex-col gap-4 border border-white/5 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 group"
+            >
+              <div className="flex items-center gap-2 text-tertiary font-code-snippet text-[10px] uppercase tracking-tighter">
+                <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>terminal</span>
+                <span className="truncate">{project.status}</span>
               </div>
-            ))}
-          </div>
+              <h3 className="font-headline-md text-headline-md text-white uppercase break-words leading-tight group-hover:text-primary transition-colors">
+                {project.title}
+              </h3>
+              <p className="font-body-sm text-on-surface-variant leading-relaxed line-clamp-3">
+                {project.description}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-auto pt-4">
+                {project.tags.slice(0, 3).map((tag) => (
+                  <span key={tag} className="px-2 py-1 border border-primary/20 bg-primary/5 font-code-snippet text-[9px] text-primary uppercase tracking-widest">{tag}</span>
+                ))}
+              </div>
+              <span className="font-code-snippet text-[10px] text-primary/70 uppercase tracking-widest group-hover:translate-x-1 transition-transform">
+                Inspect_Build &gt;
+              </span>
+            </Link>
+          ))}
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {heroStats.map((stat, i) => (
+            <div key={i} className="glass-card p-8 flex flex-col items-center justify-center text-center space-y-2 border border-white/5 hover:border-primary/30 transition-all">
+              <div className="text-display-md font-display-lg text-primary">{stat.value}</div>
+              <div className="font-code-snippet text-label-caps text-on-surface-variant uppercase">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
         <div className="mt-12 text-center">
           <Link to="/projects" className="inline-block font-code-snippet text-primary hover:underline uppercase tracking-widest">View_All_Projects &gt;</Link>
         </div>

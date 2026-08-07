@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { experiences, ExperienceEntry } from '../data/experience';
+import { personalInfo } from '../data/personal';
 import WindowControls from './WindowControls';
 
 const formatTerminalString = (str: string) => {
@@ -33,10 +34,10 @@ const ExperienceCard: React.FC<{ exp: ExperienceEntry }> = ({ exp }) => {
 
   if (isClosed) {
     return (
-      <div className="relative mb-gutter md:mb-section-gap pl-12 opacity-30 group">
+      <div className="relative mb-gutter md:mb-section-gap pl-8 md:pl-12 opacity-30 group">
         <div className="absolute left-[-4px] md:left-3.5 w-3 h-3 bg-white/20 border-4 border-background rounded-full z-20"></div>
-        <div className="glass-card border border-dashed border-white/10 p-4 flex justify-between items-center">
-          <span className="font-code-snippet text-[10px] uppercase">EXP_LOG_{exp.period.replace(/\s+/g, '_')}_CLOSED</span>
+        <div className="glass-card border border-dashed border-white/10 p-4 flex flex-wrap justify-between items-center gap-2">
+          <span className="font-code-snippet text-[10px] uppercase break-all min-w-0">EXP_LOG_{exp.period.replace(/\s+/g, '_')}_CLOSED</span>
           <button 
             onClick={() => setIsClosed(false)}
             className="text-primary font-code-snippet text-[10px] hover:underline uppercase"
@@ -111,6 +112,25 @@ const ExperienceCard: React.FC<{ exp: ExperienceEntry }> = ({ exp }) => {
 };
 
 const Experience: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [connectStatus, setConnectStatus] = useState('');
+
+  // Hands off to the visitor's mail client with their address as reply-to,
+  // so the prompt actually does something instead of just looking clickable.
+  const handleConnect = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setConnectStatus('[ERR] Malformed address — check and retry.');
+      return;
+    }
+    setConnectStatus('[OK] Opening mail client...');
+    const subject = encodeURIComponent('Opportunity for Tanush Thakran');
+    const body = encodeURIComponent(`Reply to: ${value}\n\n`);
+    window.location.href = `mailto:${personalInfo.email}?subject=${subject}&body=${body}`;
+    setEmail('');
+  };
+
   return (
     <div className="pt-32 pb-section-gap px-margin-safe max-w-container-max mx-auto relative overflow-hidden">
       {/* Mascot Background Element */}
@@ -128,7 +148,7 @@ const Experience: React.FC = () => {
         </div>
           <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface uppercase">
             DEPLOYMENT_<wbr/>HISTORY
-            <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+            <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
           </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
           A sequential log of technical execution, systems architecture, and software deployments.
@@ -144,7 +164,7 @@ const Experience: React.FC = () => {
         ))}
 
         {/* Status: Ready for Next Mission */}
-        <div className="relative pl-12">
+        <div className="relative pl-8 md:pl-12">
           <div className="absolute left-[-4px] md:left-3.5 w-3 h-3 bg-tertiary border-4 border-background rounded-full z-20 animate-pulse"></div>
           <div className="font-code-snippet text-tertiary text-sm uppercase tracking-widest">
             Awaiting_Next_Deployment...
@@ -155,16 +175,31 @@ const Experience: React.FC = () => {
       {/* Command Line Call to Action */}
       <section className="mt-section-gap flex flex-col items-center">
         <div className="glass-card border border-white/10 p-gutter w-full max-w-3xl">
-          <div className="font-code-snippet text-tertiary mb-4 uppercase">root@terminal_luxe:~$ hire --talent "Tanush Thakran"</div>
-          <div className="flex items-center gap-4 border-b border-primary/20 pb-4">
-            <span className="font-code-snippet text-primary text-xl">&gt;</span>
-            <input 
-              className="bg-transparent border-none focus:ring-0 w-full font-code-snippet text-on-surface placeholder:text-on-surface-variant/30 outline-none uppercase" 
-              placeholder="ENTER_EMAIL_FOR_CONNECTION..." 
-              type="text"
+          <div className="font-code-snippet text-tertiary mb-4 uppercase break-words">root@terminal_luxe:~$ hire --talent "Tanush Thakran"</div>
+          <form onSubmit={handleConnect} className="flex flex-wrap items-center gap-3 sm:gap-4 border-b border-primary/20 pb-4">
+            <span className="font-code-snippet text-primary text-xl flex-shrink-0" aria-hidden="true">&gt;</span>
+            <label htmlFor="connect-email" className="sr-only">Your email address</label>
+            <input
+              id="connect-email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-transparent border-none focus:ring-0 flex-1 min-w-0 basis-40 font-code-snippet text-on-surface placeholder:text-on-surface-variant/30 outline-none uppercase"
+              placeholder="ENTER_EMAIL_FOR_CONNECTION..."
+              type="email"
+              autoComplete="email"
             />
-            <button className="bg-primary text-on-primary px-6 py-2 font-label-caps uppercase text-[10px] hover:opacity-90 transition-opacity">Send_Exec</button>
-          </div>
+            <button
+              type="submit"
+              className="bg-primary text-on-primary px-6 py-2 font-label-caps uppercase text-[10px] hover:opacity-90 transition-opacity flex-shrink-0"
+            >
+              Send_Exec
+            </button>
+          </form>
+          {connectStatus && (
+            <p role="status" className="mt-4 font-code-snippet text-[11px] text-primary uppercase tracking-widest break-words">
+              {connectStatus}
+            </p>
+          )}
           <div className="mt-4 font-code-snippet text-label-caps text-on-surface-variant/50 uppercase">Status: System_Ready</div>
         </div>
       </section>

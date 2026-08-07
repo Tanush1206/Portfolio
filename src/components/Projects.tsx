@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { projects, Project } from '../data/projects';
+import { personalInfo } from '../data/personal';
 import WindowControls from './WindowControls';
 
 const formatTerminalString = (str: string) => {
@@ -88,17 +89,90 @@ const ProjectCard: React.FC<{
 const Projects: React.FC = () => {
   const [closedIds, setClosedIds] = useState<string[]>([]);
   const location = useLocation();
+  const navigate = useNavigate();
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [command, setCommand] = useState('');
+  const [commandOutput, setCommandOutput] = useState('');
+
+  const runCommand = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Strip flags (`contact --now`) and normalise so the prompt is forgiving.
+    const input = command.trim().toLowerCase();
+    if (!input) return;
+    const verb = input.split(/\s+/)[0].replace(/^-+/, '');
+
+    const say = (msg: string) => {
+      setCommandOutput(msg);
+      setCommand('');
+    };
+
+    switch (verb) {
+      case 'contact':
+      case 'hire':
+      case 'email':
+        say('[OK] Opening contact channel...');
+        setTimeout(() => navigate('/contact'), 600);
+        return;
+      case 'resume':
+      case 'cv':
+        say('[OK] Fetching resume.pdf...');
+        window.open(personalInfo.resume, '_blank', 'noopener,noreferrer');
+        return;
+      case 'about':
+      case 'whoami':
+        say(`[OK] ${personalInfo.name} — ${personalInfo.role}`);
+        setTimeout(() => navigate('/about'), 600);
+        return;
+      case 'github':
+        say('[OK] Opening GitHub...');
+        window.open(personalInfo.github, '_blank', 'noopener,noreferrer');
+        return;
+      case 'skills':
+      case 'stack':
+        say('[OK] Loading stack...');
+        setTimeout(() => navigate('/skills'), 600);
+        return;
+      case 'restore':
+      case 'reset':
+        setClosedIds([]);
+        say('[OK] All windows restored.');
+        return;
+      case 'clear':
+        setCommand('');
+        setCommandOutput('');
+        return;
+      case 'help':
+      case 'ls':
+        say('AVAILABLE: contact · resume · about · skills · github · restore · clear');
+        return;
+      default: {
+        // Fall back to fuzzy-matching a project name, e.g. `rag` or `pactpal`.
+        const match = projects.find(
+          (p) => p.id.includes(verb) || p.title.toLowerCase().includes(verb)
+        );
+        if (match) {
+          say(`[OK] Locating ${match.title}...`);
+          setHighlightedId(match.id);
+          setClosedIds((prev) => prev.filter((id) => id !== match.id));
+          return;
+        }
+        say(`[ERR] Unknown command: "${verb}" — type "help" for options.`);
+      }
+    }
+  };
 
   useEffect(() => {
     const hash = location.hash.replace('#', '');
-    if (hash) {
-      setHighlightedId(hash);
-      // Remove highlight after 3 seconds
-      const timer = setTimeout(() => setHighlightedId(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (hash) setHighlightedId(hash);
   }, [location]);
+
+  // Clear the highlight a few seconds after it is set, regardless of whether
+  // it came from a deep link or the command bar.
+  useEffect(() => {
+    if (!highlightedId) return;
+    const timer = setTimeout(() => setHighlightedId(null), 3000);
+    return () => clearTimeout(timer);
+  }, [highlightedId]);
 
   const handleClose = (id: string) => {
     setClosedIds(prev => [...prev, id]);
@@ -115,7 +189,7 @@ const Projects: React.FC = () => {
         <img 
           alt="Mascot" 
           className="w-[300px] md:w-[800px] h-auto" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNmu6kl-MnyTI4hlX1_8NbhP9fVnvtly6kZyASFFQfdffMa_4qozMgcQc8YCU5ZnJruWaeNvEK95GwFbt0A1DQPgMJiwHrhh3hG5iXs2CGn1F01yTLR4FdPdF5mv2tKfz1P1Id_Tl5N21eBKbWmkfYswmqIP8zGBf4UjQ3Lg4XCYS8JoG3dBnd0gGOe_3u3Gd7842ywxYl03P2EwtaI7K3RTyHEO_UBWWlcU56aKv6_Xthyvp2P_mHm95rb4YVn2_MH23Es0l4SwNT" 
+          src="/images/mascot.png" 
         />
       </div>
 
@@ -125,7 +199,7 @@ const Projects: React.FC = () => {
           <span className="text-primary font-code-snippet text-body-lg">&gt;</span>
           <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface uppercase">
             PROJECTS.<wbr/>LOG
-            <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+            <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
           </h1>
         </div>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
@@ -164,6 +238,8 @@ const Projects: React.FC = () => {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
                     ) : id === 'aasrah' ? (
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    ) : id === 'rag-based-ai' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
                     ) : (
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
                     )}
@@ -198,19 +274,37 @@ const Projects: React.FC = () => {
         </div>
       )}
 
-      {/* Section Footer CTA */}
+      {/* Section Footer CTA — a working command bar, not a decorative input */}
       <div className="mt-section-gap flex flex-col items-center text-center space-y-8 relative z-10">
         <div className="w-px h-24 bg-gradient-to-b from-primary to-transparent"></div>
         <h2 className="font-headline-md text-headline-md text-on-surface uppercase">Ready To Collaborate?</h2>
-        <div className="flex items-center gap-4 bg-surface-container-low border border-white/10 px-6 py-4 w-full max-w-xl">
-          <span className="text-primary font-code-snippet">&gt;</span>
-          <input 
-            className="bg-transparent border-none focus:ring-0 text-on-surface font-code-snippet w-full placeholder:opacity-30 outline-none uppercase" 
-            placeholder="type command (e.g. contact --now)" 
-            type="text"
-          />
-          <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle"></span>
-        </div>
+        <form onSubmit={runCommand} className="w-full max-w-xl">
+          <label htmlFor="command-input" className="sr-only">Terminal command</label>
+          <div className="flex items-center gap-4 bg-surface-container-low border border-white/10 focus-within:border-primary/50 px-6 py-4 transition-colors">
+            <span className="text-primary font-code-snippet">&gt;</span>
+            <input
+              id="command-input"
+              value={command}
+              onChange={(e) => setCommand(e.target.value)}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-code-snippet w-full placeholder:opacity-30 outline-none uppercase"
+              placeholder="type command (e.g. contact --now)"
+              type="text"
+              autoComplete="off"
+              spellCheck={false}
+              aria-describedby="command-output"
+            />
+            <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle"></span>
+          </div>
+          {commandOutput && (
+            <p
+              id="command-output"
+              role="status"
+              className="mt-3 font-code-snippet text-[11px] text-primary/80 uppercase tracking-widest text-left px-6 animate-in fade-in slide-in-from-top-1 duration-300"
+            >
+              {commandOutput}
+            </p>
+          )}
+        </form>
       </div>
     </div>
   );

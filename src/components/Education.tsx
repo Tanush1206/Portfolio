@@ -18,8 +18,8 @@ const EducationCard: React.FC<{ entry: EducationEntry }> = ({ entry }) => {
 
   if (isClosed) {
     return (
-      <div className="glass-card border border-dashed border-white/10 p-6 flex justify-between items-center opacity-40">
-        <span className="font-code-snippet text-xs uppercase">ACADEMIC_RECORD_{entry.index}_HIDDEN</span>
+      <div className="glass-card border border-dashed border-white/10 p-4 sm:p-6 flex flex-wrap justify-between items-center gap-3 opacity-40">
+        <span className="font-code-snippet text-[10px] sm:text-xs uppercase break-all min-w-0">ACADEMIC_RECORD_{entry.index}_HIDDEN</span>
         <button 
           onClick={() => setIsClosed(false)}
           className="text-secondary font-code-snippet text-xs hover:underline uppercase"
@@ -120,7 +120,7 @@ const Education: React.FC = () => {
         </div>
         <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface mb-6 uppercase">
           NEURAL_<wbr/>MAPPING
-          <span className="inline-block w-[0.5em] h-[1em] bg-secondary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+          <span className="w-[0.5em] h-[1em] bg-secondary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
           Tracing the foundational knowledge layers and specialized training modules that constitute my technical expertise.

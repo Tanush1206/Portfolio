@@ -19,7 +19,7 @@ const About: React.FC = () => {
         </div>
         <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface mb-6 uppercase">
           BIO_<wbr/>METRIC_<wbr/>LOG
-          <span className="inline-block w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+          <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
         </h1>
       </section>
 
@@ -83,7 +83,7 @@ const About: React.FC = () => {
             <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed text-left">
               {personalInfo.bio}
             </p>
-            <div className="grid grid-cols-2 gap-gutter pt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-gutter pt-8">
               <div className="space-y-2 text-left">
                 <div className="font-code-snippet text-primary text-sm uppercase">&gt; INNOVATION</div>
                 <p className="font-body-sm text-xs text-on-surface-variant uppercase">Turning concepts into digital reality.</p>
@@ -93,22 +93,25 @@ const About: React.FC = () => {
                 <p className="font-body-sm text-xs text-on-surface-variant uppercase">Clean code and optimized systems.</p>
               </div>
             </div>
-            <div className="pt-12 flex flex-col sm:flex-row gap-6">
-              <a 
-                href="/docs/tanush_thakran_resume.pdf" 
-                download 
-                className="flex-1 flex items-center justify-center gap-4 py-4 px-6 bg-primary/10 border border-primary/20 text-primary font-code-snippet uppercase hover:bg-primary hover:text-black transition-all group"
+            {/* Stacked until there is genuinely room for both labels side by
+                side. min-w-0 lets each button shrink below its intrinsic
+                text width instead of overflowing the card. */}
+            <div className="pt-12 flex flex-col lg:flex-row gap-4 lg:gap-6">
+              <a
+                href="/docs/tanush_thakran_resume.pdf"
+                download
+                className="flex-1 min-w-0 flex items-center justify-center gap-3 py-4 px-4 bg-primary/10 border border-primary/20 text-primary font-code-snippet text-[11px] sm:text-xs uppercase hover:bg-primary hover:text-black transition-all group"
               >
-                <span className="material-symbols-outlined group-hover:animate-bounce">download</span>
-                DOWNLOAD_RESUME.EXE
+                <span className="material-symbols-outlined text-[18px] flex-shrink-0 group-hover:animate-bounce">download</span>
+                <span className="truncate">DOWNLOAD_RESUME.EXE</span>
               </a>
-              <a 
-                href="/docs/Portfolio ft. Tanush Thakran.pdf" 
-                download 
-                className="flex-1 flex items-center justify-center gap-4 py-4 px-6 bg-tertiary/10 border border-tertiary/20 text-tertiary font-code-snippet uppercase hover:bg-tertiary hover:text-black transition-all group"
+              <a
+                href="/docs/Portfolio ft. Tanush Thakran.pdf"
+                download
+                className="flex-1 min-w-0 flex items-center justify-center gap-3 py-4 px-4 bg-tertiary/10 border border-tertiary/20 text-tertiary font-code-snippet text-[11px] sm:text-xs uppercase hover:bg-tertiary hover:text-black transition-all group"
               >
-                <span className="material-symbols-outlined group-hover:rotate-12 transition-transform">download</span>
-                DOWNLOAD_PORTFOLIO.EXE
+                <span className="material-symbols-outlined text-[18px] flex-shrink-0 group-hover:rotate-12 transition-transform">download</span>
+                <span className="truncate">DOWNLOAD_PORTFOLIO.EXE</span>
               </a>
             </div>
           </div>

@@ -66,22 +66,29 @@ export default {
         "mono": ["JetBrains Mono", "monospace"],
         "headline": ["Space Grotesk", "sans-serif"],
       },
+      // Fluid type: each clamp()'s upper bound is the original desktop size,
+      // so large screens render exactly as before while narrow screens scale
+      // down instead of overflowing.
       fontSize: {
-        "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "500" }],
+        "headline-md": ["clamp(22px, 4vw, 32px)", { lineHeight: "1.3", fontWeight: "500" }],
         "body-sm": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
-        "code-snippet": ["14px", { lineHeight: "1.7", fontWeight: "400" }],
-        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
-        "headline-lg-mobile": ["40px", { lineHeight: "1.2", fontWeight: "600" }],
+        "code-snippet": ["clamp(12px, 2.5vw, 14px)", { lineHeight: "1.7", fontWeight: "400" }],
+        "body-lg": ["clamp(15px, 2.5vw, 18px)", { lineHeight: "1.6", fontWeight: "400" }],
+        "headline-lg-mobile": ["clamp(30px, 8vw, 40px)", { lineHeight: "1.2", fontWeight: "600" }],
         "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.1em", fontWeight: "700" }],
-        "display-lg": ["120px", { lineHeight: "110%", letterSpacing: "-0.04em", fontWeight: "700" }],
-        "headline-lg": ["64px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "600" }]
+        "display-lg": ["clamp(44px, 9vw, 120px)", { lineHeight: "110%", letterSpacing: "-0.04em", fontWeight: "700" }],
+        "headline-lg": ["clamp(32px, 6vw, 64px)", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "600" }]
       },
       spacing: {
         "unit": "8px",
         "container-max": "1440px",
-        "margin-safe": "64px",
-        "section-gap": "160px",
-        "gutter": "32px"
+        // These read the responsive custom properties declared in index.css
+        // (20/80/16px on phones, scaling up at md and lg). Hardcoding the
+        // desktop pixel values here silently disabled that scaling and left
+        // phones with 128px of horizontal padding.
+        "margin-safe": "var(--margin-safe)",
+        "section-gap": "var(--section-gap)",
+        "gutter": "var(--gutter)"
       },
       animation: {
         'blink': 'blink 1s step-end infinite',

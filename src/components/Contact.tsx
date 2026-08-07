@@ -8,19 +8,33 @@ const EMAILJS_SERVICE_ID = "service_5rxokx8";   // e.g. "service_abc123"
 const EMAILJS_TEMPLATE_ID = "template_3f867zk";  // e.g. "template_xyz789"
 const EMAILJS_PUBLIC_KEY = "JfWCL7VqanzAZ6JiR";   // e.g. "xAbCdEfGhIjKlMn"
 
+type FieldErrors = Partial<Record<'name' | 'email' | 'message', string>>;
+
+const validate = (data: { name: string; email: string; message: string }): FieldErrors => {
+  const errors: FieldErrors = {};
+  if (!data.name.trim()) errors.name = 'Identifier required.';
+  if (!data.email.trim()) errors.email = 'Address required.';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Malformed address.';
+  if (!data.message.trim()) errors.message = 'Directive cannot be empty.';
+  return errors;
+};
+
 const Contact: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
 
-  const handleManualSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.message) {
-      alert("Please fill in all fields.");
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const nextErrors = validate(formData);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
 
     setStatus('sending');
 
@@ -40,18 +54,35 @@ const Contact: React.FC = () => {
 
       setStatus('success');
       setFormData({ name: '', email: '', message: '' });
+      setErrors({});
       setTimeout(() => setStatus('idle'), 5000);
     } catch (error) {
       console.error('EmailJS error:', error);
+      // Report what actually went wrong instead of always blaming config —
+      // a visitor hitting a network blip should be told to retry, not that
+      // the site is unconfigured.
+      const text = (error as { text?: string })?.text;
+      const offline = typeof navigator !== 'undefined' && !navigator.onLine;
+      setErrorMessage(
+        offline
+          ? 'No network connection detected. Reconnect and retry.'
+          : text || 'The mail gateway rejected the transmission. Please retry, or email directly.'
+      );
       setStatus('error');
-      setTimeout(() => setStatus('idle'), 5000);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear a field's error as soon as the visitor starts correcting it.
+    setErrors(prev => (prev[name as keyof FieldErrors] ? { ...prev, [name]: undefined } : prev));
   };
+
+  const fieldClass = (field: keyof FieldErrors) =>
+    `w-full bg-surface-container-lowest border-0 border-b ${
+      errors[field] ? 'border-red-500' : 'border-outline-variant focus:border-primary'
+    } focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-on-surface-variant/40 transition-all outline-none uppercase`;
 
   return (
     <div className="relative z-10 pt-section-gap px-margin-safe max-w-container-max mx-auto min-h-screen flex flex-col overflow-hidden">
@@ -71,10 +102,10 @@ const Contact: React.FC = () => {
         </div>
         <div className="space-y-4">
           <h1 className="font-display-lg text-headline-lg-mobile md:text-display-lg text-primary uppercase">CONTACT_<wbr/>INIT</h1>
-          <div className="flex items-center font-code-snippet text-headline-md text-tertiary">
-            <span className="mr-4 uppercase">&gt;</span>
-            <span className="uppercase">initiate --contact --direct</span>
-            <span className="inline-block w-2.5 h-6 bg-primary/80 animate-pulse ml-4 vertical-middle"></span>
+          <div className="flex items-center flex-wrap font-code-snippet text-base sm:text-xl md:text-headline-md text-tertiary">
+            <span className="mr-2 md:mr-4 uppercase">&gt;</span>
+            <span className="uppercase break-words min-w-0">initiate --contact --direct</span>
+            <span className="inline-block w-2 md:w-2.5 h-5 md:h-6 bg-primary/80 animate-pulse ml-2 md:ml-4 align-middle flex-shrink-0"></span>
           </div>
         </div>
       </section>
@@ -83,7 +114,7 @@ const Contact: React.FC = () => {
       <div className="grid grid-cols-12 gap-gutter mt-12 pb-section-gap relative z-10">
         {/* Left Column: Form */}
         <div className="col-span-12 lg:col-span-8">
-          <div className="glass-card p-10 space-y-12 transition-all duration-500 min-h-[450px] flex flex-col">
+          <div className="glass-card p-6 sm:p-8 md:p-10 space-y-8 md:space-y-12 transition-all duration-500 min-h-[450px] flex flex-col">
             {status === 'success' ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
                 <div className="w-20 h-20 rounded-full border-2 border-tertiary flex items-center justify-center text-tertiary mb-4">
@@ -108,7 +139,13 @@ const Contact: React.FC = () => {
                   <span className="material-symbols-outlined text-4xl">warning</span>
                 </div>
                 <h2 className="font-headline-md text-headline-md text-white uppercase tracking-[0.2em]">Transmission_Failed</h2>
-                <p className="font-code-snippet text-red-400 uppercase text-sm">EmailJS credentials not configured yet.</p>
+                <p className="font-code-snippet text-red-400 text-sm max-w-sm">{errorMessage}</p>
+                <a
+                  href="mailto:tanushthakran.work@gmail.com"
+                  className="font-code-snippet text-tertiary hover:underline uppercase tracking-widest text-xs"
+                >
+                  tanushthakran.work@gmail.com
+                </a>
                 <button
                   type="button"
                   onClick={() => setStatus('idle')}
@@ -123,44 +160,63 @@ const Contact: React.FC = () => {
                   <h2 className="font-headline-md text-headline-md text-on-surface uppercase tracking-widest">Transmission_Data</h2>
                   <p className="font-body-sm text-on-surface-variant opacity-90 italic">Messages are dispatched directly through our secure gateway.</p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <label className="font-label-caps text-label-caps text-primary block uppercase">Sender_Name</label>
+                    <label htmlFor="contact-name" className="font-label-caps text-label-caps text-primary block uppercase">Sender_Name</label>
                     <input
+                      id="contact-name"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-on-surface-variant/40 transition-all outline-none uppercase"
+                      className={fieldClass('name')}
                       placeholder="ID_IDENTIFIER"
                       type="text"
+                      autoComplete="name"
+                      aria-invalid={!!errors.name}
+                      aria-describedby={errors.name ? 'contact-name-error' : undefined}
                     />
+                    {errors.name && (
+                      <p id="contact-name-error" role="alert" className="font-code-snippet text-[10px] text-red-400 uppercase tracking-widest">{errors.name}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <label className="font-label-caps text-label-caps text-primary block uppercase">Sender_Email</label>
+                    <label htmlFor="contact-email" className="font-label-caps text-label-caps text-primary block uppercase">Sender_Email</label>
                     <input
+                      id="contact-email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-on-surface-variant/40 transition-all outline-none uppercase"
+                      className={fieldClass('email')}
                       placeholder="ADDR_LOCATOR"
                       type="email"
+                      autoComplete="email"
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? 'contact-email-error' : undefined}
                     />
+                    {errors.email && (
+                      <p id="contact-email-error" role="alert" className="font-code-snippet text-[10px] text-red-400 uppercase tracking-widest">{errors.email}</p>
+                    )}
                   </div>
                   <div className="col-span-full space-y-2">
-                    <label className="font-label-caps text-label-caps text-primary block uppercase">Directive</label>
+                    <label htmlFor="contact-message" className="font-label-caps text-label-caps text-primary block uppercase">Directive</label>
                     <textarea
+                      id="contact-message"
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
-                      className="w-full bg-surface-container-lowest border-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-white font-code-snippet py-4 px-2 placeholder:text-surface-variant transition-all resize-none outline-none uppercase"
+                      className={`${fieldClass('message')} resize-none`}
                       placeholder="INPUT_COMMAND_OR_QUERY..."
                       rows={4}
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? 'contact-message-error' : undefined}
                     ></textarea>
+                    {errors.message && (
+                      <p id="contact-message-error" role="alert" className="font-code-snippet text-[10px] text-red-400 uppercase tracking-widest">{errors.message}</p>
+                    )}
                   </div>
                   <div className="col-span-full pt-8">
                     <button
-                      type="button"
-                      onClick={handleManualSubmit}
+                      type="submit"
                       disabled={status === 'sending'}
                       className={`group relative inline-flex items-center justify-center px-4 md:px-12 py-4 border border-primary font-code-snippet text-primary overflow-hidden transition-all duration-300 ${status === 'sending' ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-surface-container-lowest'} uppercase text-xs md:text-base w-full md:w-auto`}
                     >
@@ -170,7 +226,7 @@ const Contact: React.FC = () => {
                       </span>
                     </button>
                   </div>
-                </div>
+                </form>
               </>
             )}
           </div>
