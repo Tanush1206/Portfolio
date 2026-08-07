@@ -44,5 +44,14 @@ export const certificates: CertificateEntry[] = [
     link: "/certs/ai_fluency.png",
     image: "/certs/ai_fluency.png",
     logo: "/certs/anthropic_logo.png"
+  },
+  {
+    title: "Intro to Machine Learning",
+    issuer: "Kaggle",
+    date: "JUL 2026",
+    id: "KAGGLE-INTRO-ML-2026",
+    link: "/certs/Intro_to_Machine_Learning.png",
+    image: "/certs/Intro_to_Machine_Learning.png",
+    logo: "/certs/kaggle_logo.svg"
   }
 ];
