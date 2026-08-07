@@ -14,7 +14,7 @@ export const personalInfo = {
   linkedin:    'https://linkedin.com/in/tanush-thakran-1b54a8327',
   twitter:     'https://x.com/tanush65556130',
   instagram:   'https://www.instagram.com/tanushhh__12',
-  resume:      '/docs/tanush_thakran_resume.pdf',
+  resume:      '/docs/TanushThakranResume.pdf',
   statusText:  "If there's any suitable role for me, don't hesitate. I'm open to communication on all channels. Let's discuss how I can contribute to your team or project.",
 };
 

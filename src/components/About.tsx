@@ -10,7 +10,7 @@ const About: React.FC = () => {
     <div className="pt-32 pb-section-gap px-margin-safe max-w-container-max mx-auto relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-primary/5 blur-[120px] -z-10 rounded-full"></div>
-      
+
       {/* Section Header */}
       <section className="mb-24 relative z-10">
         <div className="flex items-center gap-4 mb-4">
@@ -28,16 +28,16 @@ const About: React.FC = () => {
         <div className="md:col-span-5 space-y-gutter">
           {!isProfileClosed ? (
             <div className={`glass-card border border-white/10 p-0 group overflow-hidden transition-all duration-500 ${isProfileMinimized ? 'h-fit' : ''}`}>
-              <WindowControls 
+              <WindowControls
                 onClose={() => setIsProfileClosed(true)}
                 onMinimize={() => setIsProfileMinimized(!isProfileMinimized)}
                 title="User_Profile.Img"
               />
               {!isProfileMinimized && (
-                <img 
-                  alt={personalInfo.name} 
-                  className="w-full aspect-square object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700 animate-in fade-in zoom-in-95 duration-500" 
-                  src="/images/user_image2.JPG" 
+                <img
+                  alt={personalInfo.name}
+                  className="w-full aspect-square object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700 animate-in fade-in zoom-in-95 duration-500"
+                  src="/images/user_image2.JPG"
                 />
               )}
             </div>
@@ -45,7 +45,7 @@ const About: React.FC = () => {
             <div className="glass-card border border-dashed border-white/10 p-12 flex flex-col items-center justify-center gap-4 opacity-40">
               <span className="material-symbols-outlined text-4xl text-primary">person_off</span>
               <span className="font-code-snippet text-xs uppercase">Profile_Link_Terminated</span>
-              <button 
+              <button
                 onClick={() => setIsProfileClosed(false)}
                 className="px-4 py-2 bg-primary/10 border border-primary/30 text-primary font-code-snippet text-[10px] hover:bg-primary hover:text-on-primary transition-all uppercase"
               >
@@ -98,7 +98,7 @@ const About: React.FC = () => {
                 text width instead of overflowing the card. */}
             <div className="pt-12 flex flex-col lg:flex-row gap-4 lg:gap-6">
               <a
-                href="/docs/tanush_thakran_resume.pdf"
+                href="/docs/TanushThakranResume.pdf"
                 download
                 className="flex-1 min-w-0 flex items-center justify-center gap-3 py-4 px-4 bg-primary/10 border border-primary/20 text-primary font-code-snippet text-[11px] sm:text-xs uppercase hover:bg-primary hover:text-black transition-all group"
               >
