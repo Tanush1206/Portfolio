@@ -4,8 +4,13 @@ import { personalInfo, heroStats } from '../data/personal';
 import { projects } from '../data/projects';
 import WindowControls from './WindowControls';
 
-// The three most recent builds get a preview card on the landing page.
+// The first three entries in projects.ts get a preview card on the landing
+// page — that list is ordered deliberately, so this is the ML/data lead-in.
 const featuredProjects = projects.slice(0, 3);
+
+// "a Data Engineer" vs "an AI/ML Engineer" — the role string is editable, so
+// pick the article from its first letter rather than hardcoding one.
+const articleFor = (word: string) => (/^[aeiou]/i.test(word.trim()) ? 'an' : 'a');
 
 const Hero: React.FC = () => {
   const [isAboutClosed, setIsAboutClosed] = useState(false);
@@ -31,7 +36,7 @@ const Hero: React.FC = () => {
         <div className="relative z-10 text-center max-w-4xl px-4">
           <div className="inline-flex items-center space-x-3 mb-6 font-code-snippet text-primary bg-primary-container/10 px-4 py-2 border border-primary/20 backdrop-blur-sm">
             <span className="material-symbols-outlined text-[16px]">terminal</span>
-            <span className="text-[10px] md:text-label-caps uppercase tracking-widest">STATUS: ACTIVE_DEVELOPER</span>
+            <span className="text-[10px] md:text-label-caps uppercase tracking-widest">STATUS: OPEN_TO_AI_ML_&_DATA_ROLES</span>
             <span className="flex h-2 w-2 rounded-full bg-[#10b981] animate-pulse"></span>
           </div>
 
@@ -40,7 +45,7 @@ const Hero: React.FC = () => {
           </h1>
 
           <p className="font-body-lg text-body-md md:text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-12 px-2">
-            {personalInfo.tagline}. I am <span className="text-primary font-bold">{personalInfo.name}</span>, a {personalInfo.role}.
+            {personalInfo.tagline}. I am <span className="text-primary font-bold">{personalInfo.name}</span>, {articleFor(personalInfo.role)} {personalInfo.role}.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
@@ -68,10 +73,10 @@ const Hero: React.FC = () => {
 
         {/* Floating Code Snippets */}
         <div className="hidden lg:block absolute left-24 top-1/3 glass-card p-4 font-code-snippet text-xs text-primary/60 border-primary/20 rotate-[-4deg]">
-          <pre>const developer = {'{'}<br />  name: "{personalInfo.name}",<br />  role: "{personalInfo.role}",<br />  stack: ["MongoDB", "Express", "React", "Node"]<br />{'}'};</pre>
+          <pre>engineer = {'{'}<br />  "name": "{personalInfo.name}",<br />  "role": "{personalInfo.role}",<br />  "stack": ["Python", "SQL", "scikit-learn", "Power BI"]<br />{'}'}</pre>
         </div>
         <div className="hidden lg:block absolute right-24 bottom-1/4 glass-card p-4 font-code-snippet text-xs text-tertiary/60 border-tertiary/20 rotate-[6deg]">
-          <pre>while (alive) {'{'}<br />  solveProblems();<br />  buildScalableApps();<br />  optimizeUX();<br />{'}'}</pre>
+          <pre>for q in labelled_set:<br />&nbsp;&nbsp;ctx = retrieve(index, q, k=5)<br />&nbsp;&nbsp;ans = llm(ctx, q)<br />&nbsp;&nbsp;assert cites(ans, ctx)</pre>
         </div>
       </section>
 
@@ -87,9 +92,9 @@ const Hero: React.FC = () => {
               {personalInfo.bio}
             </p>
             <div className="flex flex-wrap gap-4">
-              <span className="px-4 py-1 border border-primary/30 font-code-snippet text-body-sm text-primary bg-primary/5 uppercase">REACT_ENGINE</span>
-              <span className="px-4 py-1 border border-tertiary/30 font-code-snippet text-body-sm text-tertiary bg-tertiary/5 uppercase">NODE_CORE</span>
-              <span className="px-4 py-1 border border-secondary/30 font-code-snippet text-body-sm text-secondary bg-secondary/5 uppercase">MONGODB_MESH</span>
+              <span className="px-4 py-1 border border-primary/30 font-code-snippet text-body-sm text-primary bg-primary/5 uppercase">PYTHON_CORE</span>
+              <span className="px-4 py-1 border border-tertiary/30 font-code-snippet text-body-sm text-tertiary bg-tertiary/5 uppercase">SQL_ENGINE</span>
+              <span className="px-4 py-1 border border-secondary/30 font-code-snippet text-body-sm text-secondary bg-secondary/5 uppercase">ML_PIPELINE</span>
             </div>
             <Link to="/about" className="inline-block font-code-snippet text-primary hover:underline uppercase tracking-widest">Read_Full_Bio &gt;</Link>
           </div>

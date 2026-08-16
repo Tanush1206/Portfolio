@@ -58,11 +58,11 @@ const About: React.FC = () => {
             <div className="font-code-snippet text-xs space-y-3 uppercase">
               <div className="flex justify-between text-left">
                 <span className="text-on-surface-variant">NAME:</span>
-                <span className="text-on-surface">{personalInfo.name.toUpperCase().replace(' ', '_')}</span>
+                <span className="text-on-surface">{personalInfo.name.toUpperCase().replace(/\s+/g, '_')}</span>
               </div>
               <div className="flex justify-between text-left">
                 <span className="text-on-surface-variant">ROLE:</span>
-                <span className="text-primary font-bold">{personalInfo.role.toUpperCase().replace(' ', '_')}</span>
+                <span className="text-primary font-bold">{personalInfo.role.toUpperCase().replace(/\s+/g, '_')}</span>
               </div>
               <div className="flex justify-between text-left">
                 <span className="text-on-surface-variant">LOC:</span>
@@ -85,12 +85,12 @@ const About: React.FC = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-gutter pt-8">
               <div className="space-y-2 text-left">
-                <div className="font-code-snippet text-primary text-sm uppercase">&gt; INNOVATION</div>
-                <p className="font-body-sm text-xs text-on-surface-variant uppercase">Turning concepts into digital reality.</p>
+                <div className="font-code-snippet text-primary text-sm uppercase">&gt; MEASUREMENT</div>
+                <p className="font-body-sm text-xs text-on-surface-variant uppercase">Tuning against a labelled set, not a hunch.</p>
               </div>
               <div className="space-y-2 text-left">
-                <div className="font-code-snippet text-tertiary text-sm uppercase">&gt; PRECISION</div>
-                <p className="font-body-sm text-xs text-on-surface-variant uppercase">Clean code and optimized systems.</p>
+                <div className="font-code-snippet text-tertiary text-sm uppercase">&gt; DECISIONS</div>
+                <p className="font-body-sm text-xs text-on-surface-variant uppercase">Analysis that ends in a recommendation.</p>
               </div>
             </div>
             {/* Stacked until there is genuinely room for both labels side by

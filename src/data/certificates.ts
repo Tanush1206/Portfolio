@@ -8,24 +8,26 @@ export interface CertificateEntry {
   logo?: string;
 }
 
+// Ordered data/ML first — this portfolio targets analytics and ML roles, and
+// the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
-    title: "Learn JavaScript",
-    issuer: "Scrimba",
-    date: "FEB 2026",
-    id: "SCRIMBA-JS-2026",
-    link: "/certs/scrimba_js.jpeg",
-    image: "/certs/scrimba_js.jpeg",
-    logo: "/certs/scrimba_logo.webp"
+    title: "Google Analytics Certification",
+    issuer: "Google",
+    date: "AUG 2026",
+    id: "191498591",
+    link: "/certs/GoogleAnalyticsCertification.png",
+    image: "/certs/GoogleAnalyticsCertification.png",
+    logo: "/certs/GAbadge.png"
   },
   {
-    title: "Python Course",
-    issuer: "Tutedude",
-    date: "APR 2026",
-    id: "TD-TANU-PY-0908",
-    link: "/certs/tutedude_py.jpeg",
-    image: "/certs/tutedude_py.jpeg",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgtsoUhhVZ5dXNqJmc_MnlJ_dHCZr0ZTwLTQ&s"
+    title: "Intro to Machine Learning",
+    issuer: "Kaggle",
+    date: "JUL 2026",
+    id: "KAGGLE-INTRO-ML-2026",
+    link: "/certs/Intro_to_Machine_Learning.png",
+    image: "/certs/Intro_to_Machine_Learning.png",
+    logo: "/certs/kaggle_logo.svg"
   },
   {
     title: "Data Science",
@@ -46,21 +48,21 @@ export const certificates: CertificateEntry[] = [
     logo: "/certs/anthropic_logo.png"
   },
   {
-    title: "Intro to Machine Learning",
-    issuer: "Kaggle",
-    date: "JUL 2026",
-    id: "KAGGLE-INTRO-ML-2026",
-    link: "/certs/Intro_to_Machine_Learning.png",
-    image: "/certs/Intro_to_Machine_Learning.png",
-    logo: "/certs/kaggle_logo.svg"
+    title: "Python Course",
+    issuer: "Tutedude",
+    date: "APR 2026",
+    id: "TD-TANU-PY-0908",
+    link: "/certs/tutedude_py.jpeg",
+    image: "/certs/tutedude_py.jpeg",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgtsoUhhVZ5dXNqJmc_MnlJ_dHCZr0ZTwLTQ&s"
   },
   {
-    title: "Google Analytics Certification",
-    issuer: "Google",
-    date: "JUL 2026",
-    id: "191498591",
-    link: "/certs/GoogleAnalyticsCertification.png",
-    image: "/certs/GoogleAnalyticsCertification.png",
-    logo: "/certs/GAbadge.png"
+    title: "Learn JavaScript",
+    issuer: "Scrimba",
+    date: "FEB 2026",
+    id: "SCRIMBA-JS-2026",
+    link: "/certs/scrimba_js.jpeg",
+    image: "/certs/scrimba_js.jpeg",
+    logo: "/certs/scrimba_logo.webp"
   }
 ];

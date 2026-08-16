@@ -11,9 +11,9 @@ export const siteUrl = 'https://tanush-thakran-portfolio.netlify.app';
 
 export const siteMeta = {
   name: 'Tanush Thakran',
-  title: 'Tanush Thakran — Full-Stack & AI Developer',
+  title: 'Tanush Thakran — AI/ML Engineer',
   description:
-    'Full-stack developer building AI-driven products — offline RAG pipelines, legal-tech NLP, and MERN platforms. Portfolio, projects, and resume.',
+    'Machine learning and data work — an evaluated local RAG pipeline, ML running in production, and a SQL and Power BI profitability analysis. Portfolio, projects, and resume.',
   ogImage: '/images/og-cover.png',
   twitterHandle: '@tanush65556130',
 };
@@ -32,12 +32,12 @@ export const routeMeta: Record<string, RouteMeta> = {
   '/about': {
     title: 'About',
     description:
-      'Full-stack developer pursuing an Integrated B.Sc. in Computer Science at Scaler School of Technology with BITS Pilani. Background, bio, and resume.',
+      'Computer Science undergraduate working across data, applied ML and software engineering at Scaler School of Technology with BITS Pilani. Background, bio, and resume.',
   },
   '/skills': {
     title: 'Skills',
     description:
-      'Technical stack — React, Node.js, MongoDB, Python, Java, and the AI/ML tooling behind local RAG and NLP work.',
+      'Technical stack — Python, embeddings and vector retrieval, scikit-learn, Whisper and local LLMs, plus SQL, Pandas, Power BI and DAX for the analytics work.',
   },
   '/education': {
     title: 'Education',
@@ -47,17 +47,17 @@ export const routeMeta: Record<string, RouteMeta> = {
   '/experience': {
     title: 'Experience',
     description:
-      'Professional and leadership experience across engineering roles, internships, and AIESEC.',
+      'Real-time data and production engineering at CYPARTA in Cairo, plus KPI reporting and funnel analysis with AIESEC.',
   },
   '/projects': {
     title: 'Projects',
     description:
-      'Selected builds — an offline Retrieval-Augmented QA pipeline, AI legal-document simplification, and full-stack platforms.',
+      'Selected work — an evaluated offline RAG pipeline, a SQL and Power BI profitability analysis, ML in production, and NLP contract analysis.',
   },
   '/certificates': {
     title: 'Certificates',
     description:
-      'Verified certifications in AI fluency, data science, JavaScript, and Python.',
+      'Verified certifications in Google Analytics (GA4), machine learning, data science, AI fluency, JavaScript, and Python.',
   },
   '/contact': {
     title: 'Contact',

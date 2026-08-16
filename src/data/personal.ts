@@ -4,9 +4,9 @@
 
 export const personalInfo = {
   name:        'Tanush Thakran',
-  role:        'Full-Stack Developer',
-  tagline:     'MERN Stack • Java • Problem Solver',
-  bio:         'A passionate full-stack developer specializing in the MERN stack, currently pursuing an Integrated B.Sc. in Computer Science at Scaler School of Technology in collaboration with BITS Pilani. I build scalable, user-centric web applications and am always exploring new technologies.',
+  role:        'AI/ML Engineer',
+  tagline:     'Machine Learning • Retrieval Systems • Python • SQL • Power BI',
+  bio:         'A Computer Science undergraduate working across data, applied ML and software engineering, currently pursuing an Integrated B.Sc. at Scaler School of Technology in collaboration with BITS Pilani. I have traced a company\'s margin problem to a specific pricing threshold with SQL and Power BI, built a local RAG pipeline evaluated against a labelled question set, and shipped production applications for a logistics client in Cairo. Comfortable owning a problem end to end — raw data through to recommendation, or schema through to deployment.',
   location:    'New Delhi, India',
   timezone:    'GMT+5:30',
   email:       'tanushthakran.work@gmail.com',
@@ -19,7 +19,7 @@ export const personalInfo = {
 };
 
 export const heroStats = [
-  { label: 'Projects_Shipped', value: '6+' },
-  { label: 'Core_Stack', value: 'MERN + AI' },
+  { label: 'Projects_Shipped', value: '8' },
+  { label: 'Core_Stack', value: 'Python + SQL + ML' },
   { label: 'Availability', value: 'Open' },
 ];

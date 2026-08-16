@@ -53,7 +53,7 @@ const Skills: React.FC = () => {
           <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-          A comprehensive breakdown of technical proficiencies, specialized frameworks, and engineering tools utilized in my development pipeline.
+          The stack behind the ML and analysis work — Python and the retrieval/LLM tooling for building models into systems, SQL and Power BI for getting to an answer, and the web layer for shipping both.
         </p>
       </section>
 
@@ -84,8 +84,8 @@ const Skills: React.FC = () => {
             <div className="font-code-snippet text-on-surface-variant text-[10px] space-y-1 uppercase text-left">
               <p className="text-primary">$ analyze --profile</p>
               <p>Scanning_modules...</p>
-              <p>Type: Full-Stack_Developer</p>
-              <p>Specialization: MERN_Stack</p>
+              <p>Type: AI/ML_Engineer</p>
+              <p>Specialization: Applied_ML_+_Analytics</p>
               <p>Status: Optimization_Complete</p>
             </div>
           </div>
