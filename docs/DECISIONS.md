@@ -1,16 +1,9 @@
 # Ask My Portfolio — decisions of record
 
-> **The two source documents (`ASK_MY_PORTFOLIO_SPEC.md`, `CLAUDE_CODE_PROMPT.md`) are
-> not in this repo.** They were pasted into a chat session and the raw text was lost to a
-> context compaction — it is not recoverable from any transcript on disk. Paste both into
-> `docs/` when convenient; until then this file is the working authority, and everything
-> in it is either quoted verbatim from surviving messages or marked as a derivation.
->
-> **What the missing spec costs right now:** the exact palette values and the type scale.
-> The instruction was "do not deviate from the spec palette or typefaces." Phase 1 defines
-> every colour as a CSS custom property in one block at the top of `src/index.css`, so
-> restoring the real values is an edit to that block and nothing else. The typeface is
-> settled and correct — Departure Mono, self-hosted, with IBM Plex Mono as fallback.
+The two source documents are at [ASK_MY_PORTFOLIO_SPEC.md](ASK_MY_PORTFOLIO_SPEC.md) and
+[CLAUDE_CODE_PROMPT.md](CLAUDE_CODE_PROMPT.md), reconstructed after the originals were lost to a
+context compaction. They are the authority on *what* is being built; this file records *why*
+the open questions were settled the way they were.
 
 ## Standing constraints (verbatim)
 
@@ -45,10 +38,21 @@ alarming, and not what the visitor experiences. Retention asks whether on-screen
 means what it claims. Current: mean 0.538, median 0.600 (threshold 0.50).
 
 **Departure Mono, self-hosted.** SIL Open Font License 1.1, which permits web embedding.
-Subset to the used codepoints: 2.2 KB woff2, down from 22 KB. Native design size is 11px —
-pin to 11/22/33px, never arbitrary sizes, or the pixel grid goes mushy. IBM Plex Mono
-stays in the family declaration as fallback. License shipped at
-`public/fonts/DepartureMono-LICENSE.txt`.
+Subset to the used codepoints: 2.2 KB woff2, down from 22 KB. IBM Plex Mono stays in the
+family declaration as fallback. License shipped at `public/fonts/DepartureMono-LICENSE.txt`.
+
+It sits **outside** the 12/14/16/20/28/44/72 type scale, at 11px and 22px only. The scale
+governs Bricolage Grotesque and Newsreader — outline faces that resample cleanly to any
+size. Departure Mono is drawn on an 11px pixel grid: at 12px each font-pixel maps to 1.09
+device pixels and the face goes soft. So the scale governs the two faces it was written
+for, and the pixel font keeps its grid. Mono is utility text only — coordinates, cosine
+scores, telemetry, labels.
+
+**`--query` is reserved.** Query node, retrieval beams, citation chips, and nothing else.
+The reservation is stated as a comment in both `index.css` and `scene/palette.ts`, at the
+two places someone would reach for it. It is not a hover colour, not a focus ring, not an
+"active" state — if a UI state needs emphasis the answer is `--ivory` or `--muted` at a
+different alpha.
 
 **Min-degree 1, drawn dimmed and dashed.** Nine of 45 nodes fall below the 0.42 edge
 threshold against everything in the corpus — generic tooling nobody wrote a paragraph
@@ -85,10 +89,14 @@ eases internally, and never writes back.
 
 ## Open
 
-**34 skills against 8 projects.** Projects currently dominate via larger base scale and
-being the only nodes emissive at rest. If that still reads as a skill list with projects
-buried in it, the next lever is desaturating skill hues toward `--muted` and reserving
-full cluster chroma for projects — *not* scaling projects up further.
+**34 skills against 8 projects.** Projects dominate via larger base scale and being the
+only nodes emissive at rest. Skill hues are desaturated 55% toward `--muted`.
+
+That 55% is a ceiling, not a starting point. Pushing further does separate skills from
+projects, but it also collapses the three cluster hues toward the same grey, and at
+full-cloud distance the legend then corresponds to nothing on screen. If ml-teal and
+eng-violet start reading as the same colour, stop: the remaining lever is size or opacity,
+not more chroma loss.
 
 **`ml` ↔ `eng` overlap.** Centroid separation 10.03 against summed spreads of 10.77, so
 the two lobes bleed. This is left as it is and stated in the legend: RAG and serving
@@ -103,3 +111,26 @@ not tuning the layout.
 
 The previous terminal-themed portfolio is preserved three ways: git tag `v1-terminal-ui`,
 the `legacy/v1-terminal-ui/` directory, and history on `main`.
+
+## Tailwind cannot alpha a hex `var()`
+
+`bg-panel/95` against a colour defined as a bare `var(--panel)` holding a hex string emits
+**nothing** — not 95%, not an opaque fallback, no background declaration at all. Every overlay
+panel rendered fully transparent from the first commit, and the symptom read as bloom bleed, so
+the first fix targeted the wrong cause and did not work.
+
+Custom properties therefore hold **RGB channel triples** and the Tailwind config wraps them as
+`rgb(var(--token) / <alpha-value>)`. Any new colour token must follow that form or it will fail
+the same silent way.
+
+## Phase 2 measurements
+
+Cold model load ~11–14 s on a headless SwiftShader run; warm embed **10 ms**, cold **47 ms**.
+Comfortably under the ~150 ms threshold at which the query node would need to materialise
+before the beams rather than with them, so both land together.
+
+Browser-vs-bake projection drift for a corpus node's own text: **0.12 scene units** on a cloud
+spanning roughly 24, with the query vector's L2 norm exactly 1.0. That residual is int8
+quantisation in the ONNX graph against fp32 PyTorch in the bake, not a projection error — a
+transposed matmul misses by scene units, not hundredths. fp32 weights would cut it to near zero
+at roughly four times the download, which is not worth it.

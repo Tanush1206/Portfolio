@@ -52,8 +52,8 @@ export default function App() {
 
 function Booting() {
   return (
-    <div className="bg-backdrop fixed inset-0 flex items-center justify-center">
-      <span className="text-muted animate-pulse text-[11px] uppercase tracking-[0.22em]">
+    <div className="bg-void fixed inset-0 flex items-center justify-center">
+      <span className="animate-pulse font-mono text-[11px] text-muted uppercase tracking-[0.22em]">
         reading latent space…
       </span>
     </div>

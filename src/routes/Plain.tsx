@@ -3,9 +3,9 @@ import { useStore } from '../store/useStore';
 import type { Cluster } from '../types';
 
 const LABEL: Record<Cluster, string> = {
-  ml: 'Machine learning',
-  eng: 'Engineering',
-  data: 'Data',
+  ml: 'AI / ML + NLP',
+  eng: 'Full-stack / infra',
+  data: 'Data / analytics',
 };
 
 /**
@@ -31,31 +31,31 @@ export default function Plain() {
   }));
 
   return (
-    <main className="bg-backdrop min-h-screen px-[22px] py-[44px]">
-      <div className="mx-auto max-w-[720px]">
-        <h1 className="text-fg text-[22px] leading-[22px]">Tanush Thakran</h1>
-        <p className="text-muted mt-[11px] text-[11px] leading-[17px]">
+    <main className="min-h-screen bg-void px-[22px] py-[44px]">
+      <div className="mx-auto max-w-[680px]">
+        <h1 className="font-display text-xl text-ivory">Tanush Thakran</h1>
+        <p className="mt-[11px] font-body text-base text-muted">
           Text version of the portfolio. The interactive one needs WebGL —{' '}
-          <a href="./" className="text-accent underline">
+          <a href="./" className="text-ivory underline decoration-muted underline-offset-4">
             try it
           </a>
           .
         </p>
 
-        {error && <p className="text-accent mt-[22px] text-[11px] leading-[17px]">{error}</p>}
+        {error && <p className="mt-[22px] font-body text-base text-ivory/80">{error}</p>}
 
         {byCluster.map(({ cluster, projects, skills }) => (
           <section key={cluster} className="mt-[44px]">
-            <h2 className="text-muted text-[11px] uppercase leading-[11px] tracking-[0.14em]">
+            <h2 className="font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted">
               {LABEL[cluster]}
             </h2>
 
             {projects.map((n) => (
-              <article key={n.id} className="border-line mt-[22px] border-t pt-[22px]">
-                <h3 className="text-fg text-[11px] leading-[11px]">{n.title}</h3>
-                <p className="text-dim mt-[11px] text-[11px] leading-[17px]">{n.blurb}</p>
+              <article key={n.id} className="mt-[22px] border-t border-muted/20 pt-[22px]">
+                <h3 className="font-display text-md text-ivory">{n.title}</h3>
+                <p className="mt-[11px] font-body text-base text-ivory/80">{n.blurb}</p>
                 {n.chunks.map((c, i) => (
-                  <p key={i} className="text-muted mt-[11px] text-[11px] leading-[17px]">
+                  <p key={i} className="mt-[11px] font-body text-base text-muted">
                     {c}
                   </p>
                 ))}
@@ -64,7 +64,7 @@ export default function Plain() {
                     href={n.links.repo}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="text-accent mt-[11px] inline-block text-[11px] leading-[11px] underline"
+                    className="mt-[11px] inline-block font-mono text-[11px] leading-[11px] text-ivory underline decoration-muted underline-offset-4"
                   >
                     repository ↗
                   </a>
@@ -73,7 +73,7 @@ export default function Plain() {
             ))}
 
             {skills.length > 0 && (
-              <p className="text-muted mt-[22px] text-[11px] leading-[17px]">
+              <p className="mt-[22px] font-body text-sm text-muted">
                 {skills.map((s) => s.title).join(' · ')}
               </p>
             )}

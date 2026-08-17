@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+/*
+ * Display is Bricolage Grotesque loaded with its optical-size, width and weight
+ * axes; the width axis is pushed wide on the hero line only. Body is Newsreader.
+ * IBM Plex Mono stays purely as the fallback for the self-hosted mono below.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,9 +14,13 @@
  * permits web embedding. Subset to the codepoints actually used: 2.2 KB, down
  * from 22 KB. License text ships at /fonts/DepartureMono-LICENSE.txt.
  *
- * Native design size is 11px. Every size in this app is 11px or an integer
- * multiple — at anything else the pixel grid falls between device pixels and
- * the whole face goes mushy.
+ * Native design size is 11px, and it is used at 11px or 22px only.
+ *
+ * That deliberately sits outside the 12/14/16/20/28/44/72 type scale, because
+ * the scale governs Bricolage and Newsreader — outline faces that resample
+ * cleanly to any size — while this one is drawn on a pixel grid. At 12px each
+ * font-pixel maps to 1.09 device pixels and the whole face goes soft. Mono is
+ * utility text only: coordinates, cosine scores, telemetry, labels.
  */
 @font-face {
   font-family: 'Departure Mono';
@@ -24,32 +33,33 @@
 @layer base {
   /*
    * THE PALETTE LIVES HERE AND NOWHERE ELSE.
-   *
-   * The spec's exact values were lost with the source document (see
-   * docs/DECISIONS.md). These are a stand-in chosen to satisfy the structure
-   * the spec describes — dark instrument ground, three distinguishable cluster
-   * hues, one accent that is none of them. Restoring the real palette is an
-   * edit to this block plus the mirrored constants in src/scene/palette.ts.
+   * src/scene/palette.ts mirrors it for three.js and must be edited with it.
    */
   /*
+   * The spec palette. Eight colours, nothing else.
+   *
    * Declared as raw RGB channel triples, not hex, and this is load-bearing:
    * Tailwind can only inject an alpha channel — `bg-panel/95` — into a colour
    * it can rewrite as `rgb(… / …)`. Given a bare `var(--panel)` holding a hex
    * string it emits nothing at all, so every translucent panel silently
    * renders fully transparent and the scene shines straight through the text.
+   *
+   * --query is reserved for the visitor's query: the query node, its retrieval
+   * beams, and the citation chips that point back at them. Nothing else, ever.
+   * The moment it appears on a hover state or a focus ring it stops meaning
+   * "this is you" and the whole colour story collapses. There is no --accent.
    */
   :root {
-    --backdrop: 7 9 12;
-    --panel: 13 18 24;
-    --line: 27 37 49;
-    --fg: 220 228 238;
-    --dim: 154 167 182;
-    --muted: 92 103 115;
-    --accent: 255 77 141;
+    --void: 11 14 20; /* #0B0E14 */
+    --panel: 20 26 36; /* #141A24 */
+    --ivory: 232 228 218; /* #E8E4DA */
+    --muted: 124 135 152; /* #7C8798 */
 
-    --cluster-ml: 139 157 255;
-    --cluster-eng: 78 222 163;
-    --cluster-data: 255 180 84;
+    --cluster-ml: 110 231 220; /* #6EE7DC  AI/ML + NLP */
+    --cluster-eng: 167 139 250; /* #A78BFA  full-stack / infra */
+    --cluster-data: 240 180 41; /* #F0B429  data / analytics */
+
+    --query: 255 94 91; /* #FF5E5B */
   }
 
   html,
@@ -59,20 +69,27 @@
   }
 
   body {
+    /* The backdrop is a lift of --void toward --panel at the centre, so the
+       gradient stays inside the palette instead of introducing a ninth colour. */
     background:
-      radial-gradient(120% 90% at 50% 42%, #101823 0%, #0a0f16 45%, rgb(var(--backdrop)) 100%),
-      rgb(var(--backdrop));
-    color: rgb(var(--fg));
-    font-family: 'Departure Mono', 'IBM Plex Mono', ui-monospace, monospace;
-    font-size: 11px;
-    line-height: 17px;
+      radial-gradient(
+        120% 90% at 50% 42%,
+        rgb(var(--panel)) 0%,
+        rgb(var(--void) / 0.55) 45%,
+        rgb(var(--void)) 100%
+      ),
+      rgb(var(--void));
+    color: rgb(var(--ivory));
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 16px;
+    line-height: 26px;
     font-synthesis: none;
     -webkit-text-size-adjust: 100%;
   }
 
   ::selection {
-    background: rgb(var(--accent));
-    color: rgb(var(--backdrop));
+    background: rgb(var(--query));
+    color: rgb(var(--void));
   }
 
   /* Instrument scrollbars — a default macOS scrollbar in the detail panel
@@ -85,7 +102,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgb(var(--line));
+    background: rgb(var(--muted) / 0.3);
   }
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(var(--muted));

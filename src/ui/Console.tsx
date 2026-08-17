@@ -10,6 +10,8 @@ const SUGGESTIONS = [
 export function Console() {
   const query = useStore((s) => s.query);
   const queryStatus = useStore((s) => s.queryStatus);
+  const modelStatus = useStore((s) => s.modelStatus);
+  const modelProgress = useStore((s) => s.modelProgress);
   const actions = useStore((s) => s.actions);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -37,8 +39,8 @@ export function Console() {
           actions.submit();
         }}
       >
-        <div className="border-line bg-panel flex items-center gap-[11px] border px-[11px] py-[11px]">
-          <span className="text-accent shrink-0 text-[11px] leading-[11px]">›</span>
+        <div className="flex items-center gap-[11px] border border-muted/20 bg-panel px-[11px] py-[11px]">
+          <span className="shrink-0 font-mono text-[11px] leading-[11px] text-muted">›</span>
           <input
             ref={inputRef}
             value={query}
@@ -46,9 +48,9 @@ export function Console() {
             placeholder="ask my portfolio a question…"
             spellCheck={false}
             autoComplete="off"
-            className="text-fg placeholder:text-muted min-w-0 flex-1 bg-transparent text-[11px] leading-[11px] outline-none"
+            className="min-w-0 flex-1 bg-transparent font-body text-base text-ivory outline-none placeholder:text-muted"
           />
-          <span className="text-muted shrink-0 text-[11px] leading-[11px]">/</span>
+          <span className="shrink-0 font-mono text-[11px] leading-[11px] text-muted">/</span>
         </div>
       </form>
 
@@ -60,19 +62,46 @@ export function Console() {
               actions.setQuery(s);
               actions.submit();
             }}
-            className="border-line text-muted hover:text-dim hover:border-dim pointer-events-auto border px-[7px] py-[4px] text-[11px] leading-[11px] transition-colors"
+            className="pointer-events-auto border border-muted/20 bg-panel px-[7px] py-[4px] font-mono text-[11px] leading-[11px] text-muted transition-colors hover:border-muted/50 hover:text-ivory"
           >
             {s}
           </button>
         ))}
       </div>
 
-      {queryStatus === 'queued' && (
-        <p className="text-muted mt-[11px] text-[11px] leading-[17px]">
-          Query held. The in-browser embedding model arrives in phase 2 — nothing is being
-          sent anywhere, and nothing is being faked here in the meantime.
-        </p>
-      )}
+      <Status queryStatus={queryStatus} modelStatus={modelStatus} progress={modelProgress} />
     </div>
   );
+}
+
+/**
+ * The model downloads once and is then served from IndexedDB, so the honest
+ * thing to report is which of those two is happening — a visitor who waited
+ * 20 seconds on their first visit should be told the second one is free.
+ */
+function Status({
+  queryStatus,
+  modelStatus,
+  progress,
+}: {
+  queryStatus: string;
+  modelStatus: string;
+  progress: number;
+}) {
+  let text: string | null = null;
+
+  if (queryStatus === 'queued' && modelStatus === 'loading') {
+    text = `Query held — fetching the embedding model, ${Math.round(progress * 100)}%. It runs in your browser, so nothing is sent anywhere. Cached after this once.`;
+  } else if (queryStatus === 'queued') {
+    text = 'Query held until the embedding model is ready.';
+  } else if (queryStatus === 'embedding') {
+    text = 'Embedding your question…';
+  } else if (queryStatus === 'retrieving') {
+    text = 'Scanning the corpus…';
+  } else if (modelStatus === 'error') {
+    text = 'The embedding model failed to load, so retrieval is unavailable. Everything else still works.';
+  }
+
+  if (!text) return null;
+  return <p className="mt-[11px] font-body text-sm text-muted">{text}</p>;
 }

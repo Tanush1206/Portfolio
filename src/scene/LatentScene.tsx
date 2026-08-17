@@ -5,6 +5,7 @@ import { Ambient } from './Ambient';
 import { CameraRig } from './CameraRig';
 import { EdgeLines } from './EdgeLines';
 import { NodeCloud } from './NodeCloud';
+import { QueryNode, RetrievalBeams } from './QueryNode';
 
 /**
  * The canvas is transparent and the backdrop is a CSS radial gradient on the
@@ -30,6 +31,8 @@ export function LatentScene() {
       <Ambient />
       <EdgeLines />
       <NodeCloud />
+      <RetrievalBeams />
+      <QueryNode />
 
       <EffectComposer>
         {/* Threshold sits above the desaturated skill hues and below the

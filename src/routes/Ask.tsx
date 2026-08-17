@@ -5,6 +5,7 @@ import { Legend } from '../ui/Legend';
 import { NodeDetail, NodeTooltip } from '../ui/NodeCard';
 import { Telemetry } from '../ui/Telemetry';
 import { useStore } from '../store/useStore';
+import { useEmbedder } from '../engine/useEmbedder';
 
 export default function Ask() {
   const corpusReady = useStore((s) => s.corpusReady);
@@ -15,8 +16,12 @@ export default function Ask() {
     void actions.loadCorpus();
   }, [actions]);
 
+  // Owns the worker, reports load progress, and drains a queued query the
+  // moment the model is ready.
+  useEmbedder();
+
   return (
-    <div className="bg-backdrop fixed inset-0 overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden bg-void">
       {corpusReady && <LatentScene />}
 
       {/* Overlays sit above the canvas but must not eat pointer events meant
@@ -32,7 +37,7 @@ export default function Ask() {
 
       {!corpusReady && !error && (
         <div className="absolute inset-0 z-30 flex items-center justify-center">
-          <span className="text-muted animate-pulse text-[11px] uppercase tracking-[0.22em]">
+          <span className="animate-pulse font-mono text-[11px] uppercase tracking-[0.22em] text-muted">
             reading latent space…
           </span>
         </div>
@@ -40,14 +45,14 @@ export default function Ask() {
 
       {error && (
         <div className="absolute inset-0 z-30 flex items-center justify-center p-[22px]">
-          <div className="border-line bg-panel max-w-[440px] border p-[22px]">
-            <h2 className="text-accent text-[11px] uppercase leading-[11px] tracking-[0.14em]">
+          <div className="max-w-[440px] border border-muted/20 bg-panel p-[22px]">
+            <h2 className="font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted">
               corpus failed to load
             </h2>
-            <p className="text-dim mt-[11px] text-[11px] leading-[17px]">{error}</p>
+            <p className="mt-[11px] font-body text-base text-ivory/80">{error}</p>
             <a
               href="plain"
-              className="border-line text-muted hover:text-fg mt-[22px] inline-block border px-[7px] py-[4px] text-[11px] leading-[11px]"
+              className="mt-[22px] inline-block border border-muted/20 px-[7px] py-[4px] font-mono text-[11px] leading-[11px] text-muted transition-colors hover:text-ivory"
             >
               read it as text instead →
             </a>
@@ -60,13 +65,18 @@ export default function Ask() {
 
 function Header() {
   return (
-    <header className="absolute left-0 top-0 z-20 m-[22px]">
-      <h1 className="text-fg text-[11px] uppercase leading-[11px] tracking-[0.22em]">
-        Tanush Thakran
+    <header className="absolute left-0 top-0 z-20 m-[22px] max-w-[420px]">
+      {/* The one hero size in the design. Bricolage's width axis is pushed wide
+          here and nowhere else. */}
+      <h1
+        className="font-display text-hero text-ivory"
+        style={{ fontVariationSettings: "'wdth' 100, 'wght' 600" }}
+      >
+        Tanush
       </h1>
-      <p className="text-muted mt-[11px] max-w-[300px] text-[11px] leading-[17px]">
-        This portfolio is a retrieval system. Every node sits where its embedding put it.
-        Ask it something.
+      <p className="mt-[11px] font-body text-base text-muted">
+        This portfolio is a retrieval system. Every node sits where its embedding put it. Ask it
+        something and watch where the answer comes from.
       </p>
     </header>
   );

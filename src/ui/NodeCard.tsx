@@ -43,17 +43,17 @@ export function NodeTooltip() {
   return (
     <div
       ref={ref}
-      className="pointer-events-none absolute left-0 top-0 z-20 max-w-[280px] border border-line bg-panel px-3 py-2"
+      className="pointer-events-none absolute left-0 top-0 z-20 max-w-[280px] border border-muted/20 bg-panel px-[11px] py-[11px]"
       style={{ opacity: 0 }}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-[7px]">
         <span
           className="inline-block h-[7px] w-[7px] shrink-0"
           style={{ background: CLUSTER_HEX[node.cluster] }}
         />
-        <span className="text-fg text-[11px] leading-[11px]">{node.title}</span>
+        <span className="font-mono text-[11px] leading-[11px] text-ivory">{node.title}</span>
       </div>
-      <div className="text-muted mt-2 text-[11px] leading-[17px]">{node.blurb}</div>
+      <p className="mt-[11px] font-body text-sm text-muted">{node.blurb}</p>
     </div>
   );
 }
@@ -76,27 +76,29 @@ export function NodeDetail() {
     .slice(0, 6);
 
   return (
-    <aside className="border-line bg-panel pointer-events-auto absolute right-0 top-0 z-20 flex h-full w-[min(380px,86vw)] flex-col gap-[22px] overflow-y-auto border-l p-[22px]">
-      <header className="flex items-start justify-between gap-3">
+    <aside className="pointer-events-auto absolute right-0 top-0 z-20 flex h-full w-[min(380px,86vw)] flex-col gap-[22px] overflow-y-auto border-l border-muted/20 bg-panel p-[22px]">
+      <header className="flex items-start justify-between gap-[11px]">
         <div>
-          <div className="text-muted text-[11px] uppercase tracking-[0.14em]">{node.type}</div>
-          <h2 className="text-fg mt-[11px] text-[22px] leading-[22px]">{node.title}</h2>
+          <div className="font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted">
+            {node.type}
+          </div>
+          <h2 className="mt-[11px] font-display text-lg text-ivory">{node.title}</h2>
         </div>
         <button
           onClick={() => actions.selectNode(null)}
-          className="text-muted hover:text-fg shrink-0 border border-line px-[7px] py-[4px] text-[11px] leading-[11px] transition-colors"
+          className="shrink-0 border border-muted/20 px-[7px] py-[4px] font-mono text-[11px] leading-[11px] text-muted transition-colors hover:text-ivory"
         >
           ESC
         </button>
       </header>
 
-      <p className="text-dim text-[11px] leading-[17px]">{node.blurb}</p>
+      <p className="font-body text-base text-ivory/80">{node.blurb}</p>
 
       <Section label="coordinates">
-        <code className="text-accent text-[11px] leading-[17px]">
+        <code className="font-mono text-[11px] leading-[17px] text-ivory">
           [{node.pos.map((c) => c.toFixed(3)).join(', ')}]
         </code>
-        <p className="text-muted mt-[11px] text-[11px] leading-[17px]">
+        <p className="mt-[11px] font-body text-sm text-muted">
           Derived by PCA over the embedding of this node's text. Not hand-placed.
         </p>
       </Section>
@@ -105,7 +107,7 @@ export function NodeDetail() {
         <Section label="metrics">
           <ul className="flex flex-col gap-[11px]">
             {node.metrics.map((m) => (
-              <li key={m} className="text-dim text-[11px] leading-[17px]">
+              <li key={m} className="font-body text-sm text-ivory/80">
                 {m}
               </li>
             ))}
@@ -117,7 +119,10 @@ export function NodeDetail() {
         <Section label="tech">
           <div className="flex flex-wrap gap-[7px]">
             {node.tech.map((t) => (
-              <span key={t} className="border-line text-muted border px-[7px] py-[4px] text-[11px] leading-[11px]">
+              <span
+                key={t}
+                className="border border-muted/20 px-[7px] py-[4px] font-mono text-[11px] leading-[11px] text-muted"
+              >
                 {t}
               </span>
             ))}
@@ -133,11 +138,13 @@ export function NodeDetail() {
                 onClick={() => actions.selectNode(n.node.id)}
                 onMouseEnter={() => actions.hoverNode(n.node.id)}
                 onMouseLeave={() => actions.hoverNode(null)}
-                className="hover:border-line flex w-full items-center justify-between gap-3 border border-transparent px-[7px] py-[4px] text-left transition-colors"
+                className="flex w-full items-center justify-between gap-[11px] border border-transparent px-[7px] py-[4px] text-left transition-colors hover:border-muted/20"
               >
-                <span className="text-dim truncate text-[11px] leading-[17px]">{n.node.title}</span>
+                <span className="truncate font-body text-sm text-ivory/80">{n.node.title}</span>
                 <span
-                  className={`shrink-0 text-[11px] leading-[11px] ${n.forced ? 'text-muted' : 'text-accent'}`}
+                  className={`shrink-0 font-mono text-[11px] leading-[11px] ${
+                    n.forced ? 'text-muted' : 'text-ivory'
+                  }`}
                   title={n.forced ? 'below threshold — forced min-degree link' : undefined}
                 >
                   {n.w.toFixed(3)}
@@ -164,7 +171,7 @@ export function NodeDetail() {
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="text-muted mb-[11px] text-[11px] uppercase leading-[11px] tracking-[0.14em]">
+      <h3 className="mb-[11px] font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted">
         {label}
       </h3>
       {children}
@@ -178,7 +185,7 @@ function ExtLink({ href, children }: { href: string; children: React.ReactNode }
       href={href}
       target="_blank"
       rel="noreferrer noopener"
-      className="border-line text-dim hover:text-accent hover:border-accent border px-[7px] py-[4px] text-[11px] leading-[11px] transition-colors"
+      className="border border-muted/20 px-[7px] py-[4px] font-mono text-[11px] leading-[11px] text-ivory/80 transition-colors hover:border-ivory hover:text-ivory"
     >
       {children} ↗
     </a>

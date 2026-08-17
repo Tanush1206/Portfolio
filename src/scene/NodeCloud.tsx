@@ -19,11 +19,14 @@ const RADIUS: Record<CorpusNode['type'], number> = {
 
 const HOVER_GROWTH = 0.5;
 const SELECT_GROWTH = 0.85;
+/** Retrieved nodes swell, so a hit is visible even off to the side of frame. */
+const HIT_GROWTH = 0.55;
 
 export function NodeCloud() {
   const nodes = useStore((s) => s.nodes);
   const hoveredNode = useStore((s) => s.hoveredNode);
   const selectedNode = useStore((s) => s.selectedNode);
+  const hits = useStore((s) => s.hits);
   const actions = useStore((s) => s.actions);
   const { camera, size } = useThree();
 
@@ -52,24 +55,37 @@ export function NodeCloud() {
     allocateScreen(nodes.map((n) => n.id));
   }, [nodes]);
 
-  // Colours are static, so write them once per corpus rather than per frame.
+  /**
+   * Colours change only when the corpus or the retrieval result changes, so
+   * they are written on those transitions rather than per frame.
+   *
+   * When there are hits, everything that was not retrieved is pushed down
+   * toward the background. Dimming the rest is what makes retrieval legible —
+   * brightening the hits alone just makes the whole cloud lighter.
+   */
   useEffect(() => {
+    const hitIds = new Set(hits.map((h) => h.id));
+    const dimming = hitIds.size > 0;
+
     const write = (mesh: InstancedMesh | null, idx: number[]) => {
       if (!mesh) return;
       const c = new Color();
       idx.forEach((nodeIdx, slot) => {
         const n = nodes[nodeIdx];
         c.copy(nodeColor(n.cluster, n.type === 'skill'));
+        if (dimming && !hitIds.has(n.id)) c.multiplyScalar(0.22);
         mesh.setColorAt(slot, c);
       });
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     };
     write(heroRef.current, heroes);
     write(subRef.current, substrate);
-  }, [nodes, heroes, substrate]);
+  }, [nodes, heroes, substrate, hits]);
 
   const m4 = useMemo(() => new Matrix4(), []);
   const v3 = useMemo(() => new Vector3(), []);
+
+  const hitIds = useMemo(() => new Set(hits.map((h) => h.id)), [hits]);
 
   useFrame((_, dt) => {
     if (!nodes.length) return;
@@ -81,7 +97,13 @@ export function NodeCloud() {
       idx.forEach((nodeIdx, slot) => {
         const n = nodes[nodeIdx];
         const want =
-          n.id === selectedNode ? SELECT_GROWTH : n.id === hoveredNode ? HOVER_GROWTH : 0;
+          n.id === selectedNode
+            ? SELECT_GROWTH
+            : n.id === hoveredNode
+              ? HOVER_GROWTH
+              : hitIds.has(n.id)
+                ? HIT_GROWTH
+                : 0;
         grow.current[nodeIdx] += (want - grow.current[nodeIdx]) * k;
         const r = RADIUS[n.type] * (1 + grow.current[nodeIdx]);
         m4.makeScale(r, r, r);
