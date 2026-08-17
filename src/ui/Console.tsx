@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useStore } from '../store/useStore';
+import { MODEL_DOWNLOAD_MB, shouldDeferModel } from '../engine/capabilities';
 
 const SUGGESTIONS = [
   'what have you built with retrieval?',
@@ -69,7 +70,12 @@ export function Console() {
         ))}
       </div>
 
-      <Status queryStatus={queryStatus} modelStatus={modelStatus} progress={modelProgress} />
+      <Status
+        queryStatus={queryStatus}
+        modelStatus={modelStatus}
+        progress={modelProgress}
+        deferred={useMemo(shouldDeferModel, [])}
+      />
     </div>
   );
 }
@@ -83,14 +89,22 @@ function Status({
   queryStatus,
   modelStatus,
   progress,
+  deferred,
 }: {
   queryStatus: string;
   modelStatus: string;
   progress: number;
+  deferred: boolean;
 }) {
   let text: string | null = null;
 
-  if (queryStatus === 'queued' && modelStatus === 'loading') {
+  // On a deferred device, say the price before it is paid rather than starting
+  // a 9 MB download on someone's mobile data without telling them.
+  if (deferred && modelStatus === 'idle' && queryStatus === 'idle') {
+    text = `Asking downloads a ~${MODEL_DOWNLOAD_MB} MB model to your device, once. It runs here — your question is never sent anywhere. Exploring the map costs nothing.`;
+  } else if (queryStatus === 'queued' && modelStatus === 'idle') {
+    text = 'Query held — starting the model download.';
+  } else if (queryStatus === 'queued' && modelStatus === 'loading') {
     text = `Query held — fetching the embedding model, ${Math.round(progress * 100)}%. It runs in your browser, so nothing is sent anywhere. Cached after this once.`;
   } else if (queryStatus === 'queued') {
     text = 'Query held until the embedding model is ready.';

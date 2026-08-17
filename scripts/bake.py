@@ -210,6 +210,19 @@ def main() -> int:
 
     # ── the acceptance test ──
     ret = neighbourhood_retention(vecs, coords, RETENTION_K)
+
+    # Write the two headline statistics back into layout.json so the "How this
+    # works" panel quotes measured numbers instead of numbers someone typed in
+    # once and forgot to update after a re-bake.
+    layout_path = OUT_DIR / "layout.json"
+    payload = json.loads(layout_path.read_text())
+    payload["stats"] = {
+        "explainedVariance": [round(float(v), 4) for v in var],
+        "retentionK": RETENTION_K,
+        "retentionMean": round(float(ret.mean()), 4),
+    }
+    layout_path.write_text(json.dumps(payload, indent=1))
+
     print(f"\nneighbourhood retention @{RETENTION_K}: "
           f"mean {ret.mean():.3f}  median {np.median(ret):.3f}  "
           f"min {ret.min():.3f}  (>= 0.50 means the geometry is trustworthy)")

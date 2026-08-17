@@ -1,8 +1,10 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import { AdditiveBlending, BufferGeometry, Float32BufferAttribute, Points } from 'three';
+import { isSmallScreen } from '../engine/capabilities';
 
-const COUNT = 700;
+// Halved on phones: pure fill-rate, and the field carries no meaning.
+const COUNT = isSmallScreen() ? 340 : 700;
 const SPAN = 46;
 
 /**

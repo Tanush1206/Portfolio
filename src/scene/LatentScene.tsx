@@ -1,9 +1,11 @@
 import { Canvas } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { FogExp2 } from 'three';
+import { isSmallScreen } from '../engine/capabilities';
 import { Ambient } from './Ambient';
 import { CameraRig } from './CameraRig';
 import { EdgeLines } from './EdgeLines';
+import { Halos } from './Halos';
 import { NodeCloud } from './NodeCloud';
 import { QueryNode, RetrievalBeams } from './QueryNode';
 
@@ -20,7 +22,10 @@ const FOG_COLOR = 0x0a0e14;
 export function LatentScene() {
   return (
     <Canvas
-      dpr={[1, 2]}
+      // Cap the pixel ratio harder on phones. A 3× retina phone renders nine
+      // times the fragments of a 1× desktop for a scene whose meaning is
+      // carried by position, not by edge sharpness.
+      dpr={isSmallScreen() ? [1, 1.5] : [1, 2]}
       gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
       camera={{ fov: 42, near: 0.1, far: 400, position: [0, 8, 46] }}
       onCreated={({ scene }) => {
@@ -29,6 +34,7 @@ export function LatentScene() {
     >
       <CameraRig />
       <Ambient />
+      <Halos />
       <EdgeLines />
       <NodeCloud />
       <RetrievalBeams />

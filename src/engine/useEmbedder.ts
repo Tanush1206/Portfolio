@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { projectVector } from './project';
+import { shouldDeferModel } from './capabilities';
 import type { Incoming, Outgoing } from './embedder.worker';
 import type { CorpusNode } from '../types';
 
@@ -39,7 +40,20 @@ export function useEmbedder() {
    */
   const [workerGen, setWorkerGen] = useState(0);
 
+  /**
+   * On a constrained device the worker is not even created until someone asks
+   * something — creating it pulls in the transformers bundle, which is the
+   * point of deferring. The cloud renders and is fully explorable meanwhile.
+   */
+  const deferred = useMemo(shouldDeferModel, []);
+  const [armed, setArmed] = useState(!deferred);
+
   useEffect(() => {
+    if (!armed && (queryStatus === 'queued' || queryStatus === 'embedding')) setArmed(true);
+  }, [armed, queryStatus]);
+
+  useEffect(() => {
+    if (!armed) return;
     // Vite resolves this at build time; no bundler config, no CDN, and the
     // worker is a real module worker rather than a blob shim.
     const worker = new Worker(new URL('./embedder.worker.ts', import.meta.url), {
@@ -72,7 +86,7 @@ export function useEmbedder() {
       worker.terminate();
       workerRef.current = null;
     };
-  }, [actions]);
+  }, [actions, armed]);
 
   // Dispatch whenever the store says a query is ready to be embedded.
   useEffect(() => {

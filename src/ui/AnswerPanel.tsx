@@ -23,7 +23,7 @@ export function AnswerPanel() {
   return (
     // Bottom stop clears the collapsed legend and its margin; the legend folds
     // itself away on the first answer so the two never stack.
-    <aside className="pointer-events-auto absolute left-0 top-0 z-20 m-[22px] mt-[176px] flex max-h-[calc(100%-300px)] w-[min(420px,86vw)] flex-col gap-[22px] overflow-y-auto border border-muted/20 bg-panel p-[22px]">
+    <aside className="pointer-events-auto absolute inset-x-[11px] top-[116px] z-20 flex max-h-[40vh] flex-col gap-[22px] overflow-y-auto border border-muted/20 bg-panel p-[22px] md:inset-x-auto md:left-0 md:top-0 md:m-[22px] md:mt-[176px] md:max-h-[calc(100%-300px)] md:w-[min(420px,86vw)]">
       <div className="flex items-center justify-between">
         <h2 className="font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted">
           answer

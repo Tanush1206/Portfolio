@@ -162,3 +162,35 @@ the answer panel's footer to stop saying they are. That is a product call, not a
 `HIT_FLOOR` alone plus a fixed `TOP_K` returned five results whether or not five were any
 good. Results must now also clear 70% of the top hit's score, so weak tails fall off on their
 own instead of a fixed number being tuned to suit one query.
+
+## Scores stay pure cosine — no type prior, no reranking
+
+Given the finding above, the obvious product fix is a prior that boosts projects and
+experience above skills. **Rejected**, for three reasons in order of weight.
+
+The site's whole claim is that nothing is hand-placed and the numbers are real. A type prior
+is a thumb on the scale, and the moment the answer footer has to read "cosine, adjusted", the
+demo becomes an ordinary portfolio with a nice graph. That trades the one property nothing
+else here has for slightly tidier citation labels.
+
+The behaviour is the system being honest about a real limitation, not a defect. Dense
+retrieval matches topic; "what have you built" is an intent. That gap is a well-known result,
+and someone who knows retrieval reads it as the system working correctly.
+
+And it is a better story told than hidden, so it is stated outright in the "How this works"
+panel rather than engineered around.
+
+The legitimate lever, if the project should surface, is the **corpus, not the ranking**:
+`RAG_BASED_AI`'s chunks may simply not contain build-intent language. Rewriting a chunk to say
+what was built and why changes the input, which is fair; changing the metric is not.
+
+## A dependency-less rAF effect must not be gated on a conditional render
+
+`CitationLines` returned `null` until the first answer arrived. Its rAF loop lives in a
+`useEffect` with `[]` dependencies **on purpose** — it must not tear down and restart on every
+render — so it ran exactly once, against a `ref` that was still `null`, and never again. Lines
+never drew, with no error anywhere.
+
+The element is now always mounted and simply inert when there is nothing to point at. Any
+long-lived imperative loop keyed to a ref has this trap: if the component can render `null`,
+the effect's one and only run may land on nothing.

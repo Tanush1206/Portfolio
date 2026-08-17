@@ -3,7 +3,7 @@ import { loadCorpus } from '../engine/corpus';
 import { projectVector } from '../engine/project';
 import { bestChunk, retrieve } from '../engine/retrieve';
 import { compose } from '../engine/compose';
-import type { AnswerSegment, Basis, CorpusNode, Edge, Hit, Vec3 } from '../types';
+import type { AnswerSegment, Basis, CorpusNode, Edge, Hit, Layout, Vec3 } from '../types';
 
 /**
  * Model loading and query lifecycle are separate state machines on purpose.
@@ -24,6 +24,8 @@ interface State {
   vectors: Float32Array | null;
   basis: Basis | null;
   edgeThreshold: number;
+  /** Measured by the bake; quoted verbatim by the "How this works" panel. */
+  stats: Layout['stats'];
   corpusReady: boolean;
 
   // ── model ──
@@ -80,6 +82,7 @@ export const useStore = create<State>((set, get) => ({
   vectors: null,
   basis: null,
   edgeThreshold: 0.42,
+  stats: undefined,
   corpusReady: false,
 
   modelStatus: 'idle',
@@ -113,6 +116,7 @@ export const useStore = create<State>((set, get) => ({
           nodes: layout.nodes,
           edges: layout.edges,
           edgeThreshold: layout.edgeThreshold,
+          stats: layout.stats,
           vectors,
           basis,
           corpusReady: true,

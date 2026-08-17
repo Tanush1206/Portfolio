@@ -50,6 +50,12 @@ export interface Layout {
   edgeThreshold: number;
   sceneScale: number;
   projection: { file: string; layout: string; scale: number };
+  /** Written by the bake so the UI never quotes a stale hand-typed figure. */
+  stats?: {
+    explainedVariance: [number, number, number];
+    retentionK: number;
+    retentionMean: number;
+  };
   nodes: CorpusNode[];
   edges: Edge[];
 }

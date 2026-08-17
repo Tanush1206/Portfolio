@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
+import { isSmallScreen } from '../engine/capabilities';
 import { CLUSTER_HEX } from '../scene/palette';
 import type { Cluster } from '../types';
 
@@ -14,7 +15,7 @@ export function Legend() {
   const edges = useStore((s) => s.edges);
   const threshold = useStore((s) => s.edgeThreshold);
   const hasAnswer = useStore((s) => s.segments.length > 0);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => !isSmallScreen());
   const autoClosed = useRef(false);
 
   /**
@@ -38,7 +39,13 @@ export function Legend() {
   const forced = edges.filter((e) => e.forced).length;
 
   return (
-    <div className="pointer-events-auto absolute bottom-0 left-0 z-20 m-[22px] w-[min(330px,80vw)] border border-muted/20 bg-panel">
+    // Bottom-left belongs to the console on a phone, so the legend moves to the
+    // top-right slot the telemetry readout vacates below `md`.
+    <div
+      className={`pointer-events-auto absolute right-0 top-[64px] z-20 m-[11px] w-[min(330px,80vw)] border border-muted/20 bg-panel md:bottom-0 md:left-0 md:right-auto md:top-auto md:m-[22px] ${
+        hasAnswer ? 'hidden md:block' : ''
+      }`}
+    >
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between px-[11px] py-[11px] font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted transition-colors hover:text-ivory"

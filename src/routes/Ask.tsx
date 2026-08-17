@@ -3,6 +3,7 @@ import { LatentScene } from '../scene/LatentScene';
 import { Console } from '../ui/Console';
 import { AnswerPanel } from '../ui/AnswerPanel';
 import { CitationLines } from '../ui/CitationLines';
+import { HowItWorks } from '../ui/HowItWorks';
 import { Legend } from '../ui/Legend';
 import { NodeDetail, NodeTooltip } from '../ui/NodeCard';
 import { Telemetry } from '../ui/Telemetry';
@@ -69,19 +70,20 @@ export default function Ask() {
 
 function Header() {
   return (
-    <header className="absolute left-0 top-0 z-20 m-[22px] max-w-[420px]">
+    <header className="absolute left-0 top-0 z-20 m-[11px] max-w-[420px] md:m-[22px]">
       {/* The one hero size in the design. Bricolage's width axis is pushed wide
           here and nowhere else. */}
       <h1
-        className="font-display text-hero text-ivory"
+        className="font-display text-xl text-ivory md:text-hero"
         style={{ fontVariationSettings: "'wdth' 100, 'wght' 600" }}
       >
         Tanush
       </h1>
-      <p className="mt-[11px] font-body text-base text-muted">
+      <p className="mt-[11px] hidden font-body text-base text-muted sm:block">
         This portfolio is a retrieval system. Every node sits where its embedding put it. Ask it
         something and watch where the answer comes from.
       </p>
+      <HowItWorks />
     </header>
   );
 }

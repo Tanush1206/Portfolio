@@ -1462,5 +1462,14 @@
    "w": 0.3866,
    "forced": true
   }
- ]
+ ],
+ "stats": {
+  "explainedVariance": [
+   0.1161,
+   0.0918,
+   0.0657
+  ],
+  "retentionK": 5,
+  "retentionMean": 0.5378
+ }
 }

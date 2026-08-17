@@ -15,7 +15,7 @@ export function Telemetry() {
   const forced = edges.filter((e) => e.forced).length;
 
   return (
-    <div className="pointer-events-auto absolute right-0 top-0 z-20 m-[22px] border border-muted/20 bg-panel px-[11px] py-[11px] font-mono">
+    <div className="pointer-events-auto absolute right-0 top-0 hidden md:block z-20 m-[22px] border border-muted/20 bg-panel px-[11px] py-[11px] font-mono">
       <dl className="grid grid-cols-[auto_auto] gap-x-[22px] gap-y-[7px] text-[11px] leading-[11px]">
         <Row k="nodes" v={nodes.length ? String(nodes.length) : '—'} />
         <Row k="links" v={edges.length ? `${edges.length - forced} + ${forced} forced` : '—'} />

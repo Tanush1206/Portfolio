@@ -76,7 +76,7 @@ export function NodeDetail() {
     .slice(0, 6);
 
   return (
-    <aside className="pointer-events-auto absolute right-0 top-0 z-20 flex h-full w-[min(380px,86vw)] flex-col gap-[22px] overflow-y-auto border-l border-muted/20 bg-panel p-[22px]">
+    <aside className="pointer-events-auto absolute inset-x-0 bottom-0 top-auto z-30 flex max-h-[70vh] flex-col gap-[22px] overflow-y-auto border-t border-muted/20 bg-panel p-[22px] md:inset-x-auto md:right-0 md:top-0 md:h-full md:max-h-none md:w-[min(380px,86vw)] md:border-l md:border-t-0">
       <header className="flex items-start justify-between gap-[11px]">
         <div>
           <div className="font-mono text-[11px] uppercase leading-[11px] tracking-[0.14em] text-muted">
