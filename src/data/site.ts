@@ -29,6 +29,11 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: siteMeta.title,
     description: siteMeta.description,
   },
+  '/flight': {
+    title: 'Flight Log',
+    description:
+      'An interactive 3D flight log — the work plotted across Delhi, Bengaluru, Pilani and Cairo, the four places it actually happened.',
+  },
   '/about': {
     title: 'About',
     description:

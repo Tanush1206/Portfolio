@@ -7,6 +7,7 @@ const Navigation: React.FC = () => {
   const location = useLocation();
 
   const navItems = [
+    { name: 'FLIGHT', href: '/flight' },
     { name: 'PROJ', href: '/projects' },
     { name: 'EXP', href: '/experience' },
     { name: 'STACK', href: '/skills' },

@@ -41,6 +41,44 @@
 }
 
 @layer components {
+  /* The flight globe's arrival panel embeds the real section components so
+     About/Projects/Skills stay the single source of truth. Those components
+     are built as full pages, so strip their page-level chrome here rather
+     than forking them. */
+  .gate-embed > * {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Page-level decorative blurs and watermarks are sized for a viewport. */
+  .gate-embed [class*="blur-["],
+  .gate-embed [class*="absolute"][class*="opacity-10"] {
+    display: none !important;
+  }
+
+  /* Section heroes run to text-display-lg (up to 120px) — right for a page,
+     absurd inside a 78vh panel whose header already names the section. */
+  .gate-embed h1 {
+    font-size: clamp(19px, 3.2vw, 32px) !important;
+    line-height: 1.12 !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .gate-embed h2 {
+    font-size: clamp(17px, 2.6vw, 25px) !important;
+    line-height: 1.15 !important;
+  }
+
+  .gate-embed h3 {
+    font-size: clamp(14px, 2vw, 19px) !important;
+  }
+
   .mesh-gradient {
     background: radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
   }

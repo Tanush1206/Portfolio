@@ -50,7 +50,9 @@ export default {
         "on-tertiary": "#003824",
         "primary-fixed": "#e2dfff",
         "on-secondary-fixed": "#23005c",
-        "secondary": "#d0bcff"
+        "secondary": "#d0bcff",
+        // Flight-HUD accent: "you are here". Matches the terminal-dot yellow.
+        "amber": "#ffbd2e"
       },
       fontFamily: {
         "headline-md": ["Space Grotesk", "sans-serif"],

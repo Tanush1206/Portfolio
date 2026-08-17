@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -14,6 +14,19 @@ import ScrollToTop from './components/ScrollToTop';
 import NotFound from './components/NotFound';
 import RouteMeta from './components/RouteMeta';
 import { personalInfo } from './data/personal';
+
+// The flight globe pulls in three.js, so it is code-split — the rest of the
+// site must never pay for it. It also renders full-viewport, so it sits
+// OUTSIDE Layout (no nav bar, no footer) and carries its own escape hatch.
+const FlightGlobe = lazy(() => import('./components/globe/FlightGlobe'));
+
+const GlobeFallback: React.FC = () => (
+  <div className="fixed inset-0 bg-[#02040a] flex items-center justify-center">
+    <span className="font-code-snippet text-[10px] tracking-[0.2em] uppercase text-primary animate-pulse">
+      ▚ loading flight deck
+    </span>
+  </div>
+);
 
 const socialLinks = [
   { label: 'GitHub', href: personalInfo.github, Icon: FaGithub },
@@ -128,13 +141,28 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
+/** Layout as a route so /flight can opt out of the nav and footer entirely. */
+const LayoutRoute: React.FC = () => (
+  <Layout>
+    <Outlet />
+  </Layout>
+);
+
 function App() {
   return (
     <Router>
       <ScrollToTop />
       <RouteMeta />
-      <Layout>
-        <Routes>
+      <Routes>
+        <Route
+          path="/flight"
+          element={
+            <Suspense fallback={<GlobeFallback />}>
+              <FlightGlobe />
+            </Suspense>
+          }
+        />
+        <Route element={<LayoutRoute />}>
           <Route path="/" element={<Hero />} />
           <Route path="/about" element={<About />} />
           <Route path="/skills" element={<Skills />} />
@@ -144,8 +172,8 @@ function App() {
           <Route path="/certificates" element={<Certificates />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
+        </Route>
+      </Routes>
     </Router>
   );
 }
