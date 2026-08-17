@@ -39,3 +39,8 @@ Desktop.ini
 *.sln
 *.sw?
 .env
+
+# Bake artifacts are committed deliberately (see scripts/bake.py) — the corpus
+# is never embedded at runtime. Python cruft from the bake is not.
+__pycache__/
+*.pyc

@@ -1,0 +1,317 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { projects, Project } from '../data/projects';
+import { personalInfo } from '../data/personal';
+import WindowControls from './WindowControls';
+
+const formatTerminalString = (str: string) => {
+  if (typeof str !== 'string') return str;
+  return str.split('_').map((part, i, arr) => (
+    <React.Fragment key={i}>
+      {part}
+      {i < arr.length - 1 && <>_<wbr/></>}
+    </React.Fragment>
+  ));
+};
+
+const ProjectCard: React.FC<{ 
+  project: Project, 
+  onClose: (id: string) => void,
+  isClosed: boolean,
+  isHighlighted?: boolean
+}> = ({ project, onClose, isClosed, isHighlighted }) => {
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isFullWidth, setIsFullWidth] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isHighlighted && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isHighlighted]);
+
+  if (isClosed) return null;
+
+  const cardClasses = `glass-card p-0 overflow-hidden border transition-all duration-500 group ${
+    isHighlighted ? 'border-primary shadow-[0_0_30px_rgba(39,201,63,0.3)] ring-1 ring-primary/50 scale-[1.02]' : 'border-white/10 hover:border-primary/50'
+  } ${
+    isFullWidth ? 'md:col-span-12' : project.layout === 'featured' || project.layout === 'wide' ? 'md:col-span-8' : project.layout === 'terminal' ? 'md:col-span-12' : 'md:col-span-4'
+  } ${isMinimized ? 'h-fit self-start' : 'h-full'}`;
+
+  return (
+    <div id={project.id} ref={cardRef} className={cardClasses}>
+      <WindowControls 
+        onClose={() => onClose(project.id)}
+        onMinimize={() => setIsMinimized(!isMinimized)}
+        onMaximize={() => setIsFullWidth(!isFullWidth)}
+        title={project.pathLabel || `PROJECT: ${project.title.toUpperCase()}`}
+      />
+      {!isMinimized && (
+        <div className={`p-8 md:p-12 flex flex-col ${project.layout === 'wide' || project.layout === 'featured' ? 'md:flex-row' : ''} gap-8 animate-in fade-in slide-in-from-top-4 duration-500`}>
+          <div className="flex-1 space-y-6">
+            <div className="flex items-center gap-2 text-tertiary font-code-snippet text-label-caps uppercase text-[10px] tracking-tighter text-left">
+              <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>terminal</span>
+              <span>Status: {project.status}</span>
+            </div>
+            <h3 className="font-headline-lg text-headline-md md:text-headline-lg text-on-surface uppercase text-left break-words leading-tight">{formatTerminalString(project.title)}</h3>
+            <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed text-left">{project.description}</p>
+            <div className="flex flex-wrap gap-2">
+              {project.tags.map(tag => (
+                <span key={tag} className="px-3 py-1 border border-primary/20 bg-primary/5 font-code-snippet text-[10px] text-primary uppercase tracking-widest">{tag}</span>
+              ))}
+            </div>
+            <div className="flex gap-6 pt-4">
+              {project.sourceUrl !== '#' && (
+                <a className="font-code-snippet text-label-caps text-on-surface hover:text-primary transition-colors border-b border-white/10 pb-1" href={project.sourceUrl} target="_blank" rel="noopener noreferrer">[VIEW_SOURCE]</a>
+              )}
+              {project.demoUrl !== '#' && (
+                <a className="font-code-snippet text-label-caps text-on-surface hover:text-primary transition-colors border-b border-white/10 pb-1" href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+                  {project.status === 'Strategy' || project.title.toLowerCase().includes('case study') ? '[VIEW_CASE_STUDY]' : '[LIVE_DEMO]'}
+                </a>
+              )}
+            </div>
+          </div>
+          {project.imgSrc && (
+            <div className="flex-1 bg-surface-container-highest rounded border border-white/5 overflow-hidden max-h-[300px]">
+              <img 
+                alt={project.imgAlt} 
+                className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" 
+                src={project.imgSrc} 
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Projects: React.FC = () => {
+  const [closedIds, setClosedIds] = useState<string[]>([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [command, setCommand] = useState('');
+  const [commandOutput, setCommandOutput] = useState('');
+
+  const runCommand = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Strip flags (`contact --now`) and normalise so the prompt is forgiving.
+    const input = command.trim().toLowerCase();
+    if (!input) return;
+    const verb = input.split(/\s+/)[0].replace(/^-+/, '');
+
+    const say = (msg: string) => {
+      setCommandOutput(msg);
+      setCommand('');
+    };
+
+    switch (verb) {
+      case 'contact':
+      case 'hire':
+      case 'email':
+        say('[OK] Opening contact channel...');
+        setTimeout(() => navigate('/contact'), 600);
+        return;
+      case 'resume':
+      case 'cv':
+        say('[OK] Fetching resume.pdf...');
+        window.open(personalInfo.resume, '_blank', 'noopener,noreferrer');
+        return;
+      case 'about':
+      case 'whoami':
+        say(`[OK] ${personalInfo.name} — ${personalInfo.role}`);
+        setTimeout(() => navigate('/about'), 600);
+        return;
+      case 'github':
+        say('[OK] Opening GitHub...');
+        window.open(personalInfo.github, '_blank', 'noopener,noreferrer');
+        return;
+      case 'skills':
+      case 'stack':
+        say('[OK] Loading stack...');
+        setTimeout(() => navigate('/skills'), 600);
+        return;
+      case 'restore':
+      case 'reset':
+        setClosedIds([]);
+        say('[OK] All windows restored.');
+        return;
+      case 'clear':
+        setCommand('');
+        setCommandOutput('');
+        return;
+      case 'help':
+      case 'ls':
+        say('AVAILABLE: contact · resume · about · skills · github · restore · clear');
+        return;
+      default: {
+        // Fall back to fuzzy-matching a project name, e.g. `rag` or `pactpal`.
+        const match = projects.find(
+          (p) => p.id.includes(verb) || p.title.toLowerCase().includes(verb)
+        );
+        if (match) {
+          say(`[OK] Locating ${match.title}...`);
+          setHighlightedId(match.id);
+          setClosedIds((prev) => prev.filter((id) => id !== match.id));
+          return;
+        }
+        say(`[ERR] Unknown command: "${verb}" — type "help" for options.`);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash) setHighlightedId(hash);
+  }, [location]);
+
+  // Clear the highlight a few seconds after it is set, regardless of whether
+  // it came from a deep link or the command bar.
+  useEffect(() => {
+    if (!highlightedId) return;
+    const timer = setTimeout(() => setHighlightedId(null), 3000);
+    return () => clearTimeout(timer);
+  }, [highlightedId]);
+
+  const handleClose = (id: string) => {
+    setClosedIds(prev => [...prev, id]);
+  };
+
+  const handleRestore = (id: string) => {
+    setClosedIds(prev => prev.filter(cid => cid !== id));
+  };
+
+  return (
+    <div className="relative pt-[120px] pb-[200px] px-margin-safe max-w-container-max mx-auto overflow-hidden">
+      {/* Subtle Ambient Background (Mascot Watermark) */}
+      <div className="fixed top-1/4 -right-20 opacity-10 pointer-events-none select-none z-0">
+        <img 
+          alt="Mascot" 
+          className="w-[300px] md:w-[800px] h-auto" 
+          src="/images/mascot.png" 
+        />
+      </div>
+
+      {/* Section Header */}
+      <div className="relative z-10 mb-20">
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-primary font-code-snippet text-body-lg">&gt;</span>
+          <h1 className="font-headline-lg text-headline-lg-mobile md:text-display-lg text-on-surface uppercase">
+            PROJECTS.<wbr/>LOG
+            <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle hidden md:inline-block"></span>
+          </h1>
+        </div>
+        <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+          Data analysis, machine learning pipelines, and the production systems built around them — each one taken from raw data through to a measured result.
+        </p>
+      </div>
+
+      {/* Bento Grid Projects Showcase */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter relative z-10">
+        {projects.map((project) => (
+          <ProjectCard 
+            key={project.id} 
+            project={project} 
+            onClose={handleClose}
+            isClosed={closedIds.includes(project.id)}
+            isHighlighted={highlightedId === project.id}
+          />
+        ))}
+      </div>
+
+      {/* OS Dock for Closed Projects */}
+      {closedIds.length > 0 && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-bottom-10 duration-500 w-fit max-w-[95vw]">
+          <div className="flex items-center gap-3 bg-black/60 backdrop-blur-xl border border-white/20 p-3 rounded-2xl shadow-2xl overflow-x-auto no-scrollbar scroll-smooth">
+            {closedIds.map(id => {
+              const project = projects.find(p => p.id === id);
+              return (
+                <button
+                  key={id}
+                  onClick={() => handleRestore(id)}
+                  className="group relative flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-white/10 hover:bg-primary/20 hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 active:scale-90"
+                  title={`Restore ${project?.title}`}
+                >
+                  <div className="w-6 h-6 text-white/60 group-hover:text-primary transition-colors">
+                    {id === 'atw' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                    ) : id === 'aasrah' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    ) : id === 'rag-based-ai' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                    ) : id === 'videocaptionmaker' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                    ) : id === 'superstore-analysis' ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                    )}
+                  </div>
+                  
+                  {/* Tooltip */}
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 border border-white/10 text-primary text-[10px] font-code-snippet rounded-lg opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none shadow-2xl backdrop-blur-md translate-y-2 group-hover:translate-y-0 z-[110]">
+                    RESTORE_{project?.title?.toUpperCase().replace(/\s+/g, '_')}
+                  </div>
+
+                  {/* Notification Dot */}
+                  <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_#27c93f] opacity-80"></div>
+                </button>
+              );
+            })}
+            
+            <div className="w-[1px] h-10 bg-white/10 mx-2 flex-shrink-0"></div>
+            
+            <button 
+              onClick={() => setClosedIds([])}
+              className="group relative flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-2xl bg-error/10 border border-error/20 text-error hover:bg-error hover:text-on-error transition-all duration-300 active:scale-90"
+              title="Reset All Windows"
+            >
+              <div className="w-6 h-6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              </div>
+              <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 border border-white/10 text-error text-[10px] font-code-snippet rounded-lg opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none shadow-2xl backdrop-blur-md translate-y-2 group-hover:translate-y-0 z-[110]">
+                RESET_ALL_WINDOWS
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Section Footer CTA — a working command bar, not a decorative input */}
+      <div className="mt-section-gap flex flex-col items-center text-center space-y-8 relative z-10">
+        <div className="w-px h-24 bg-gradient-to-b from-primary to-transparent"></div>
+        <h2 className="font-headline-md text-headline-md text-on-surface uppercase">Ready To Collaborate?</h2>
+        <form onSubmit={runCommand} className="w-full max-w-xl">
+          <label htmlFor="command-input" className="sr-only">Terminal command</label>
+          <div className="flex items-center gap-4 bg-surface-container-low border border-white/10 focus-within:border-primary/50 px-6 py-4 transition-colors">
+            <span className="text-primary font-code-snippet">&gt;</span>
+            <input
+              id="command-input"
+              value={command}
+              onChange={(e) => setCommand(e.target.value)}
+              className="bg-transparent border-none focus:ring-0 text-on-surface font-code-snippet w-full placeholder:opacity-30 outline-none uppercase"
+              placeholder="type command (e.g. contact --now)"
+              type="text"
+              autoComplete="off"
+              spellCheck={false}
+              aria-describedby="command-output"
+            />
+            <span className="w-[0.5em] h-[1em] bg-primary/80 animate-pulse ml-2 align-middle"></span>
+          </div>
+          {commandOutput && (
+            <p
+              id="command-output"
+              role="status"
+              className="mt-3 font-code-snippet text-[11px] text-primary/80 uppercase tracking-widest text-left px-6 animate-in fade-in slide-in-from-top-1 duration-300"
+            >
+              {commandOutput}
+            </p>
+          )}
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Projects;

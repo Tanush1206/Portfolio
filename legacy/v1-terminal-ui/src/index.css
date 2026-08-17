@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --margin-safe: 20px;
+    --section-gap: 80px;
+    --gutter: 16px;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --margin-safe: 40px;
+      --section-gap: 120px;
+      --gutter: 24px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --margin-safe: 64px;
+      --section-gap: 160px;
+      --gutter: 32px;
+    }
+  }
+
+  body {
+    background-color: #131313;
+    color: #e2e2e2;
+    @apply font-body overflow-x-hidden w-full;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply break-words;
+  }
+}
+
+@layer components {
+  /* The flight globe's arrival panel embeds the real section components so
+     About/Projects/Skills stay the single source of truth. Those components
+     are built as full pages, so strip their page-level chrome here rather
+     than forking them. */
+  .gate-embed > * {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Page-level decorative blurs and watermarks are sized for a viewport. */
+  .gate-embed [class*="blur-["],
+  .gate-embed [class*="absolute"][class*="opacity-10"] {
+    display: none !important;
+  }
+
+  /* Section heroes run to text-display-lg (up to 120px) — right for a page,
+     absurd inside a 78vh panel whose header already names the section. */
+  .gate-embed h1 {
+    font-size: clamp(19px, 3.2vw, 32px) !important;
+    line-height: 1.12 !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .gate-embed h2 {
+    font-size: clamp(17px, 2.6vw, 25px) !important;
+    line-height: 1.15 !important;
+  }
+
+  .gate-embed h3 {
+    font-size: clamp(14px, 2vw, 19px) !important;
+  }
+
+  .mesh-gradient {
+    background: radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+  }
+
+  .glass-card {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply transition-all duration-300;
+  }
+
+  .glass-card:hover {
+    @apply border-primary/30 shadow-[0_0_30px_rgba(79,70,229,0.1)];
+  }
+
+  .terminal-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .dot-red { background-color: #ff5f56; }
+  .dot-yellow { background-color: #ffbd2e; }
+  .dot-green { background-color: #27c93f; }
+  
+  .cursor-blink {
+    display: inline-block;
+    width: 8px;
+    height: 18px;
+    background-color: #c3c0ff;
+    @apply animate-blink;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  .neon-text {
+    @apply bg-gradient-to-r from-primary via-tertiary to-secondary bg-clip-text text-transparent font-bold;
+  }
+
+  .btn-squishy {
+    @apply transition-transform duration-300 active:scale-95 hover:scale-[1.02];
+  }
+
+  .material-symbols-outlined {
+    text-transform: none !important;
+  }
+
+  .glass-panel {
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glow-indigo {
+    box-shadow: 0 0 40px rgba(79, 70, 229, 0.2);
+  }
+  
+  .glitch-text {
+    text-shadow: 2px 0 #4edea3, -2px 0 #4f46e5;
+  }
+  
+  .scanline {
+    background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(to right, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0e0e0e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #353535;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c3c0ff;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(195, 192, 255, 0.3);
+}
