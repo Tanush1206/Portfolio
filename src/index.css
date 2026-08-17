@@ -1,177 +1,100 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Departure Mono, self-hosted under the SIL Open Font License 1.1, which
+ * permits web embedding. Subset to the codepoints actually used: 2.2 KB, down
+ * from 22 KB. License text ships at /fonts/DepartureMono-LICENSE.txt.
+ *
+ * Native design size is 11px. Every size in this app is 11px or an integer
+ * multiple — at anything else the pixel grid falls between device pixels and
+ * the whole face goes mushy.
+ */
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono-Regular.subset.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
+  /*
+   * THE PALETTE LIVES HERE AND NOWHERE ELSE.
+   *
+   * The spec's exact values were lost with the source document (see
+   * docs/DECISIONS.md). These are a stand-in chosen to satisfy the structure
+   * the spec describes — dark instrument ground, three distinguishable cluster
+   * hues, one accent that is none of them. Restoring the real palette is an
+   * edit to this block plus the mirrored constants in src/scene/palette.ts.
+   */
+  /*
+   * Declared as raw RGB channel triples, not hex, and this is load-bearing:
+   * Tailwind can only inject an alpha channel — `bg-panel/95` — into a colour
+   * it can rewrite as `rgb(… / …)`. Given a bare `var(--panel)` holding a hex
+   * string it emits nothing at all, so every translucent panel silently
+   * renders fully transparent and the scene shines straight through the text.
+   */
   :root {
-    --margin-safe: 20px;
-    --section-gap: 80px;
-    --gutter: 16px;
+    --backdrop: 7 9 12;
+    --panel: 13 18 24;
+    --line: 27 37 49;
+    --fg: 220 228 238;
+    --dim: 154 167 182;
+    --muted: 92 103 115;
+    --accent: 255 77 141;
+
+    --cluster-ml: 139 157 255;
+    --cluster-eng: 78 222 163;
+    --cluster-data: 255 180 84;
   }
 
-  @media (min-width: 768px) {
-    :root {
-      --margin-safe: 40px;
-      --section-gap: 120px;
-      --gutter: 24px;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    :root {
-      --margin-safe: 64px;
-      --section-gap: 160px;
-      --gutter: 32px;
-    }
+  html,
+  body,
+  #root {
+    height: 100%;
   }
 
   body {
-    background-color: #131313;
-    color: #e2e2e2;
-    @apply font-body overflow-x-hidden w-full;
-    position: relative;
-    -webkit-overflow-scrolling: touch;
+    background:
+      radial-gradient(120% 90% at 50% 42%, #101823 0%, #0a0f16 45%, rgb(var(--backdrop)) 100%),
+      rgb(var(--backdrop));
+    color: rgb(var(--fg));
+    font-family: 'Departure Mono', 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px;
+    line-height: 17px;
+    font-synthesis: none;
+    -webkit-text-size-adjust: 100%;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply break-words;
-  }
-}
-
-@layer components {
-  /* The flight globe's arrival panel embeds the real section components so
-     About/Projects/Skills stay the single source of truth. Those components
-     are built as full pages, so strip their page-level chrome here rather
-     than forking them. */
-  .gate-embed > * {
-    padding-top: 1.25rem !important;
-    padding-bottom: 1.75rem !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    min-height: 0 !important;
-    max-width: none !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+  ::selection {
+    background: rgb(var(--accent));
+    color: rgb(var(--backdrop));
   }
 
-  /* Page-level decorative blurs and watermarks are sized for a viewport. */
-  .gate-embed [class*="blur-["],
-  .gate-embed [class*="absolute"][class*="opacity-10"] {
-    display: none !important;
+  /* Instrument scrollbars — a default macOS scrollbar in the detail panel
+     breaks the illusion harder than almost anything else on the page. */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--line));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--muted));
   }
 
-  /* Section heroes run to text-display-lg (up to 120px) — right for a page,
-     absurd inside a 78vh panel whose header already names the section. */
-  .gate-embed h1 {
-    font-size: clamp(19px, 3.2vw, 32px) !important;
-    line-height: 1.12 !important;
-    margin-bottom: 0.75rem !important;
+  /* The canvas owns the pointer. Text selection while orbiting produces a
+     highlighted UI and a camera that feels broken. */
+  canvas {
+    touch-action: none;
+    user-select: none;
   }
-
-  .gate-embed h2 {
-    font-size: clamp(17px, 2.6vw, 25px) !important;
-    line-height: 1.15 !important;
-  }
-
-  .gate-embed h3 {
-    font-size: clamp(14px, 2vw, 19px) !important;
-  }
-
-  .mesh-gradient {
-    background: radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
-  }
-
-  .glass-card {
-    backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    @apply transition-all duration-300;
-  }
-
-  .glass-card:hover {
-    @apply border-primary/30 shadow-[0_0_30px_rgba(79,70,229,0.1)];
-  }
-
-  .terminal-dots span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-  }
-
-  .dot-red { background-color: #ff5f56; }
-  .dot-yellow { background-color: #ffbd2e; }
-  .dot-green { background-color: #27c93f; }
-  
-  .cursor-blink {
-    display: inline-block;
-    width: 8px;
-    height: 18px;
-    background-color: #c3c0ff;
-    @apply animate-blink;
-    vertical-align: middle;
-    margin-left: 4px;
-  }
-
-  .neon-text {
-    @apply bg-gradient-to-r from-primary via-tertiary to-secondary bg-clip-text text-transparent font-bold;
-  }
-
-  .btn-squishy {
-    @apply transition-transform duration-300 active:scale-95 hover:scale-[1.02];
-  }
-
-  .material-symbols-outlined {
-    text-transform: none !important;
-  }
-
-  .glass-panel {
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .glow-indigo {
-    box-shadow: 0 0 40px rgba(79, 70, 229, 0.2);
-  }
-  
-  .glitch-text {
-    text-shadow: 2px 0 #4edea3, -2px 0 #4f46e5;
-  }
-  
-  .scanline {
-    background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(to right, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 4px, 3px 100%;
-    pointer-events: none;
-  }
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0e0e0e;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #353535;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #c3c0ff;
-}
-
-/* Selection color */
-::selection {
-  background-color: rgba(195, 192, 255, 0.3);
 }

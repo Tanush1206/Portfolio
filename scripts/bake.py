@@ -121,12 +121,29 @@ def main() -> int:
     # index and keeps the numbers auditable.
     sim = vecs @ vecs.T
     edges = [
-        [i, j, round(float(sim[i, j]), 4)]
+        {"a": i, "b": j, "w": round(float(sim[i, j]), 4), "forced": False}
         for i in range(len(corpus))
         for j in range(i + 1, len(corpus))
         if sim[i, j] > EDGE_THRESHOLD
     ]
     print(f"edges: {len(edges)} above cosine {EDGE_THRESHOLD}")
+
+    # Min-degree 1. Nine nodes sit below threshold against everything — generic
+    # tooling nobody wrote a paragraph about. Rather than lowering the threshold
+    # (which would inflate every other node's connections to hide nine floaters),
+    # give each orphan its single strongest link and mark it forced. The renderer
+    # draws these dimmed and dashed and the legend says why, so 0.42 keeps
+    # meaning what it says.
+    linked = {i for e in edges for i in (e["a"], e["b"])}
+    orphans = [i for i in range(len(corpus)) if i not in linked]
+    masked = sim.copy()
+    np.fill_diagonal(masked, -np.inf)
+    for i in orphans:
+        j = int(np.argmax(masked[i]))
+        a, b = min(i, j), max(i, j)
+        edges.append({"a": a, "b": b, "w": round(float(sim[i, j]), 4), "forced": True})
+    print(f"forced: {len(orphans)} min-degree links "
+          f"(weakest {min((e['w'] for e in edges if e['forced']), default=0):.3f})")
 
     nodes = [{**n, "pos": [round(float(c), 4) for c in coords[i]]}
              for i, n in enumerate(corpus)]

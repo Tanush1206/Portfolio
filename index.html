@@ -12,7 +12,7 @@
     <!-- Icons & theme -->
     <link rel="icon" type="image/png" href="/images/logo.png" />
     <link rel="apple-touch-icon" href="/images/logo.png" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#07090c" />
     <meta name="color-scheme" content="dark" />
 
     <!-- Open Graph (LinkedIn, WhatsApp, Facebook, Slack, Discord) -->
@@ -35,10 +35,16 @@
     <meta name="twitter:image:alt" content="Tanush Thakran — AI/ML Engineer" />
     <meta name="twitter:creator" content="@tanush65556130" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <!-- Departure Mono is self-hosted and 2.2 KB, so preloading it costs almost
+         nothing and avoids a flash of fallback metrics on first paint. -->
+    <link rel="preload" href="/fonts/DepartureMono-Regular.subset.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- The corpus and its vectors are fetched immediately on load. -->
+    <link rel="preload" href="/data/layout.json" as="fetch" crossorigin />
+    <link rel="preload" href="/data/vectors.bin" as="fetch" crossorigin />
+    <link rel="preload" href="/data/projection.bin" as="fetch" crossorigin />
 
     <!-- Structured data: helps Google show your name, role and links directly -->
     <script type="application/ld+json">
