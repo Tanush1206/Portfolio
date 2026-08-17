@@ -32,7 +32,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   '/about': {
     title: 'About',
     description:
-      'Computer Science undergraduate working across data, applied ML and software engineering at Scaler School of Technology with BITS Pilani. Background, bio, and resume.',
+      'Computer Science undergraduate at BITS Pilani working across data, applied ML and software engineering. Background, bio, and resume.',
   },
   '/skills': {
     title: 'Skills',
@@ -42,7 +42,7 @@ export const routeMeta: Record<string, RouteMeta> = {
   '/education': {
     title: 'Education',
     description:
-      'Academic background, coursework, and the Integrated B.Sc. in Computer Science at Scaler School of Technology in collaboration with BITS Pilani.',
+      'Academic background and coursework — Integrated B.Sc. in Computer Science at BITS Pilani, covering algorithms, database systems, statistics and deep learning.',
   },
   '/experience': {
     title: 'Experience',

@@ -10,7 +10,6 @@ export interface EducationEntry {
   degree:      string;
   description: string;
   tags:        string[];
-  location?:   string;
   status:      string;
   statusIcon:  string;
   color:       'secondary' | 'default';
@@ -20,12 +19,11 @@ export const educationEntries: EducationEntry[] = [
   {
     index:       '01',
     label:       'HIGHER_LEARNING',
-    institution: 'Scaler_School_of_Technology',
+    institution: 'BITS_Pilani',
     period:      '2024 >> 2028',
     degree:      'Integrated_B.Sc._in_Computer_Science',
-    description: 'Currently pursuing a dual-degree program in collaboration with BITS Pilani. Coursework spans algorithms, data structures, database systems, operating systems, computer networks, system design, statistics and deep learning.',
+    description: 'Currently pursuing an Integrated B.Sc. in Computer Science at BITS Pilani. Coursework spans algorithms, data structures, database systems, operating systems, computer networks, system design, statistics and deep learning.',
     tags:        ['STATISTICS', 'DEEP_LEARNING', 'DATABASE_SYSTEMS', 'ALGORITHMS', 'SYSTEM_DESIGN'],
-    location:    'BENGALURU_CAMPUS',
     status:      'CREDENTIAL_ACTIVE',
     statusIcon:  'verified',
     color:       'secondary',

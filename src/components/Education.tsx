@@ -69,10 +69,7 @@ const EducationCard: React.FC<{ entry: EducationEntry }> = ({ entry }) => {
                 </span>
               </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                {entry.description.replace('BITS Pilani', '')}
-                {entry.description.includes('BITS Pilani') && (
-                  <><span className="text-secondary font-bold">BITS Pilani</span>. Focus on advanced computer science fundamentals, data structures, and industry-aligned software engineering practices.</>
-                )}
+                {entry.description}
               </p>
               {entry.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-4">
@@ -84,7 +81,10 @@ const EducationCard: React.FC<{ entry: EducationEntry }> = ({ entry }) => {
                 </div>
               )}
             </div>
-            <div className="md:col-span-4 bg-surface-container-low p-6 border border-white/5 space-y-4">
+            {/* self-start stops the panel stretching to the height of the
+                description beside it, which left a large empty block below
+                the status row. */}
+            <div className="md:col-span-4 self-start bg-surface-container-low p-6 border border-white/5 space-y-4">
               <div className="font-code-snippet text-[10px] text-on-surface-variant uppercase border-b border-white/10 pb-2">
                 {entry.color === 'secondary' ? 'Verification_Status' : 'Record_Status'}
               </div>
@@ -92,12 +92,6 @@ const EducationCard: React.FC<{ entry: EducationEntry }> = ({ entry }) => {
                 <span className="material-symbols-outlined text-sm">{entry.statusIcon}</span>
                 <span className="font-code-snippet text-xs uppercase">{entry.status}</span>
               </div>
-              {entry.location && (
-                <div className="space-y-1 pt-2">
-                  <div className="text-[15px] font-code-snippet text-on-surface-variant uppercase">Location:</div>
-                  <div className="text-lg font-code-snippet text-on-surface uppercase tracking-tighter">{entry.location}</div>
-                </div>
-              )}
             </div>
           </div>
         </div>

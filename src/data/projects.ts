@@ -106,7 +106,7 @@ export const projects: Project[] = [
   {
     id: 'clique',
     title: 'CLIQUE',
-    description: 'Event tracking and centralization platform specifically designed for Scaler students to manage academic and extracurricular schedules.',
+    description: 'Event tracking and centralization platform built for university students to manage academic and extracurricular schedules in one place.',
     tags: ['REACT', 'NODE.JS'],
     sourceUrl: 'https://github.com/Tanush1206/CLIQUE',
     demoUrl: 'https://frontend-clique-1.onrender.com/',
