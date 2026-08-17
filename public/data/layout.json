@@ -3,6 +3,11 @@
  "dims": 384,
  "edgeThreshold": 0.42,
  "sceneScale": 12.0,
+ "projection": {
+  "file": "projection.bin",
+  "layout": "float32: mean[dims], components[3][dims]",
+  "scale": 17.54726219177246
+ },
  "nodes": [
   {
    "id": "rag-based-ai",
