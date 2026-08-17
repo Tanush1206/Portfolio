@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { CLUSTER_HEX } from '../scene/palette';
 import type { Cluster } from '../types';
@@ -13,7 +13,21 @@ export function Legend() {
   const nodes = useStore((s) => s.nodes);
   const edges = useStore((s) => s.edges);
   const threshold = useStore((s) => s.edgeThreshold);
+  const hasAnswer = useStore((s) => s.segments.length > 0);
   const [open, setOpen] = useState(true);
+  const autoClosed = useRef(false);
+
+  /**
+   * Fold away the first time an answer arrives — the answer panel occupies the
+   * same left column and the two collide. Only once: after that the visitor's
+   * own toggle wins, rather than the legend snapping shut on every query.
+   */
+  useEffect(() => {
+    if (hasAnswer && !autoClosed.current) {
+      autoClosed.current = true;
+      setOpen(false);
+    }
+  }, [hasAnswer]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};

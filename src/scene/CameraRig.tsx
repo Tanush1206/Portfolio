@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { useStore } from '../store/useStore';
+import { rig } from './screen';
 
 const MIN_RADIUS = 6;
 const MAX_RADIUS = 90;
@@ -122,6 +123,14 @@ export function CameraRig() {
     have.current.rad += (want.current.rad - have.current.rad) * kOrbit;
 
     target.current.lerp(desired.current, 1 - Math.exp(-DAMP_TARGET * d));
+
+    // Published for the citation lines. The idle drift never stops, so
+    // "settled" has to mean "not travelling anywhere", not "not moving" —
+    // measure the remaining distance to the target, not the per-frame delta.
+    rig.settled =
+      !dragging.current &&
+      Math.abs(want.current.rad - have.current.rad) < 0.35 &&
+      target.current.distanceToSquared(desired.current) < 0.09;
 
     const { az, pol, rad } = have.current;
     const sp = Math.sin(pol);

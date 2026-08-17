@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { loadCorpus } from '../engine/corpus';
 import { projectVector } from '../engine/project';
 import { bestChunk, retrieve } from '../engine/retrieve';
+import { compose } from '../engine/compose';
 import type { AnswerSegment, Basis, CorpusNode, Edge, Hit, Vec3 } from '../types';
 
 /**
@@ -164,6 +165,7 @@ export const useStore = create<State>((set, get) => ({
       set({
         queryPos,
         hits,
+        segments: compose(hits, nodes),
         queryStatus: 'answering',
         // Look at the retrieved region rather than the query point itself: the
         // query often lands in empty space, and framing empty space is a worse

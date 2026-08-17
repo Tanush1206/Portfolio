@@ -134,3 +134,31 @@ spanning roughly 24, with the query vector's L2 norm exactly 1.0. That residual 
 quantisation in the ONNX graph against fp32 PyTorch in the bake, not a projection error — a
 transposed matmul misses by scene units, not hundredths. fp32 weights would cut it to near zero
 at roughly four times the download, which is not worth it.
+
+## Skills outrank projects, and it is not dilution
+
+For "what have you built with retrieval?" the top three hits are all skill nodes; the
+`RAG_BASED_AI` project sits fourth at 0.329.
+
+The obvious explanation — that a project's vector is diluted across six chunks plus tech and
+blurb while a skill node is short and topically pure — was **tested and is wrong**. Scoring
+against the best individual chunk instead of the node gives `RAG_BASED_AI` 0.330 against the
+node-level 0.329, and reranks the rest *worse* (a degree entry and a bare `Python` node climb
+into the top six). Chunk-level vectors would cost ~200 KB and buy nothing here.
+
+The actual cause is that a skill node titled "Retrieval Evaluation" is a near-literal match
+for a query about retrieval, while a paragraph describing a build is not. Cosine similarity
+measures topical proximity; "what have you *built*" is an intent, and MiniLM has no way to
+tell those apart.
+
+**Left as it is, deliberately.** The answer text is substantively correct — the quoted chunks
+are real descriptions of retrieval work — and only the citation *labels* name skills rather
+than the project. Fixing it means a type prior boosting projects and experience above skills,
+which is defensible for a portfolio but stops the scores being pure cosine and would require
+the answer panel's footer to stop saying they are. That is a product call, not a bug fix.
+
+## Relative retrieval floor
+
+`HIT_FLOOR` alone plus a fixed `TOP_K` returned five results whether or not five were any
+good. Results must now also clear 70% of the top hit's score, so weak tails fall off on their
+own instead of a fixed number being tuned to suit one query.

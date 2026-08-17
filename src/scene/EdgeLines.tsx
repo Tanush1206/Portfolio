@@ -12,11 +12,22 @@ import { CLUSTER_COLOR } from './palette';
  * is what lets the legend state the threshold honestly instead of quietly
  * relaxing it to make the picture tidier.
  */
+/**
+ * Matches the node dim factor in NodeCloud. A retrieval that darkens the nodes
+ * but leaves their links at full brightness reads as "retrieval didn't work" —
+ * the lobe still glows via its edges while its nodes go dark.
+ */
+const DIM = 0.22;
+
 export function EdgeLines() {
   const nodes = useStore((s) => s.nodes);
   const edges = useStore((s) => s.edges);
+  const hits = useStore((s) => s.hits);
 
   const { solid, dashed } = useMemo(() => {
+    const hitIds = new Set(hits.map((h) => h.id));
+    const dimming = hitIds.size > 0;
+
     const build = (subset: typeof edges) => {
       const pos: number[] = [];
       const col: number[] = [];
@@ -31,9 +42,17 @@ export function EdgeLines() {
         // Weight drives brightness, so a strong link reads as one without
         // needing a second material.
         const t = Math.min(1, Math.max(0, (e.w - 0.3) / 0.45));
-        c.copy(CLUSTER_COLOR[a.cluster]).multiplyScalar(0.25 + t * 0.75);
+        const base = 0.25 + t * 0.75;
+
+        // An edge survives only if it touches something retrieved. Dimming
+        // per-endpoint instead would leave half-lit links pointing out of the
+        // result into the dark, which looks like a rendering fault.
+        const lit = !dimming || hitIds.has(a.id) || hitIds.has(b.id);
+        const k = lit ? base : base * DIM;
+
+        c.copy(CLUSTER_COLOR[a.cluster]).multiplyScalar(k);
         col.push(c.r, c.g, c.b);
-        c.copy(CLUSTER_COLOR[b.cluster]).multiplyScalar(0.25 + t * 0.75);
+        c.copy(CLUSTER_COLOR[b.cluster]).multiplyScalar(k);
         col.push(c.r, c.g, c.b);
       }
 
@@ -47,7 +66,7 @@ export function EdgeLines() {
       solid: build(edges.filter((e) => !e.forced)),
       dashed: build(edges.filter((e) => e.forced)),
     };
-  }, [nodes, edges]);
+  }, [nodes, edges, hits]);
 
   // LineDashedMaterial needs per-vertex distance along each segment, and it
   // renders solid — silently — without this. It lives on the Line object rather

@@ -25,7 +25,12 @@ export default {
         mono: ['Departure Mono', 'IBM Plex Mono', 'ui-monospace', 'monospace'],
       },
       // The spec scale: 12 / 14 / 16 / 20 / 28 / 44 / 72, one hero size only.
-      // Departure Mono is exempt and runs at 11/22 — see index.css.
+      //
+      // NAMED EXCEPTION: the utility face runs on its own 11px grid; this scale
+      // governs the outline faces only. Departure Mono is drawn pixel-by-pixel
+      // at 11px, so 12px puts each font-pixel on 1.09 device pixels and the
+      // face goes soft. It is used at 11px and 22px, via bracket values, and
+      // that is a decision rather than drift.
       fontSize: {
         xs: ['12px', { lineHeight: '18px' }],
         sm: ['14px', { lineHeight: '22px' }],

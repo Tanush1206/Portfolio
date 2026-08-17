@@ -17,6 +17,18 @@ export const screen = {
   frame: 0,
 };
 
+/**
+ * Whether the camera has stopped moving, published the same way and for the
+ * same reason as the positions above.
+ *
+ * Citation lines and the answer stream overlap in time: the rig is still easing
+ * toward the retrieved region while the first chips are already mounting. Lines
+ * drawn during that window whip across the screen. Damping the lines would only
+ * smear the whipping — the fix is to not draw them until the thing they point
+ * at has stopped moving.
+ */
+export const rig = { settled: true };
+
 export function allocateScreen(ids: string[]): void {
   screen.xy = new Float32Array(ids.length * 2);
   screen.visible = new Uint8Array(ids.length);

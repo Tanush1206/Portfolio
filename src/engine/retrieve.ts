@@ -6,6 +6,17 @@ export const HIT_FLOOR = 0.22;
 export const TOP_K = 5;
 
 /**
+ * A result must also be at least this good *relative to the best one*.
+ *
+ * An absolute floor plus a fixed k returns five results whether or not five are
+ * any good: "what have you built with retrieval?" was citing a Jupyter skill
+ * node at 0.332 against a top hit of 0.500, and the answer then claimed five
+ * things matched. Scale the bar to the strongest hit and weak tails drop off
+ * on their own, without pinning a number that only suits one query.
+ */
+const RELATIVE_FLOOR = 0.7;
+
+/**
  * Top-k by cosine, with the best-matching chunk identified per node.
  *
  * The chunk index matters downstream: a citation points at a specific sentence,
@@ -22,10 +33,15 @@ export function retrieve(
 ): Hit[] {
   const scores = scoreAll(queryVec, vectors, nodes.length, dims);
 
-  return Array.from(scores)
+  const ranked = Array.from(scores)
     .map((score, i) => ({ i, score }))
     .filter((x) => x.score >= HIT_FLOOR)
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => b.score - a.score);
+
+  const floor = ranked.length ? ranked[0].score * RELATIVE_FLOOR : 0;
+
+  return ranked
+    .filter((x) => x.score >= floor)
     .slice(0, k)
     .map(({ i, score }) => ({
       id: nodes[i].id,

@@ -27,6 +27,9 @@ export function NodeCloud() {
   const hoveredNode = useStore((s) => s.hoveredNode);
   const selectedNode = useStore((s) => s.selectedNode);
   const hits = useStore((s) => s.hits);
+  // Hovering a citation chip is hovering its node — the chip and the point are
+  // the same object stated twice, so they highlight together.
+  const hoveredCite = useStore((s) => s.hoveredCite);
   const actions = useStore((s) => s.actions);
   const { camera, size } = useThree();
 
@@ -99,7 +102,7 @@ export function NodeCloud() {
         const want =
           n.id === selectedNode
             ? SELECT_GROWTH
-            : n.id === hoveredNode
+            : n.id === hoveredNode || n.id === hoveredCite
               ? HOVER_GROWTH
               : hitIds.has(n.id)
                 ? HIT_GROWTH

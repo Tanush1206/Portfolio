@@ -19,6 +19,32 @@ import { env, pipeline, type FeatureExtractionPipeline } from '@huggingface/tran
 // makes the browser try a same-origin fetch first and log a 404 per file.
 env.allowLocalModels = false;
 
+/**
+ * Serve the onnxruntime runtime from this origin, not from a CDN.
+ *
+ * vite.config.ts aliases onnxruntime-web to its CPU-only build — nothing here
+ * needs WebGPU, and a MiniLM query embeds in ~10 ms warm on CPU, so the jsep
+ * build is 10 MB of wasm that never executes. Left alone, that build resolves
+ * its runtime files relative to the script and falls back to a CDN, quietly
+ * reintroducing a third-party dependency at runtime.
+ *
+ * Both files are vendored into `public/ort/`. They cannot be imported from
+ * node_modules with `?url` instead — onnxruntime-web's `exports` map does not
+ * expose `./dist/*`, so Vite refuses the deep import outright.
+ *
+ * See the `serve-ort-raw` plugin in vite.config.ts for why the dev server needs
+ * help with these two specific files.
+ */
+env.backends.onnx.wasm!.wasmPaths = {
+  wasm: '/ort/ort-wasm-simd-threaded.wasm',
+  mjs: '/ort/ort-wasm-simd-threaded.mjs',
+};
+
+// One worker, one inference thread. Cross-origin isolation headers would be
+// required for real wasm threads, and without them onnxruntime spawns a worker
+// pool that immediately falls back to single-threaded anyway — noisily.
+env.backends.onnx.wasm!.numThreads = 1;
+
 const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
 
 export type Incoming = { type: 'load' } | { type: 'embed'; id: number; text: string };

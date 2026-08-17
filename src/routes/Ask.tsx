@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { LatentScene } from '../scene/LatentScene';
 import { Console } from '../ui/Console';
+import { AnswerPanel } from '../ui/AnswerPanel';
+import { CitationLines } from '../ui/CitationLines';
 import { Legend } from '../ui/Legend';
 import { NodeDetail, NodeTooltip } from '../ui/NodeCard';
 import { Telemetry } from '../ui/Telemetry';
@@ -29,6 +31,8 @@ export default function Ask() {
       <div className="pointer-events-none absolute inset-0">
         <Header />
         <Telemetry />
+        <AnswerPanel />
+        <CitationLines />
         <Legend />
         <NodeTooltip />
         <NodeDetail />
