@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FLIGHT_LOG — Aviation Portfolio</title>
+
+<!-- ═════════════════════════════════════════════
+     AVIATION PORTFOLIO — v2
+
+     THEME RULE (the fix from v1): the planet is Earth, everything human-made
+     is the portfolio palette. v1 painted the globe itself indigo, which read
+     as an alien sphere and left the mint route lines fighting the terrain.
+     Now:
+       · Earth  — real coastlines, ocean blue, land green/tan, ice, city
+                  lights on the night side, cyan atmosphere
+       · HUD    — #c3c0ff indigo, #4edea3 mint, #ffbd2e amber, glass-card
+                  panels, JetBrains Mono / Space Grotesk. Untouched.
+
+     GEOGRAPHY: India-centric, as it should be. Six Indian airports plus
+     Cairo — the single international leg, because CYPARTA is the single
+     international thing on the CV. Contact isn't an airport at all; you
+     raise it on the radio.
+
+     The surface is generated at runtime from 54 KB of real coastline
+     topology (world-atlas 110m, vendored to ./data/). Everything else —
+     ocean, terrain bands, ice, clouds, city lights, the aircraft — is
+     procedural. No image files.
+     ═════════════════════════════════════════════ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* Straight from tailwind.config.js — the HUD keeps the site's identity. */
+  :root {
+    --bg:#131313; --lowest:#0e0e0e; --on-surface:#e2e2e2; --on-variant:#c7c4d8;
+    --primary:#c3c0ff; --primary-cont:#4f46e5; --tertiary:#4edea3;
+    --secondary:#d0bcff; --outline:#918fa1; --amber:#ffbd2e; --red:#ff5f56;
+    --green:#27c93f;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; }
+  body {
+    background:#02040a; color:var(--on-surface);
+    font-family:'JetBrains Mono',monospace; -webkit-font-smoothing:antialiased; user-select:none;
+  }
+  canvas { display:block; }
+  #scene { position:fixed; inset:0; }
+
+  .glass {
+    background:rgba(19,19,19,0.62);
+    border:1px solid rgba(255,255,255,0.11);
+    backdrop-filter:blur(22px) saturate(1.1); -webkit-backdrop-filter:blur(22px) saturate(1.1);
+  }
+  .lbl { font-size:9px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--outline); }
+  .num { font-family:'Space Grotesk',sans-serif; font-weight:700; }
+
+  /* window-control dots, matching WindowControls.tsx */
+  .dots { display:flex; gap:6px; align-items:center; }
+  .dots i { width:8px; height:8px; border-radius:50%; display:block; }
+  .dots .r { background:var(--red); } .dots .y { background:var(--amber); } .dots .g { background:var(--green); }
+
+  /* ══ FLIGHT STRIP ══ */
+  #strip { position:fixed; top:16px; left:16px; z-index:14; width:296px; }
+  #strip .bar {
+    display:flex; align-items:center; gap:10px; padding:9px 13px;
+    border-bottom:1px solid rgba(255,255,255,.09);
+  }
+  #strip .bar .ttl { font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--outline); }
+  #strip .in { padding:13px 15px 14px; }
+  #strip .hdr { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
+  #strip .cs { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:#fff; }
+  #phase { font-size:8.5px; letter-spacing:.14em; padding:3px 7px; white-space:nowrap; }
+  #phase.ground { color:var(--outline); border:1px solid rgba(145,143,161,.3); background:rgba(145,143,161,.07); }
+  #phase.climb, #phase.descent { color:var(--amber); border:1px solid rgba(255,189,46,.35); background:rgba(255,189,46,.08); }
+  #phase.cruise { color:var(--tertiary); border:1px solid rgba(78,222,163,.35); background:rgba(78,222,163,.08); }
+
+  #route { display:flex; align-items:center; gap:10px; margin-bottom:13px; }
+  #route .ap { text-align:center; flex-shrink:0; min-width:44px; }
+  #route .ap .code { font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:700; color:#fff; line-height:1; }
+  #route .ap .city { font-size:7.5px; letter-spacing:.09em; color:var(--outline); margin-top:4px; text-transform:uppercase; }
+  #route .link { flex:1; position:relative; height:15px; }
+  #route .link .ln { position:absolute; top:7px; left:0; right:0; height:1px; background:rgba(255,255,255,.16); }
+  #route .link .fill { position:absolute; top:7px; left:0; height:1px; width:0%; background:var(--tertiary); box-shadow:0 0 7px var(--tertiary); }
+  #route .link .ac { position:absolute; top:0; left:0%; font-size:11px; color:var(--tertiary); transform:translateX(-50%); }
+  #strip .st { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:rgba(255,255,255,.09); }
+  #strip .st div { background:rgba(9,9,13,.8); padding:9px 8px; text-align:center; }
+  #strip .st .k { font-size:7px; letter-spacing:.12em; text-transform:uppercase; color:var(--outline); margin-bottom:4px; }
+  #strip .st .v { font-size:12px; color:var(--primary); }
+
+  /* ══ DEPARTURES BOARD ══ */
+  #board { position:fixed; top:16px; right:16px; z-index:14; width:308px; display:flex; flex-direction:column; max-height:calc(100vh - 32px); }
+  #board .top { padding:12px 15px 11px; border-bottom:1px solid rgba(255,255,255,.09); }
+  #board .top .t { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; text-transform:uppercase; color:#fff; margin-top:6px; }
+  #rows { overflow-y:auto; scrollbar-width:none; }
+  #rows::-webkit-scrollbar { display:none; }
+  .row {
+    display:grid; grid-template-columns:38px 1fr auto; gap:10px; align-items:center;
+    padding:10px 15px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.05); transition:background .16s;
+  }
+  .row:hover { background:rgba(195,192,255,.08); }
+  .row.here { background:rgba(255,189,46,.07); }
+  .row.here .code { color:var(--amber); }
+  .row .code { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:var(--primary); line-height:1; }
+  .row .sect { font-size:10.5px; color:var(--on-surface); text-transform:uppercase; letter-spacing:.04em; }
+  .row .city { font-size:8px; color:var(--outline); margin-top:3px; letter-spacing:.06em; }
+  .row .dist { font-size:8px; color:var(--outline); margin-top:3px; }
+  .row .bd { font-size:6.5px; letter-spacing:.1em; padding:2.5px 5px; white-space:nowrap; }
+  .row .bd.on { color:var(--tertiary); border:1px solid rgba(78,222,163,.32); background:rgba(78,222,163,.07); }
+  .row .bd.hb { color:var(--amber); border:1px solid rgba(255,189,46,.32); background:rgba(255,189,46,.07); }
+  .row .bd.sec { color:var(--outline); border:1px solid rgba(145,143,161,.25); }
+  .row .bd.intl { color:var(--secondary); border:1px solid rgba(208,188,255,.3); background:rgba(208,188,255,.07); }
+
+  #radio {
+    display:flex; align-items:center; gap:10px; padding:12px 15px; cursor:pointer;
+    border-top:1px solid rgba(255,255,255,.09); transition:background .16s;
+  }
+  #radio:hover { background:rgba(78,222,163,.08); }
+  #radio .ic {
+    width:26px; height:26px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(78,222,163,.4); color:var(--tertiary); font-size:12px;
+  }
+  #radio .t1 { font-size:10.5px; color:var(--on-surface); text-transform:uppercase; letter-spacing:.05em; }
+  #radio .t2 { font-size:8px; color:var(--outline); margin-top:3px; letter-spacing:.08em; }
+  #radio .fr { margin-left:auto; font-size:8.5px; color:var(--tertiary); }
+
+  /* ══ INSTRUMENTS ══ */
+  #inst { position:fixed; bottom:16px; left:16px; z-index:14; width:296px; padding:12px 14px 13px; }
+  #inst .g { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:rgba(255,255,255,.09); margin-top:10px; }
+  #inst .g div { background:rgba(9,9,13,.8); padding:10px 6px; text-align:center; }
+  #inst .g .k { font-size:7px; letter-spacing:.12em; text-transform:uppercase; color:var(--outline); margin-bottom:5px; }
+  #inst .g .v { font-size:17px; color:var(--tertiary); line-height:1; }
+  #inst .g .u { font-size:6.5px; color:var(--outline); margin-top:4px; letter-spacing:.1em; }
+
+  /* ══ MAP LABELS ══ */
+  #labels { position:fixed; inset:0; z-index:10; pointer-events:none; }
+  .apL { position:absolute; transform:translate(11px,-50%); white-space:nowrap; transition:opacity .25s; }
+  .apL .c { font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:700; color:#fff; letter-spacing:.04em;
+            text-shadow:0 1px 10px #000, 0 0 22px rgba(0,0,0,.95); }
+  .apL .s { font-size:7px; letter-spacing:.13em; text-transform:uppercase; color:var(--primary); margin-top:2px;
+            text-shadow:0 1px 8px #000, 0 0 18px rgba(0,0,0,.95); }
+  .apL.hot .c { color:var(--amber); }
+  .apL.dest .c { color:var(--tertiary); }
+  .apL .tk { position:absolute; left:-11px; top:50%; width:9px; height:1px; background:rgba(255,255,255,.45); }
+
+  /* ══ ARRIVAL PANEL ══ */
+  #panel {
+    position:fixed; z-index:34; left:50%; bottom:0; transform:translate(-50%,100%);
+    width:min(900px, calc(100vw - 32px)); max-height:76vh; display:flex; flex-direction:column;
+    transition:transform .58s cubic-bezier(.22,1,.36,1); border-bottom:none;
+  }
+  #panel.on { transform:translate(-50%,0); }
+  #panel .pb {
+    display:flex; align-items:center; gap:13px; padding:11px 18px;
+    border-bottom:1px solid rgba(255,255,255,.09); flex-shrink:0; background:rgba(9,9,13,.5);
+  }
+  #panel .pc { font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; color:var(--tertiary); line-height:1; }
+  #panel .pt { flex:1; min-width:0; }
+  #panel .pt .a { font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:600; text-transform:uppercase; color:#fff; line-height:1.2; }
+  #panel .pt .b { font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--outline); margin-top:4px; }
+  #panel .x { font-size:19px; line-height:1; color:var(--on-variant); cursor:pointer; padding:3px 7px; transition:all .25s; flex-shrink:0; }
+  #panel .x:hover { color:var(--tertiary); transform:scale(1.15); }
+  #pbody { overflow-y:auto; padding:20px 22px 26px; scrollbar-width:none; }
+  #pbody::-webkit-scrollbar { display:none; }
+
+  .sh { font-family:'Space Grotesk',sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.15em;
+        text-transform:uppercase; color:var(--tertiary); margin:0 0 12px; }
+  .sh.n2 { margin-top:24px; }
+  .bt { font-size:12px; line-height:1.95; color:var(--on-variant); margin-bottom:18px; }
+  .bt b { color:var(--primary); font-weight:500; }
+  .kv { display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:1px; background:rgba(255,255,255,.08); margin-bottom:20px; }
+  .kv > div { background:rgba(11,11,16,.85); padding:12px 14px; }
+  .kv .k { font-size:7px; letter-spacing:.13em; text-transform:uppercase; color:var(--outline); margin-bottom:6px; }
+  .kv .v { font-size:12px; color:var(--primary); }
+  .kv .v.big { font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; }
+  .tg { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:18px; }
+  .tg span { font-size:8px; letter-spacing:.1em; padding:4px 7px; color:var(--primary);
+             border:1px solid rgba(195,192,255,.2); background:rgba(195,192,255,.05); }
+  .tg span.t2 { color:var(--tertiary); border-color:rgba(78,222,163,.22); background:rgba(78,222,163,.05); }
+  .bars { margin-bottom:20px; }
+  .bar { margin-bottom:11px; }
+  .bar .r { display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px; }
+  .bar .r span:first-child { color:var(--on-surface); letter-spacing:.06em; }
+  .bar .r span:last-child { color:var(--primary); }
+  .bar .t { height:3px; background:rgba(255,255,255,.08); }
+  .bar .t i { display:block; height:100%; background:linear-gradient(90deg,var(--primary-cont),var(--primary)); }
+  .it { padding:15px 17px; margin-bottom:12px; background:rgba(255,255,255,.022);
+        border:1px solid rgba(255,255,255,.07); border-left:2px solid rgba(195,192,255,.42); }
+  .it .ih { display:flex; justify-content:space-between; gap:12px; align-items:baseline; flex-wrap:wrap; margin-bottom:4px; }
+  .it .ih .t { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:#fff; text-transform:uppercase; }
+  .it .ih .p { font-size:9px; letter-spacing:.1em; color:var(--tertiary); white-space:nowrap; }
+  .it .sb { font-size:9px; letter-spacing:.09em; color:var(--outline); text-transform:uppercase; margin-bottom:10px; }
+  .it ul { margin:0 0 10px 15px; }
+  .it li { font-size:11.5px; line-height:1.85; color:var(--on-variant); margin-bottom:5px; }
+  .it p { font-size:11.5px; line-height:1.85; color:var(--on-variant); margin-bottom:10px; }
+  .it a, .lk { font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--primary);
+               text-decoration:none; margin-right:17px; display:inline-block; }
+  .it a:hover, .lk:hover { text-decoration:underline; }
+  .c2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:11px; margin-bottom:18px; }
+
+  /* ══ BOOT ══ */
+  #boot { position:fixed; inset:0; z-index:120; background:#02040a; display:flex; flex-direction:column;
+          align-items:center; justify-content:center; transition:opacity .7s; }
+  #boot .w { width:min(430px, calc(100vw - 40px)); }
+  #boot .t { font-family:'Space Grotesk',sans-serif; font-size:clamp(24px,5vw,36px); font-weight:700;
+             text-transform:uppercase; color:#fff; letter-spacing:-.02em; margin-bottom:6px; }
+  #boot .cmd { font-size:11px; color:var(--tertiary); margin-bottom:18px; }
+  #boot .cmd .c { color:var(--outline); }
+  #boot .ln { font-size:10px; line-height:2.1; color:var(--on-variant); opacity:0; transition:opacity .3s; }
+  #boot .ln .ok { color:var(--tertiary); }
+  #boot .ln.on { opacity:1; }
+  #boot .pb { height:2px; background:rgba(255,255,255,.1); margin-top:18px; }
+  #boot .pb i { display:block; height:100%; width:0%; background:var(--tertiary); transition:width .3s; }
+
+  #hint { position:fixed; bottom:16px; right:16px; z-index:14; padding:9px 12px; font-size:8px;
+          letter-spacing:.12em; text-transform:uppercase; color:var(--outline); line-height:2; text-align:right; pointer-events:none; }
+
+  @media (max-width:1120px) {
+    #inst { display:none; }
+    #strip { width:252px; } #board { width:256px; }
+  }
+  @media (max-width:780px) {
+    #strip { left:10px; top:10px; right:10px; width:auto; }
+    #board { top:auto; bottom:10px; left:10px; right:10px; width:auto; max-height:none; }
+    #board .top { display:none; }
+    #rows { display:flex; overflow-x:auto; }
+    .row { grid-template-columns:1fr; gap:0; border-bottom:none; border-right:1px solid rgba(255,255,255,.06);
+           min-width:112px; padding:9px 11px; }
+    .row .bd, .row .dist { display:none; }
+    #radio { border-top:none; border-left:1px solid rgba(255,255,255,.09); }
+    #radio .t2, #radio .fr { display:none; }
+    #hint { display:none; }
+    #panel { max-height:62vh; }
+    .apL .s { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="scene"></div>
+<div id="labels"></div>
+
+<div id="strip" class="glass">
+  <div class="bar">
+    <span class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></span>
+    <span class="ttl">flight_strip.log</span>
+  </div>
+  <div class="in">
+    <div class="hdr">
+      <span class="cs" id="cs">TT—000</span>
+      <span id="phase" class="ground">ON STAND</span>
+    </div>
+    <div id="route">
+      <div class="ap"><div class="code" id="r-from">DEL</div><div class="city" id="r-fromc">Delhi</div></div>
+      <div class="link"><div class="ln"></div><div class="fill" id="r-fill"></div><div class="ac" id="r-ac">✈</div></div>
+      <div class="ap"><div class="code" id="r-to">—</div><div class="city" id="r-toc">select</div></div>
+    </div>
+    <div class="st">
+      <div><div class="k">Dist</div><div class="v num" id="s-dist">—</div></div>
+      <div><div class="k">ETE</div><div class="v num" id="s-ete">—</div></div>
+      <div><div class="k">Legs</div><div class="v num" id="s-legs">0</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="board" class="glass">
+  <div class="top">
+    <span class="lbl">02 // Departures</span>
+    <div class="t">Route Network</div>
+  </div>
+  <div id="rows"></div>
+  <div id="radio">
+    <div class="ic">◉</div>
+    <div>
+      <div class="t1">Ground Control</div>
+      <div class="t2">Contact · no flight required</div>
+    </div>
+    <div class="fr">121.9</div>
+  </div>
+</div>
+
+<div id="inst" class="glass">
+  <span class="lbl">03 // Instruments</span>
+  <div class="g">
+    <div><div class="k">HDG</div><div class="v num" id="i-hdg">000</div><div class="u">deg</div></div>
+    <div><div class="k">ALT</div><div class="v num" id="i-alt">0</div><div class="u">ft</div></div>
+    <div><div class="k">GS</div><div class="v num" id="i-gs">0</div><div class="u">kt</div></div>
+  </div>
+</div>
+
+<div id="panel" class="glass">
+  <div class="pb">
+    <span class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></span>
+    <div class="pc" id="p-code">—</div>
+    <div class="pt"><div class="a" id="p-title">—</div><div class="b" id="p-sub">—</div></div>
+    <div class="x" id="p-close">×</div>
+  </div>
+  <div id="pbody"></div>
+</div>
+
+<div id="hint" class="glass">
+  drag — orbit · scroll — zoom<br>
+  click a beacon or a row to fly
+</div>
+
+<div id="boot">
+  <div class="w">
+    <div class="t">FLIGHT_LOG</div>
+    <div class="cmd"><span class="c">&gt;</span> initiate --preflight</div>
+    <div class="ln" id="b1"><span class="ok">✓</span> decoding coastline topology</div>
+    <div class="ln" id="b2"><span class="ok">✓</span> rendering surface &amp; terrain bands</div>
+    <div class="ln" id="b3"><span class="ok">✓</span> seeding city lights</div>
+    <div class="ln" id="b4"><span class="ok">✓</span> plotting route network</div>
+    <div class="ln" id="b5"><span class="ok">✓</span> clearance granted — DEL</div>
+    <div class="pb"><i id="boot-b"></i></div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+
+const $ = id => document.getElementById(id);
+const bootB = $('boot-b');
+let bootStep = 0;
+const mark = (n, pct) => { const e = $('b' + n); if (e) e.classList.add('on'); bootB.style.width = pct + '%'; };
+
+/* ═════════════════════════════════════════════
+   1. DESTINATIONS — India-centric
+
+   Four are literally in Tanush's history and badged ON-SITE:
+     DEL  home              JAI  BITS Pilani
+     BLR  AIESEC Bengaluru  CAI  CYPARTA client
+   Three are navigation waypoints inside India, badged SECTOR so nothing
+   reads as a résumé claim. Cairo is the only international leg — which is
+   exactly true of the CV.
+   Contact is not an airport; it's a radio frequency.
+   ═════════════════════════════════════════════ */
+const AIRPORTS = [
+  {
+    code:'DEL', name:'Indira Gandhi Intl', city:'New Delhi', region:'India',
+    lat:28.5562, lon:77.1000, section:'Identity', sub:'Home base · GMT+5:30',
+    badge:'hb', badgeText:'HOME BASE',
+    render:() => `
+      <div class="sh">01 // Pilot in command</div>
+      <div class="kv">
+        <div><div class="k">Name</div><div class="v big">Tanush Thakran</div></div>
+        <div><div class="k">Rating</div><div class="v big">AI/ML Engineer</div></div>
+        <div><div class="k">Base</div><div class="v">New Delhi, India</div></div>
+        <div><div class="k">Zone</div><div class="v">GMT+5:30</div></div>
+      </div>
+      <div class="bt">
+        A Computer Science undergraduate working across data, applied ML and software
+        engineering, currently pursuing an Integrated B.Sc. in Computer Science at
+        <b>BITS Pilani</b>. I have traced a company's margin problem to a specific pricing
+        threshold with SQL and Power BI, built a local RAG pipeline evaluated against a
+        labelled question set, and shipped production applications for a logistics client
+        in Cairo. Comfortable owning a problem end to end — raw data through to
+        recommendation, or schema through to deployment.
+      </div>
+      <div class="tg"><span>PYTHON_CORE</span><span class="t2">SQL_ENGINE</span><span>ML_PIPELINE</span></div>
+      <div class="sh n2">Flight plan // this network</div>
+      <div class="bt" style="margin:0">
+        Six Indian stations and one international. <b>JAI</b> is BITS Pilani,
+        <b>BLR</b> is AIESEC Bengaluru, and <b>CAI</b> is the CYPARTA engagement in
+        Cairo — the only leg that leaves the country, because it's the only thing on
+        the CV that did.
+      </div>`,
+  },
+  {
+    code:'JAI', name:'Jaipur Intl', city:'Jaipur / Pilani', region:'Rajasthan, India',
+    lat:26.8242, lon:75.8122, section:'Education', sub:'BITS Pilani · 2024 → 2028',
+    badge:'on', badgeText:'ON-SITE',
+    render:() => `
+      <div class="sh">01 // Training record</div>
+      <div class="it">
+        <div class="ih"><div class="t">BITS_Pilani</div><div class="p">2024 &gt;&gt; 2028</div></div>
+        <div class="sb">Higher_Learning · Integrated B.Sc. in Computer Science</div>
+        <p>Coursework spans algorithms, data structures, database systems, operating systems,
+        computer networks, system design, statistics and deep learning.</p>
+        <div class="tg"><span>STATISTICS</span><span>DEEP_LEARNING</span><span>DATABASE_SYSTEMS</span><span>ALGORITHMS</span><span>SYSTEM_DESIGN</span></div>
+        <div class="sb" style="margin:0"><span style="color:var(--tertiary)">◆</span> Credential active</div>
+      </div>
+      <div class="it" style="border-left-color:rgba(145,143,161,.35)">
+        <div class="ih"><div class="t">Columbia_Foundation_School</div><div class="p" style="color:var(--outline)">2022 &gt;&gt; 2024</div></div>
+        <div class="sb">Secondary_Education · Class 11th &amp; 12th</div>
+        <p>Higher secondary education focused on core sciences and mathematics, laying the
+        groundwork for engineering logic and computational thinking.</p>
+        <div class="sb" style="margin:0">Archive complete</div>
+      </div>`,
+  },
+  {
+    code:'BLR', name:'Kempegowda Intl', city:'Bengaluru', region:'Karnataka, India',
+    lat:13.1986, lon:77.7066, section:'Experience I', sub:'AIESEC · Junior Manager',
+    badge:'on', badgeText:'ON-SITE',
+    render:() => `
+      <div class="sh">01 // Logged hours — AIESEC in Bengaluru</div>
+      <div class="it">
+        <div class="ih"><div class="t">Junior_Manager</div><div class="p">2025.10 // 2026.03</div></div>
+        <div class="sb">@AIESEC_in_Bengaluru · Bengaluru, India</div>
+        <ul>
+          <li>Tracked and reported departmental <b style="color:var(--primary)">KPIs</b>, using performance data to steer team priorities.</li>
+          <li>Managed the applicant pipeline end to end, monitoring <b style="color:var(--primary)">stage-by-stage conversion</b> and flagging drop-off points to leadership.</li>
+          <li>[OCT–JAN] Managed operations for the <b style="color:var(--primary)">Outgoing Global Volunteer</b> department, facilitating international leadership opportunities.</li>
+          <li>[FEB–MAR] Transitioned to the <b style="color:var(--primary)">Incoming Global Volunteer</b> department, overseeing project management and intern integration.</li>
+          <li>Led cross-functional coordination to hit targets and expand programme reach across the Bengaluru entity.</li>
+        </ul>
+        <div class="tg"><span>KPI_REPORTING</span><span>FUNNEL_ANALYSIS</span><span>LEADERSHIP</span><span>OGV_DEPT</span><span>IGV_DEPT</span></div>
+      </div>
+      <div class="bt" style="margin:0">Next leg: <b>CAI</b> — the CYPARTA engagement in Cairo, 4,400 km west.</div>`,
+  },
+  {
+    code:'CAI', name:'Cairo Intl', city:'Cairo', region:'Egypt', intl:true,
+    lat:30.1219, lon:31.4056, section:'Experience II', sub:'CYPARTA · App Developer Intern',
+    badge:'intl', badgeText:'INTERNATIONAL',
+    render:() => `
+      <div class="sh">01 // Logged hours — CYPARTA, Cairo</div>
+      <div class="bt">
+        The one leg that leaves India. Everything else on this network is domestic;
+        this is the single international engagement on the CV.
+      </div>
+      <div class="it">
+        <div class="ih"><div class="t">App_Developer_Intern</div><div class="p">2025.12 // 2026.01</div></div>
+        <div class="sb">@CYPARTA · Cairo, Egypt</div>
+        <ul>
+          <li>Modelled full <b style="color:var(--primary)">trip-lifecycle event data</b> — request, acceptance, live status, completion — producing a clean, queryable operational record.</li>
+          <li>Worked with <b style="color:var(--primary)">real-time GPS telemetry</b> streams, handling ingestion, state updates and consistency across concurrent users.</li>
+          <li>Engineered post-trip EMS reporting modules with <b style="color:var(--primary)">validation rules protecting data integrity</b> across high-criticality logistics records.</li>
+          <li>Developed the <b style="color:var(--primary)">Driver &amp; Medic</b> mobile application end to end, shipped to a logistics client in Cairo.</li>
+        </ul>
+        <div class="tg"><span>REAL_TIME_DATA</span><span>EVENT_MODELLING</span><span>DATA_INTEGRITY</span><span>FLUTTER</span><span>FIREBASE</span></div>
+        <a href="https://github.com/NeuralSynth/cyparta-atw-frontend-android" target="_blank" rel="noopener">View_ATW_Source &gt;</a>
+      </div>`,
+  },
+  {
+    code:'BOM', name:'Chhatrapati Shivaji Maharaj Intl', city:'Mumbai', region:'Maharashtra, India',
+    lat:19.0896, lon:72.8656, section:'Projects', sub:'Deployment history · 8 builds',
+    badge:'sec', badgeText:'SECTOR',
+    render:() => `
+      <div class="sh">01 // Deployment history — lead builds</div>
+      <div class="it">
+        <div class="ih"><div class="t">RAG_BASED_AI</div><div class="p">ML_Pipeline</div></div>
+        <div class="sb">SRC: /ml/rag-based-ai</div>
+        <p>A fully offline Retrieval-Augmented QA pipeline that turns course videos into a
+        searchable knowledge base and answers questions grounded strictly in retrieved
+        transcript context — no external APIs, every model runs locally. Chunk size and
+        overlap were tuned against a manually labelled question set, so retrieval quality
+        was measured rather than assumed.</p>
+        <div class="kv" style="margin-bottom:12px">
+          <div><div class="k">Embed_Dims</div><div class="v big">1024</div></div>
+          <div><div class="k">Top_K</div><div class="v big">5</div></div>
+          <div><div class="k">External_APIs</div><div class="v big">0</div></div>
+        </div>
+        <div class="tg"><span>PYTHON</span><span>RAG</span><span>EMBEDDINGS</span><span>VECTOR_SEARCH</span><span>WHISPER</span><span>LOCAL_LLM</span></div>
+        <a href="https://github.com/Tanush1206/rag_based_ai" target="_blank" rel="noopener">View_Source &gt;</a>
+      </div>
+      <div class="it">
+        <div class="ih"><div class="t">SUPERSTORE_ANALYSIS</div><div class="p">Analytics_Case_Study</div></div>
+        <div class="sb">SRC: /data/superstore-analysis</div>
+        <p>Across 9,994 transactions ($2.3M revenue, 793 customers), SQL bucketing showed
+        margin holds at 29.5% undiscounted but turns negative past a 25% discount and reaches
+        −77% beyond 40% — converting a vague concern into a specific policy threshold,
+        validated independently at sub-category, region, category and customer level.</p>
+        <div class="kv" style="margin-bottom:12px">
+          <div><div class="k">Break_Even</div><div class="v big">25%</div></div>
+          <div><div class="k">Worst_Margin</div><div class="v big">−77%</div></div>
+          <div><div class="k">Recoverable</div><div class="v big">$35K</div></div>
+        </div>
+        <div class="tg"><span>SQL</span><span>POSTGRESQL</span><span>POWER_BI</span><span>DAX</span><span>COHORT_ANALYSIS</span><span>RFM</span></div>
+        <a href="https://github.com/Tanush1206/superstore-powerbi-analysis" target="_blank" rel="noopener">View_Source &gt;</a>
+      </div>
+      <div class="it">
+        <div class="ih"><div class="t">VIDEO_CAPTION_MAKER</div><div class="p">Production_SaaS</div></div>
+        <div class="sb">SRC: /saas/video-caption-maker</div>
+        <p>GPU-accelerated Whisper transcription on Celery workers so long-running inference
+        never blocks the API, with ChromaDB holding transcript vectors. Six Docker Compose
+        services over an async SQLAlchemy layer with Alembic migrations.</p>
+        <div class="tg"><span>ML_IN_PRODUCTION</span><span>WHISPER</span><span>FASTAPI</span><span>CELERY</span><span>POSTGRESQL</span><span>DOCKER</span></div>
+        <a href="https://github.com/Tanush1206/video-caption-maker" target="_blank" rel="noopener">View_Source &gt;</a>
+      </div>
+      <div class="it">
+        <div class="ih"><div class="t">PACTPAL</div><div class="p">NLP_Platform</div></div>
+        <div class="sb">SRC: /ml/pactpal</div>
+        <p>An NLP contract-analysis platform that rewrites dense legal language into plain
+        English, cutting measured reading time by roughly 30% for the users it was tested
+        with — quantified against real documents rather than estimated.</p>
+        <div class="tg"><span>PYTHON</span><span>NLP</span><span>TEXT_PROCESSING</span><span>REACT</span></div>
+        <a href="https://github.com/Tanush1206/PactPal" target="_blank" rel="noopener">View_Source &gt;</a>
+        <a href="https://pactpal-frontend.onrender.com/" target="_blank" rel="noopener">Live_Demo &gt;</a>
+      </div>
+      <div class="bt" style="margin:0">Plus <b>ATW Mobile</b>, <b>Aasrah</b>, <b>Clique</b> and the Urban Company case study — 8 shipped builds total.</div>`,
+  },
+  {
+    code:'PNQ', name:'Pune Intl', city:'Pune', region:'Maharashtra, India',
+    lat:18.5793, lon:73.9089, section:'Stack', sub:'Technical loadout',
+    badge:'sec', badgeText:'SECTOR',
+    render:() => `
+      <div class="sh">01 // Core languages</div>
+      <div class="bars">
+        ${[['PYTHON',90],['SQL',85],['JAVASCRIPT',85],['JAVA',80]].map(([n,l]) => `
+          <div class="bar"><div class="r"><span>${n}</span><span>${l}%</span></div>
+          <div class="t"><i style="width:${l}%"></i></div></div>`).join('')}
+      </div>
+      <div class="sh n2">02 // Frameworks &amp; platforms</div>
+      <div class="c2">
+        ${[['EMBEDDINGS_RAG','Vector_Retrieval'],['SCIKIT_LEARN','Modelling'],
+           ['WHISPER_OLLAMA','Local_LLM_Stack'],['PANDAS_NUMPY','Data_Wrangling'],
+           ['POSTGRESQL','Window_Functions_CTEs'],['POWER_BI_DAX','BI_Dashboards'],
+           ['FASTAPI','ML_Serving'],['REACT_NEXT.JS','App_Layer'],
+           ['NODE_MONGODB','Web_Backend']].map(([n,l]) => `
+          <div style="padding:10px 12px;background:rgba(11,11,16,.85);border:1px solid rgba(255,255,255,.06)">
+            <div style="font-size:11px;color:#fff;letter-spacing:.05em">${n}</div>
+            <div style="font-size:8px;color:var(--outline);margin-top:4px;letter-spacing:.09em;text-transform:uppercase">${l}</div>
+          </div>`).join('')}
+      </div>
+      <div class="sh n2">03 // Tooling</div>
+      <div class="tg">${['JUPYTER','POWER_BI','GOOGLE_ANALYTICS_4','EXCEL','CHROMADB','DOCKER','GIT','GITHUB','VERCEL','RENDER','CURSOR','COPILOT'].map(t=>`<span>${t}</span>`).join('')}</div>
+      <div class="sh n2">04 // Domain focus</div>
+      <div class="tg" style="margin:0">
+        <span class="t2">Applied_ML_&amp;_Retrieval</span><span class="t2">ML_In_Production</span><span>Data_Analysis_&amp;_Insight</span>
+      </div>`,
+  },
+  {
+    code:'HYD', name:'Rajiv Gandhi Intl', city:'Hyderabad', region:'Telangana, India',
+    lat:17.2403, lon:78.4294, section:'Certificates', sub:'Credential registry · 6 verified',
+    badge:'sec', badgeText:'SECTOR',
+    render:() => `
+      <div class="sh">01 // Credential registry</div>
+      <div class="c2">
+        ${[['Google Analytics Certification','Google','AUG 2026','191498591'],
+           ['Intro to Machine Learning','Kaggle','JUL 2026','KAGGLE-INTRO-ML-2026'],
+           ['Data Science','CWH Official','JUL 2026','CWH-DS-2026'],
+           ['AI Fluency','Anthropic','JUL 2026','ANTHROPIC-AI-FLUENCY-2026'],
+           ['Python Course','Tutedude','APR 2026','TD-TANU-PY-0908'],
+           ['Learn JavaScript','Scrimba','FEB 2026','SCRIMBA-JS-2026']].map(([t,i,d,id]) => `
+          <div style="padding:13px 15px;background:rgba(11,11,16,.85);border:1px solid rgba(255,255,255,.06);border-left:2px solid rgba(78,222,163,.42)">
+            <div style="font-size:12px;color:#fff;line-height:1.4">${t}</div>
+            <div style="font-size:9px;color:var(--primary);margin-top:6px;letter-spacing:.08em">${i} · ${d}</div>
+            <div style="font-size:7px;color:var(--outline);margin-top:5px;letter-spacing:.1em">ID ${id}</div>
+          </div>`).join('')}
+      </div>
+      <div class="bt" style="margin:0">
+        Ordered data and ML first — GA4 analytics, machine learning, data science and AI
+        fluency lead, with the language certifications behind them.
+      </div>`,
+  },
+];
+
+// Contact — a frequency, not a destination.
+const GROUND_CONTROL = {
+  code:'121.9', section:'Ground Control', city:'New Delhi', sub:'Open channels · GMT+5:30',
+  render:() => `
+    <div class="sh">01 // Open channels</div>
+    <div class="bt">
+      If there's any suitable role for me, don't hesitate. I'm open to communication on
+      all channels — let's discuss how I can contribute to your team or project.
+    </div>
+    <div class="kv">
+      <div><div class="k">Email</div><div class="v">tanushthakran.work@gmail.com</div></div>
+      <div><div class="k">Based</div><div class="v">New Delhi, India · GMT+5:30</div></div>
+      <div><div class="k">Availability</div><div class="v" style="color:var(--tertiary)">Open</div></div>
+    </div>
+    <div class="sh n2">02 // Frequencies</div>
+    <div>
+      <a class="lk" href="mailto:tanushthakran.work@gmail.com">Email &gt;</a>
+      <a class="lk" href="https://github.com/Tanush1206" target="_blank" rel="noopener">GitHub &gt;</a>
+      <a class="lk" href="https://linkedin.com/in/tanush-thakran-1b54a8327" target="_blank" rel="noopener">LinkedIn &gt;</a>
+      <a class="lk" href="https://x.com/tanush65556130" target="_blank" rel="noopener">X &gt;</a>
+    </div>`,
+};
+
+/* ═════════════════════════════════════════════
+   2. GEO MATH — real formulas
+   ═════════════════════════════════════════════ */
+const R_GLOBE = 10, R_EARTH_KM = 6371, CRUISE_KMH = 880, CRUISE_FT = 38000;
+const D2R = Math.PI/180, R2D = 180/Math.PI;
+
+function latLonToVec3(lat, lon, r = R_GLOBE) {
+  const p = lat*D2R, l = lon*D2R;
+  return new THREE.Vector3(r*Math.cos(p)*Math.cos(l), r*Math.sin(p), -r*Math.cos(p)*Math.sin(l));
+}
+const vec3ToLatLon = v => {
+  const r = v.length();
+  return { lat: Math.asin(v.y/r)*R2D, lon: Math.atan2(-v.z, v.x)*R2D };
+};
+function centralAngle(a, b) {
+  const p1 = a.lat*D2R, p2 = b.lat*D2R, dl = (b.lon-a.lon)*D2R;
+  return Math.acos(Math.min(1, Math.max(-1,
+    Math.sin(p1)*Math.sin(p2) + Math.cos(p1)*Math.cos(p2)*Math.cos(dl))));
+}
+const distanceKm = (a, b) => R_EARTH_KM * centralAngle(a, b);
+function bearing(lat1, lon1, lat2, lon2) {
+  const p1 = lat1*D2R, p2 = lat2*D2R, dl = (lon2-lon1)*D2R;
+  return (Math.atan2(Math.sin(dl)*Math.cos(p2),
+    Math.cos(p1)*Math.sin(p2) - Math.sin(p1)*Math.cos(p2)*Math.cos(dl))*R2D + 360) % 360;
+}
+function slerpSurface(uA, uB, omega, t, out) {
+  if (omega < 1e-6) return out.copy(uA);
+  const s = Math.sin(omega);
+  return out.set(
+    uA.x*Math.sin((1-t)*omega)/s + uB.x*Math.sin(t*omega)/s,
+    uA.y*Math.sin((1-t)*omega)/s + uB.y*Math.sin(t*omega)/s,
+    uA.z*Math.sin((1-t)*omega)/s + uB.z*Math.sin(t*omega)/s
+  ).normalize();
+}
+const smoothstep = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x-e0)/(e1-e0))); return t*t*(3-2*t); };
+const altProfile = t => smoothstep(0, 0.18, t) * (1 - smoothstep(0.82, 1, t));
+// Domestic Indian legs are short, so arc height gets a floor — otherwise
+// DEL→JAI (231 km) would be a flat scratch on the surface.
+const arcHeight = omega => 0.34 + omega * 0.86;
+
+AIRPORTS.forEach(a => { a.pos = latLonToVec3(a.lat, a.lon); a.unit = a.pos.clone().normalize(); });
+const byCode = Object.fromEntries(AIRPORTS.map(a => [a.code, a]));
+
+/* ═════════════════════════════════════════════
+   3. SCENE
+   ═════════════════════════════════════════════ */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x02040a);
+const camera = new THREE.PerspectiveCamera(44, innerWidth/innerHeight, 0.1, 1200);
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+$('scene').appendChild(renderer.domElement);
+
+// Sun direction — fixed, chosen so India sits in daylight with the
+// terminator falling across the Pacific.
+const SUN_DIR = latLonToVec3(14, 108, 1).normalize();
+
+/* ── starfield ── */
+{
+  const N = 3000, pos = new Float32Array(N*3), col = new Float32Array(N*3);
+  const w = new THREE.Color(0xffffff), b = new THREE.Color(0xbcd2ff), o = new THREE.Color(0xffd9b0);
+  for (let i = 0; i < N; i++) {
+    const r = 300+Math.random()*450, th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+    pos[i*3] = r*Math.sin(ph)*Math.cos(th); pos[i*3+1] = r*Math.cos(ph); pos[i*3+2] = r*Math.sin(ph)*Math.sin(th);
+    const c = Math.random()<0.1 ? o : (Math.random()<0.3 ? b : w);
+    col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+    size:1.45, vertexColors:true, transparent:true, opacity:.8,
+    sizeAttenuation:true, depthWrite:false, blending:THREE.AdditiveBlending })));
+}
+
+/* ═════════════════════════════════════════════
+   4. EARTH
+
+   Real coastlines, decoded from vendored TopoJSON and painted into two
+   canvas textures (day + night lights), then blended in-shader across the
+   terminator. Nothing downloaded but the 54 KB of topology.
+   ═════════════════════════════════════════════ */
+
+// ── TopoJSON decode: delta-encoded quantised arcs → lon/lat rings ──
+function decodeLandRings(topo) {
+  const [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+  const arcs = topo.arcs.map(arc => {
+    let x = 0, y = 0;
+    return arc.map(([dx, dy]) => { x += dx; y += dy; return [x*sx+tx, y*sy+ty]; });
+  });
+  const rings = [];
+  topo.objects.land.geometries.forEach(geom => {
+    // MultiPolygon: [polygon][ring][arcIndex]; a negative index means the
+    // arc is shared and must be walked backwards.
+    geom.arcs.forEach(poly => poly.forEach(ring => {
+      const pts = [];
+      ring.forEach(idx => {
+        const rev = idx < 0;
+        const a = arcs[rev ? ~idx : idx];
+        const seq = rev ? a.slice().reverse() : a;
+        for (let i = pts.length ? 1 : 0; i < seq.length; i++) pts.push(seq[i]);
+      });
+      if (pts.length > 2) rings.push(pts);
+    }));
+  });
+  return rings;
+}
+
+const TEX_W = 2048, TEX_H = 1024;
+const lonToX = lon => (lon + 180) / 360 * TEX_W;
+const latToY = lat => (90 - lat) / 180 * TEX_H;
+
+// Build a Path2D, splitting subpaths where a ring crosses the antimeridian —
+// otherwise Chukotka smears a band right across the map.
+function ringPath(rings) {
+  const p = new Path2D();
+  rings.forEach(pts => {
+    let started = false, prevLon = null;
+    for (const [lon, lat] of pts) {
+      const x = lonToX(lon), y = latToY(lat);
+      if (!started || (prevLon !== null && Math.abs(lon - prevLon) > 180)) { p.moveTo(x, y); started = true; }
+      else p.lineTo(x, y);
+      prevLon = lon;
+    }
+    p.closePath();
+  });
+  return p;
+}
+
+function mkCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+// value-noise helper, reused for terrain mottle and clouds
+const nhash = (x, y, z) => {
+  let h = x*374761393 + y*668265263 + z*1274126177;
+  h = (h ^ (h >> 13)) * 1274126177;
+  return ((h ^ (h >> 16)) >>> 0) / 4294967296;
+};
+const nfade = t => t*t*(3-2*t);
+function vnoise(x, y, z) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const xf = nfade(x-xi), yf = nfade(y-yi), zf = nfade(z-zi);
+  let v = 0;
+  for (let dz = 0; dz <= 1; dz++) for (let dy = 0; dy <= 1; dy++) for (let dx = 0; dx <= 1; dx++)
+    v += (dx?xf:1-xf)*(dy?yf:1-yf)*(dz?zf:1-zf) * nhash(xi+dx, yi+dy, zi+dz);
+  return v;
+}
+function fbm(x, y, z, oct = 4) {
+  let a = .5, f = 1, s = 0, n = 0;
+  for (let o = 0; o < oct; o++) { s += a*vnoise(x*f, y*f, z*f); n += a; a *= .5; f *= 2.03; }
+  return s/n;
+}
+
+let dayTex, nightTex, cloudTex;
+
+function buildEarthTextures(rings) {
+  const land = ringPath(rings);
+
+  /* ── land mask (also used to place city lights) ── */
+  const maskC = mkCanvas(TEX_W, TEX_H), mk = maskC.getContext('2d');
+  mk.fillStyle = '#000'; mk.fillRect(0, 0, TEX_W, TEX_H);
+  mk.fillStyle = '#fff'; mk.fill(land);
+  // Antarctica is clipped at −85.6° in this dataset; close the cap.
+  mk.fillRect(0, latToY(-83), TEX_W, TEX_H - latToY(-83));
+  const maskData = mk.getImageData(0, 0, TEX_W, TEX_H).data;
+  const isLand = (x, y) => maskData[((y|0)*TEX_W + (x|0))*4] > 127;
+
+  /* ── DAY ── */
+  const dc = mkCanvas(TEX_W, TEX_H), d = dc.getContext('2d');
+
+  // ocean: deep navy, warming slightly toward the tropics
+  const og = d.createLinearGradient(0, 0, 0, TEX_H);
+  og.addColorStop(0.00, '#061021');
+  og.addColorStop(0.22, '#0a1c38');
+  og.addColorStop(0.50, '#123a5c');
+  og.addColorStop(0.78, '#0a1c38');
+  og.addColorStop(1.00, '#061021');
+  d.fillStyle = og; d.fillRect(0, 0, TEX_W, TEX_H);
+
+  // continental shelf halo — stroke the coast wide and soft before filling
+  d.save();
+  d.strokeStyle = 'rgba(58,124,178,0.30)'; d.lineWidth = 9; d.stroke(land);
+  d.strokeStyle = 'rgba(84,158,206,0.30)'; d.lineWidth = 4; d.stroke(land);
+  d.restore();
+
+  // land base
+  d.fillStyle = '#2c5738'; d.fill(land);
+
+  // terrain bands, clipped to land so the ocean is untouched
+  d.save();
+  d.clip(land);
+  const band = (y0, y1, color, alpha) => {
+    const g = d.createLinearGradient(0, latToY(y1), 0, latToY(y0));
+    g.addColorStop(0, `rgba(${color},0)`);
+    g.addColorStop(.5, `rgba(${color},${alpha})`);
+    g.addColorStop(1, `rgba(${color},0)`);
+    d.fillStyle = g; d.fillRect(0, latToY(y1), TEX_W, latToY(y0) - latToY(y1));
+  };
+  band(  8,  -8, '38,92,48', 0.85);   // equatorial rainforest
+  band( 34,  14, '150,126,74', 0.92); // Sahara / Arabia / Thar
+  band(-14, -34, '146,120,72', 0.80); // Kalahari / outback
+  band( 66,  44, '44,72,54', 0.85);   // boreal
+  band(-46, -66, '52,78,60', 0.6);
+  band( 90,  68, '214,226,238', 0.95);// arctic
+  band(-70, -90, '224,234,244', 0.98);// antarctic
+
+  // mottle so the land isn't flat
+  const mo = d.getImageData(0, 0, TEX_W, TEX_H), md = mo.data;
+  for (let y = 0; y < TEX_H; y += 1) {
+    for (let x = 0; x < TEX_W; x += 1) {
+      const i = (y*TEX_W + x)*4;
+      if (maskData[i] < 128) continue;
+      const n = (fbm(x*0.028, y*0.028, 3.1, 3) - 0.5) * 46;
+      md[i] = Math.max(0, Math.min(255, md[i]+n));
+      md[i+1] = Math.max(0, Math.min(255, md[i+1]+n));
+      md[i+2] = Math.max(0, Math.min(255, md[i+2]+n*0.8));
+    }
+  }
+  d.putImageData(mo, 0, 0);
+  d.restore();
+
+  // crisp coastline
+  d.strokeStyle = 'rgba(180,214,240,0.28)'; d.lineWidth = 1.1; d.stroke(land);
+
+  dayTex = new THREE.CanvasTexture(dc);
+  dayTex.colorSpace = THREE.SRGBColorSpace;
+  dayTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+  mark(2, 46);
+
+  /* ── NIGHT: city lights, land only, India weighted ── */
+  const nc = mkCanvas(TEX_W, TEX_H), n = nc.getContext('2d');
+  n.fillStyle = '#000'; n.fillRect(0, 0, TEX_W, TEX_H);
+  n.globalCompositeOperation = 'lighter';
+
+  const glow = (x, y, r, a) => {
+    const g = n.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0,   `rgba(255,224,160,${a})`);
+    g.addColorStop(0.4, `rgba(255,186,96,${a*0.45})`);
+    g.addColorStop(1,   'rgba(255,170,70,0)');
+    n.fillStyle = g; n.beginPath(); n.arc(x, y, r, 0, 7); n.fill();
+  };
+
+  // scattered settlement, denser in temperate latitudes
+  for (let i = 0; i < 34000; i++) {
+    const x = Math.random()*TEX_W, y = Math.random()*TEX_H;
+    if (!isLand(x, y)) continue;
+    const lat = 90 - y/TEX_H*180;
+    if (Math.abs(lat) > 70) continue;
+    if (Math.random() > 0.30 + 0.42*Math.exp(-Math.pow((Math.abs(lat)-34)/26, 2))) continue;
+    glow(x, y, 1.6 + Math.random()*2.6, 0.24 + Math.random()*0.3);
+  }
+
+  // Indian subcontinent gets extra density — it's the subject of this map
+  for (let i = 0; i < 14000; i++) {
+    const lon = 68 + Math.random()*24, lat = 7 + Math.random()*29;
+    const x = lonToX(lon), y = latToY(lat);
+    if (!isLand(x, y)) continue;
+    glow(x, y, 1.5 + Math.random()*2.4, 0.3 + Math.random()*0.34);
+  }
+
+  // named metros, brightest
+  [[77.21,28.61,17],[72.87,19.07,16],[77.59,12.97,14],[78.48,17.38,13],
+   [80.27,13.08,12],[88.36,22.57,13],[73.86,18.52,11],[75.79,26.91,9],
+   [31.24,30.04,13],[72.57,23.02,9],[80.95,26.85,9],[77.10,28.56,8]]
+   .forEach(([lon, lat, r]) => {
+     const x = lonToX(lon), y = latToY(lat);
+     glow(x, y, r*2.1, 0.30); glow(x, y, r*0.85, 0.62); glow(x, y, r*0.32, 0.9);
+   });
+
+  n.globalCompositeOperation = 'source-over';
+  nightTex = new THREE.CanvasTexture(nc);
+  nightTex.colorSpace = THREE.SRGBColorSpace;
+
+  mark(3, 66);
+
+  /* ── CLOUDS ── */
+  const cw = 1024, ch = 512;
+  const cc = mkCanvas(cw, ch), c = cc.getContext('2d');
+  const img = c.createImageData(cw, ch), cd = img.data;
+  for (let y = 0; y < ch; y++) {
+    // squash toward the poles so bands read as latitudinal weather
+    const lat = 90 - y/ch*180;
+    const belt = 0.5 + 0.5*Math.cos((lat/90)*Math.PI*2.4);
+    for (let x = 0; x < cw; x++) {
+      const v = fbm(x*0.016, y*0.030, 7.7, 5);
+      let a = smoothstep(0.52, 0.78, v*(0.72 + belt*0.5));
+      const i = (y*cw + x)*4;
+      cd[i] = cd[i+1] = cd[i+2] = 255;
+      cd[i+3] = a*215;
+    }
+  }
+  c.putImageData(img, 0, 0);
+  cloudTex = new THREE.CanvasTexture(cc);
+  cloudTex.colorSpace = THREE.SRGBColorSpace;
+  cloudTex.wrapS = THREE.RepeatWrapping;
+}
+
+/* ── globe meshes ── */
+let cloudMesh = null;
+function buildGlobe() {
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      dayMap:   { value: dayTex },
+      nightMap: { value: nightTex },
+      sunDir:   { value: SUN_DIR.clone() },
+    },
+    vertexShader: `
+      varying vec2 vUv; varying vec3 vN; varying vec3 vView;
+      void main() {
+        vUv = uv;
+        vN = normalize(mat3(modelMatrix) * normal);
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vView = normalize(cameraPosition - wp.xyz);
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`,
+    fragmentShader: `
+      uniform sampler2D dayMap; uniform sampler2D nightMap; uniform vec3 sunDir;
+      varying vec2 vUv; varying vec3 vN; varying vec3 vView;
+      void main() {
+        float l = dot(normalize(vN), normalize(sunDir));
+        // Wide terminator so dusk is a band, not a hard edge.
+        float dayAmt = smoothstep(-0.22, 0.30, l);
+        vec3 day = texture2D(dayMap, vUv).rgb;
+        vec3 night = texture2D(nightMap, vUv).rgb;
+
+        // Lambert on the lit side, with a little wrap so limbs don't go black.
+        float lam = max(0.0, l) * 0.86 + 0.14;
+        vec3 col = mix(night * 1.5, day * lam, dayAmt);
+
+        // A touch of warm scatter right at the terminator.
+        float dusk = exp(-pow((l - 0.02) * 6.5, 2.0));
+        col += vec3(0.30, 0.14, 0.05) * dusk * 0.5;
+
+        // Cool atmospheric fringe toward the limb.
+        float rim = pow(1.0 - max(0.0, dot(normalize(vN), normalize(vView))), 3.0);
+        col += vec3(0.16, 0.34, 0.62) * rim * (0.35 + dayAmt * 0.85);
+
+        gl_FragColor = vec4(col, 1.0);
+      }`,
+  });
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(R_GLOBE, 128, 96), mat));
+
+  // clouds — separate shell, lit by the same sun, drifting slowly
+  cloudMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(R_GLOBE * 1.013, 96, 64),
+    new THREE.ShaderMaterial({
+      uniforms: { map:{ value: cloudTex }, sunDir:{ value: SUN_DIR.clone() }, uOff:{ value: 0 } },
+      vertexShader: `
+        varying vec2 vUv; varying vec3 vN;
+        void main() { vUv = uv; vN = normalize(mat3(modelMatrix)*normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+      fragmentShader: `
+        uniform sampler2D map; uniform vec3 sunDir; uniform float uOff;
+        varying vec2 vUv; varying vec3 vN;
+        void main() {
+          float a = texture2D(map, vec2(vUv.x + uOff, vUv.y)).a;
+          float l = dot(normalize(vN), normalize(sunDir));
+          float lit = smoothstep(-0.18, 0.32, l);
+          gl_FragColor = vec4(vec3(1.0) * (0.30 + lit*0.72), a * (0.10 + lit*0.42));
+        }`,
+      transparent: true, depthWrite: false,
+    })
+  );
+  scene.add(cloudMesh);
+
+  // outer atmosphere halo
+  scene.add(new THREE.Mesh(
+    new THREE.SphereGeometry(R_GLOBE * 1.075, 64, 48),
+    new THREE.ShaderMaterial({
+      uniforms: { sunDir:{ value: SUN_DIR.clone() } },
+      vertexShader: `
+        varying float vI; varying vec3 vN;
+        void main() {
+          vN = normalize(mat3(modelMatrix)*normal);
+          vec3 wn = normalize(normalMatrix * normal);
+          vec4 wp = modelViewMatrix * vec4(position,1.0);
+          vI = pow(1.0 - abs(dot(wn, normalize(-wp.xyz))), 2.6);
+          gl_Position = projectionMatrix * wp;
+        }`,
+      fragmentShader: `
+        uniform vec3 sunDir; varying float vI; varying vec3 vN;
+        void main() {
+          float lit = smoothstep(-0.5, 0.4, dot(normalize(vN), normalize(sunDir)));
+          gl_FragColor = vec4(vec3(0.30,0.58,1.0), vI * (0.14 + lit*0.62));
+        }`,
+      transparent: true, side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending,
+    })
+  ));
+
+  // graticule — deliberately faint, and cool-white rather than indigo so it
+  // reads as an overlay on blue ocean instead of muddying it
+  const pts = [], rr = R_GLOBE * 1.0015;
+  const push = (a, b) => pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+  for (let lat = -60; lat <= 60; lat += 30)
+    for (let lon = -180; lon < 180; lon += 5) push(latLonToVec3(lat, lon, rr), latLonToVec3(lat, lon+5, rr));
+  for (let lon = -180; lon < 180; lon += 30)
+    for (let lat = -84; lat < 84; lat += 5) push(latLonToVec3(lat, lon, rr), latLonToVec3(lat+5, lon, rr));
+  const gg = new THREE.BufferGeometry();
+  gg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  scene.add(new THREE.LineSegments(gg, new THREE.LineBasicMaterial({
+    color: 0xbfe0ff, transparent: true, opacity: 0.085, depthWrite: false })));
+}
+
+/* ═════════════════════════════════════════════
+   5. AIRPORT BEACONS — portfolio palette, sitting on top of Earth
+   ═════════════════════════════════════════════ */
+const labelLayer = $('labels');
+const markers = [];
+function buildMarkers() {
+  AIRPORTS.forEach((ap, i) => {
+    const g = new THREE.Group(), up = ap.unit.clone();
+
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.15, 0.21, 28),
+      new THREE.MeshBasicMaterial({ color:0xc3c0ff, side:THREE.DoubleSide, transparent:true, opacity:.85, depthWrite:false }));
+    ring.position.copy(up).multiplyScalar(R_GLOBE*1.014); ring.lookAt(0,0,0); g.add(ring);
+
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.5, 6),
+      new THREE.MeshBasicMaterial({ color:0xc3c0ff, transparent:true, opacity:.42, depthWrite:false }));
+    mast.position.copy(up).multiplyScalar(R_GLOBE+0.25);
+    mast.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), up); g.add(mast);
+
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.075, 14, 12),
+      new THREE.MeshBasicMaterial({ color:0xffffff }));
+    lamp.position.copy(up).multiplyScalar(R_GLOBE+0.52); g.add(lamp);
+
+    const pulse = new THREE.Mesh(new THREE.RingGeometry(0.21, 0.245, 32),
+      new THREE.MeshBasicMaterial({ color:0x4edea3, side:THREE.DoubleSide, transparent:true, opacity:0, depthWrite:false }));
+    pulse.position.copy(up).multiplyScalar(R_GLOBE*1.015); pulse.lookAt(0,0,0); g.add(pulse);
+
+    scene.add(g);
+
+    const el = document.createElement('div');
+    el.className = 'apL';
+    el.innerHTML = `<div class="tk"></div><div class="c">${ap.code}</div><div class="s">${ap.section}</div>`;
+    labelLayer.appendChild(el);
+
+    markers.push({ ap, ring, lamp, pulse, el, phase: i*0.85 });
+  });
+}
+
+/* ═════════════════════════════════════════════
+   6. AIRCRAFT — procedural, nose along +Z, TT livery
+   ═════════════════════════════════════════════ */
+const plane = new THREE.Group();
+function buildPlane() {
+  const body = new THREE.MeshStandardMaterial({ color:0xf2f2f8, roughness:.34, metalness:.5 });
+  const trim = new THREE.MeshStandardMaterial({ color:0x4f46e5, roughness:.3, metalness:.45 });
+  const mint = new THREE.MeshBasicMaterial({ color:0x4edea3 });
+  const dark = new THREE.MeshStandardMaterial({ color:0x1e1e28, roughness:.45, metalness:.7 });
+
+  const fus = new THREE.Mesh(new THREE.CylinderGeometry(0.058, 0.058, 0.6, 16), body);
+  fus.rotation.x = Math.PI/2; plane.add(fus);
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.058, 0.18, 16), body);
+  nose.rotation.x = Math.PI/2; nose.position.z = 0.39; plane.add(nose);
+
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.058, 0.25, 16), body);
+  tail.rotation.x = -Math.PI/2; tail.position.z = -0.42; plane.add(tail);
+
+  // mint cheatline along the fuselage — the livery detail
+  const chl = new THREE.Mesh(new THREE.BoxGeometry(0.122, 0.012, 0.58), mint);
+  chl.position.set(0, -0.014, -0.01); plane.add(chl);
+
+  [-1, 1].forEach(s => {
+    const w = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.017, 0.16), body);
+    w.position.set(s*0.24, -0.012, -0.03); w.rotation.y = s*-0.38; w.rotation.z = s*0.055; plane.add(w);
+
+    const wl = new THREE.Mesh(new THREE.BoxGeometry(0.019, 0.072, 0.085), trim);
+    wl.position.set(s*0.447, 0.028, -0.112); plane.add(wl);
+
+    const eng = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.03, 0.125, 12), dark);
+    eng.rotation.x = Math.PI/2; eng.position.set(s*0.185, -0.043, 0.02); plane.add(eng);
+
+    const hs = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.013, 0.075), body);
+    hs.position.set(s*0.09, 0.019, -0.445); hs.rotation.y = s*-0.3; plane.add(hs);
+  });
+
+  // fin with a TT marking drawn to a tiny canvas
+  const fc = mkCanvas(64, 64), fx = fc.getContext('2d');
+  fx.fillStyle = '#4f46e5'; fx.fillRect(0, 0, 64, 64);
+  fx.fillStyle = '#e8e6ff'; fx.font = '700 34px "Space Grotesk", sans-serif';
+  fx.textAlign = 'center'; fx.textBaseline = 'middle'; fx.fillText('TT', 32, 36);
+  const finTex = new THREE.CanvasTexture(fc);
+  finTex.colorSpace = THREE.SRGBColorSpace;
+  const fin = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.145, 0.135),
+    new THREE.MeshStandardMaterial({ map:finTex, roughness:.35, metalness:.4 }));
+  fin.position.set(0, 0.086, -0.455); plane.add(fin);
+
+  const nav = (color, x, y, z) => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.021, 8, 6), new THREE.MeshBasicMaterial({ color }));
+    m.position.set(x, y, z); plane.add(m); return m;
+  };
+  plane.userData.navRed   = nav(0xff3b30, -0.45, 0.012, -0.125);
+  plane.userData.navGreen = nav(0x2fdd6b,  0.45, 0.012, -0.125);
+  plane.userData.strobe   = nav(0xffffff,  0,    0.165, -0.455);
+
+  plane.visible = false;
+  scene.add(plane);
+}
+
+/* ── contrail ── */
+const TRAIL = 200;
+const trailPos = new Float32Array(TRAIL*3), trailCol = new Float32Array(TRAIL*3);
+let trailCount = 0;
+const trailGeo = new THREE.BufferGeometry();
+trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+trailGeo.setAttribute('color', new THREE.BufferAttribute(trailCol, 3));
+trailGeo.setDrawRange(0, 0);
+const trail = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({
+  vertexColors:true, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false }));
+scene.add(trail);
+const resetTrail = () => { trailCount = 0; trailGeo.setDrawRange(0, 0); };
+function pushTrail(p) {
+  if (trailCount < TRAIL) {
+    trailPos[trailCount*3] = p.x; trailPos[trailCount*3+1] = p.y; trailPos[trailCount*3+2] = p.z; trailCount++;
+  } else {
+    trailPos.copyWithin(0, 3);
+    trailPos[(TRAIL-1)*3] = p.x; trailPos[(TRAIL-1)*3+1] = p.y; trailPos[(TRAIL-1)*3+2] = p.z;
+  }
+  for (let i = 0; i < trailCount; i++) {
+    const f = Math.pow(i/Math.max(1, trailCount-1), 2) * 0.95;
+    trailCol[i*3] = 0.55*f; trailCol[i*3+1] = 0.9*f; trailCol[i*3+2] = 0.76*f;
+  }
+  trailGeo.attributes.position.needsUpdate = true;
+  trailGeo.attributes.color.needsUpdate = true;
+  trailGeo.setDrawRange(0, trailCount);
+}
+
+/* ═════════════════════════════════════════════
+   7. ROUTE NETWORK — dense inside India, one line out to Cairo
+   ═════════════════════════════════════════════ */
+const NET = [
+  ['DEL','JAI'],['DEL','BOM'],['DEL','BLR'],['DEL','HYD'],['DEL','PNQ'],['DEL','CAI'],
+  ['BOM','PNQ'],['BOM','HYD'],['BOM','JAI'],['BOM','BLR'],
+  ['BLR','HYD'],['BLR','PNQ'],['HYD','PNQ'],['JAI','PNQ'],['CAI','BOM'],
+];
+function buildNetwork() {
+  const pts = [], tmp = new THREE.Vector3();
+  NET.forEach(([ca, cb]) => {
+    const A = byCode[ca], B = byCode[cb];
+    if (!A || !B) return;
+    const om = centralAngle(A, B), h = arcHeight(om) * 0.55;
+    let prev = null;
+    for (let i = 0; i <= 44; i++) {
+      const t = i/44;
+      slerpSurface(A.unit, B.unit, om, t, tmp);
+      const p = tmp.clone().multiplyScalar(R_GLOBE*1.006 + Math.sin(Math.PI*t)*h);
+      if (prev) pts.push(prev.x, prev.y, prev.z, p.x, p.y, p.z);
+      prev = p;
+    }
+  });
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  scene.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({
+    color:0xc3c0ff, transparent:true, opacity:.24, blending:THREE.AdditiveBlending, depthWrite:false })));
+}
+
+const ASEG = 128;
+const activeGeo = new THREE.BufferGeometry();
+activeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array((ASEG+1)*3), 3));
+activeGeo.setDrawRange(0, 0);
+scene.add(new THREE.Line(activeGeo, new THREE.LineBasicMaterial({
+  color:0x4edea3, transparent:true, opacity:.62, blending:THREE.AdditiveBlending, depthWrite:false })));
+function buildActiveLeg(A, B, om) {
+  const arr = activeGeo.attributes.position.array, tmp = new THREE.Vector3(), h = arcHeight(om);
+  for (let i = 0; i <= ASEG; i++) {
+    const t = i/ASEG;
+    slerpSurface(A.unit, B.unit, om, t, tmp);
+    const r = R_GLOBE*1.008 + altProfile(t)*h;
+    arr[i*3] = tmp.x*r; arr[i*3+1] = tmp.y*r; arr[i*3+2] = tmp.z*r;
+  }
+  activeGeo.attributes.position.needsUpdate = true;
+  activeGeo.setDrawRange(0, ASEG+1);
+}
+
+/* ═════════════════════════════════════════════
+   8. CAMERA — orbits the globe centre, tracks the flight
+   ═════════════════════════════════════════════ */
+const cam = { az:0, pol:1, rad:22, tAz:0, tPol:1, tRad:22, manual:false, base:0 };
+function applyCamera() {
+  const sp = Math.sin(cam.pol), cp = Math.cos(cam.pol);
+  camera.position.set(cam.rad*sp*Math.sin(cam.az), cam.rad*cp, cam.rad*sp*Math.cos(cam.az));
+  camera.lookAt(0, 0, 0);
+}
+function aimAt(v, radius) {
+  const u = v.clone().normalize();
+  cam.tPol = Math.acos(Math.min(1, Math.max(-1, u.y)));
+  cam.tAz = Math.atan2(u.x, u.z);
+  cam.base = cam.tAz;
+  if (radius !== undefined) cam.tRad = radius;
+}
+const wrapTo = (a, t) => {
+  let d = (t-a) % (Math.PI*2);
+  if (d > Math.PI) d -= Math.PI*2;
+  if (d < -Math.PI) d += Math.PI*2;
+  return a + d;
+};
+
+const dom = renderer.domElement;
+let dragging = false, lastX = 0, lastY = 0, moved = 0;
+dom.addEventListener('pointerdown', e => {
+  dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY; dom.setPointerCapture(e.pointerId);
+});
+dom.addEventListener('pointermove', e => {
+  ndc.x = (e.clientX/innerWidth)*2 - 1; ndc.y = -(e.clientY/innerHeight)*2 + 1;
+  if (!dragging) return;
+  const dx = e.clientX-lastX, dy = e.clientY-lastY;
+  lastX = e.clientX; lastY = e.clientY; moved += Math.abs(dx)+Math.abs(dy);
+  if (moved > 4) cam.manual = true;
+  cam.tAz -= dx*0.005;
+  cam.tPol = Math.min(Math.PI-0.12, Math.max(0.12, cam.tPol - dy*0.005));
+  cam.az = cam.tAz; cam.pol = cam.tPol; cam.base = cam.tAz;
+});
+dom.addEventListener('pointerup', e => {
+  dragging = false; dom.releasePointerCapture(e.pointerId);
+  if (moved < 5) handleClick(e);
+});
+dom.addEventListener('wheel', e => {
+  e.preventDefault();
+  cam.tRad = Math.min(64, Math.max(12.6, cam.tRad + Math.sign(e.deltaY)*1.8));
+}, { passive:false });
+
+/* ═════════════════════════════════════════════
+   9. FLIGHT STATE
+   ═════════════════════════════════════════════ */
+let current = null, flight = null, legCount = 0, flightNo = 0, openKey = null;
+const panel = $('panel');
+const fmtETE = m => { const h = Math.floor(m/60), mm = Math.round(m%60);
+  return h ? `${h}h ${String(mm).padStart(2,'0')}m` : `${mm}m`; };
+
+function depart(dest) {
+  if (!dest || dest === current || flight) return;
+  closePanel();
+  const A = current, B = dest;
+  const om = centralAngle(A, B), km = R_EARTH_KM*om;
+  // sqrt scaling so a 231 km hop and a 4,400 km haul both read well
+  const dur = Math.min(9, Math.max(3.2, 1.6 + Math.sqrt(km)/15));
+  flightNo = (flightNo % 899) + 101;
+  flight = { A, B, om, km, dur, t:0, pos:new THREE.Vector3(), prev:new THREE.Vector3(),
+             hdg:bearing(A.lat, A.lon, B.lat, B.lon), bank:0, h:arcHeight(om) };
+  legCount++;
+  buildActiveLeg(A, B, om);
+  resetTrail();
+  plane.visible = true;
+  cam.manual = false;
+  $('cs').textContent = `TT—${String(flightNo).padStart(3,'0')}`;
+  $('r-from').textContent = A.code; $('r-fromc').textContent = A.city;
+  $('r-to').textContent = B.code;   $('r-toc').textContent = B.city;
+  $('s-dist').textContent = Math.round(km).toLocaleString() + ' km';
+  $('s-ete').textContent = fmtETE(km/CRUISE_KMH*60);
+  $('s-legs').textContent = legCount;
+  renderRows();
+}
+
+function arrive() {
+  const B = flight.B;
+  current = B; flight = null;
+  plane.visible = false;
+  activeGeo.setDrawRange(0, 0);
+  setPhase('ground', 'ARRIVED');
+  $('r-fill').style.width = '100%'; $('r-ac').style.left = '100%';
+  $('i-alt').textContent = '0'; $('i-gs').textContent = '0';
+  aimAt(B.pos, 15.5);
+  openPanel(B.code, B.code, B.section, `${B.name} · ${B.city}, ${B.region}`, B.render());
+  renderRows();
+}
+
+function setPhase(cls, txt) { const e = $('phase'); e.className = cls; e.textContent = txt; }
+
+function openPanel(key, code, title, sub, html) {
+  openKey = key;
+  $('p-code').textContent = code;
+  $('p-title').textContent = title;
+  $('p-sub').textContent = sub;
+  $('pbody').innerHTML = html;
+  $('pbody').scrollTop = 0;
+  panel.classList.add('on');
+}
+function closePanel() { openKey = null; panel.classList.remove('on'); }
+$('p-close').addEventListener('click', closePanel);
+addEventListener('keydown', e => { if (e.code === 'Escape') closePanel(); });
+
+$('radio').addEventListener('click', () => {
+  openPanel('gc', GROUND_CONTROL.code, GROUND_CONTROL.section,
+    `${GROUND_CONTROL.city} · ${GROUND_CONTROL.sub}`, GROUND_CONTROL.render());
+});
+
+function renderRows() {
+  $('rows').innerHTML = AIRPORTS.map(ap => {
+    const here = ap === current;
+    const km = here ? 0 : distanceKm(current, ap);
+    return `<div class="row ${here?'here':''}" data-code="${ap.code}">
+      <div class="code">${ap.code}</div>
+      <div>
+        <div class="sect">${ap.section}</div>
+        <div class="city">${ap.city} · ${ap.region}</div>
+        <div class="dist">${here ? '— at stand —' : Math.round(km).toLocaleString()+' km · '+fmtETE(km/CRUISE_KMH*60)}</div>
+      </div>
+      <div class="bd ${ap.badge}">${ap.badgeText}</div>
+    </div>`;
+  }).join('');
+  $('rows').querySelectorAll('.row').forEach(r => r.addEventListener('click', () => {
+    const ap = byCode[r.dataset.code];
+    if (ap === current) {
+      aimAt(ap.pos, 15.5); cam.manual = false;
+      openPanel(ap.code, ap.code, ap.section, `${ap.name} · ${ap.city}, ${ap.region}`, ap.render());
+    } else depart(ap);
+  }));
+}
+
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2(-10, -10);
+function handleClick(e) {
+  ndc.x = (e.clientX/innerWidth)*2 - 1; ndc.y = -(e.clientY/innerHeight)*2 + 1;
+  raycaster.setFromCamera(ndc, camera);
+  const hit = raycaster.intersectObjects(markers.map(m => m.lamp), false)[0];
+  if (!hit) return;
+  const m = markers.find(mm => mm.lamp === hit.object);
+  if (!m) return;
+  if (m.ap === current) {
+    aimAt(m.ap.pos, 15.5); cam.manual = false;
+    openPanel(m.ap.code, m.ap.code, m.ap.section, `${m.ap.name} · ${m.ap.city}, ${m.ap.region}`, m.ap.render());
+  } else depart(m.ap);
+}
+
+/* ═════════════════════════════════════════════
+   10. POST
+   ═════════════════════════════════════════════ */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.42, 0.68, 0.5);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+/* ═════════════════════════════════════════════
+   11. LOOP
+   ═════════════════════════════════════════════ */
+const clock = new THREE.Clock();
+const tmpU = new THREE.Vector3();
+const bR = new THREE.Vector3(), bU = new THREE.Vector3(), bF = new THREE.Vector3();
+const mB = new THREE.Matrix4(), qB = new THREE.Quaternion(), qBank = new THREE.Quaternion();
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
+const projV = new THREE.Vector3();
+let strobeT = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.getElapsedTime();
+
+  if (cloudMesh) cloudMesh.material.uniforms.uOff.value = t * 0.0022;
+
+  if (flight) {
+    const f = flight;
+    f.prev.copy(f.pos);
+    f.t = Math.min(1, f.t + dt/f.dur);
+
+    slerpSurface(f.A.unit, f.B.unit, f.om, f.t, tmpU);
+    const prof = altProfile(f.t);
+    f.pos.copy(tmpU).multiplyScalar(R_GLOBE*1.008 + prof*f.h);
+    plane.position.copy(f.pos);
+
+    if (f.t > 0.0005) {
+      bF.copy(f.pos).sub(f.prev);
+      if (bF.lengthSq() < 1e-12) bF.copy(f.B.unit).sub(f.A.unit);
+      bF.normalize();
+      bU.copy(tmpU);
+      bR.copy(bU).cross(bF).normalize();
+      bU.copy(bF).cross(bR).normalize();
+      mB.makeBasis(bR, bU, bF);
+      qB.setFromRotationMatrix(mB);
+      const tb = Math.sin(f.t*Math.PI) * 0.3 * (f.om > 0.2 ? 1 : 0.5);
+      f.bank += (tb - f.bank) * Math.min(1, dt*3.2);
+      qBank.setFromAxisAngle(Z_AXIS, f.bank);
+      plane.quaternion.copy(qB).multiply(qBank);
+    }
+
+    const ll = vec3ToLatLon(f.pos);
+    f.hdg = bearing(ll.lat, ll.lon, f.B.lat, f.B.lon);
+    plane.scale.setScalar(0.85 + prof*0.32);
+
+    if (f.t > 0.004) pushTrail(f.pos);
+
+    if (f.t < 0.18)      setPhase('climb', 'CLIMB');
+    else if (f.t < 0.82) setPhase('cruise', 'CRUISE');
+    else                 setPhase('descent', 'DESCENT');
+
+    $('i-hdg').textContent = String(Math.round(f.hdg)).padStart(3, '0');
+    $('i-alt').textContent = Math.round(prof*CRUISE_FT).toLocaleString();
+    $('i-gs').textContent  = Math.round(prof*475 + (prof > 0.02 ? 140 : 0));
+    $('r-fill').style.width = (f.t*100) + '%';
+    $('r-ac').style.left = (f.t*100) + '%';
+
+    if (!cam.manual) aimAt(f.pos, 14.5 + Math.sin(Math.PI*f.t)*4.2 + f.om*3.2);
+    if (f.t >= 1) arrive();
+  } else if (!cam.manual && !openKey) {
+    // Idle sway rather than a full spin — this map is about India, so it
+    // shouldn't wander off to the middle of the Pacific.
+    cam.tAz = cam.base + Math.sin(t*0.09)*0.30;
+  }
+
+  cam.az = wrapTo(cam.az, cam.tAz);
+  cam.az += (cam.tAz - cam.az) * Math.min(1, dt*2.4);
+  cam.pol += (cam.tPol - cam.pol) * Math.min(1, dt*3.0);
+  cam.rad += (cam.tRad - cam.rad) * Math.min(1, dt*2.6);
+  applyCamera();
+
+  const camDir = camera.position.clone().normalize();
+  markers.forEach(m => {
+    const here = m.ap === current, dest = flight && m.ap === flight.B, hot = here || dest;
+    const cyc = (t*0.5 + m.phase) % 1;
+    m.pulse.scale.setScalar(1 + cyc*2.2);
+    m.pulse.material.opacity = (hot ? 0.6 : 0.14) * (1-cyc);
+    m.pulse.material.color.set(dest ? 0x4edea3 : (here ? 0xffbd2e : 0xc3c0ff));
+    m.lamp.material.color.set(dest ? 0x4edea3 : (here ? 0xffbd2e : 0xffffff));
+    m.lamp.scale.setScalar(1 + Math.sin(t*2.4 + m.phase)*(hot ? 0.24 : 0.1));
+    m.ring.material.opacity = hot ? 0.95 : 0.5;
+
+    const facing = m.ap.unit.dot(camDir);
+    projV.copy(m.lamp.position).project(camera);
+    const on = projV.z < 1 && Math.abs(projV.x) < 1.05 && Math.abs(projV.y) < 1.05;
+    if (facing > 0.1 && on) {
+      m.el.style.opacity = String(Math.min(1, (facing-0.1)*5));
+      m.el.style.left = ((projV.x*0.5+0.5)*innerWidth) + 'px';
+      m.el.style.top  = ((-projV.y*0.5+0.5)*innerHeight) + 'px';
+      m.el.className = 'apL' + (dest ? ' dest' : (here ? ' hot' : ''));
+    } else m.el.style.opacity = '0';
+  });
+
+  strobeT += dt;
+  if (plane.visible) {
+    plane.userData.strobe.material.color.setScalar((strobeT % 1.1) < 0.07 ? 1 : 0.05);
+    const nb = 0.55 + Math.sin(t*5)*0.45;
+    plane.userData.navRed.material.color.setRGB(nb, 0.09, 0.07);
+    plane.userData.navGreen.material.color.setRGB(0.09, nb, 0.3);
+  }
+
+  composer.render();
+}
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+});
+
+/* ═════════════════════════════════════════════
+   12. BOOT
+   ═════════════════════════════════════════════ */
+(async function boot() {
+  mark(1, 16);
+  let rings;
+  try {
+    const res = await fetch('./data/land-110m.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    rings = decodeLandRings(await res.json());
+  } catch (err) {
+    console.error('coastline load failed:', err);
+    bootS_fail(err);
+    return;
+  }
+  mark(1, 28);
+
+  // Yield to the browser between the heavy canvas passes so the boot screen
+  // can actually repaint instead of freezing on a single long task.
+  await new Promise(r => setTimeout(r, 20));
+  buildEarthTextures(rings);
+  await new Promise(r => setTimeout(r, 20));
+
+  buildGlobe();
+  buildMarkers();
+  buildPlane();
+  buildNetwork();
+  mark(4, 84);
+
+  current = byCode['DEL'];
+  renderRows();
+  setPhase('ground', 'ON STAND');
+  aimAt(current.pos, 21);
+  cam.az = cam.tAz; cam.pol = cam.tPol; cam.rad = cam.tRad;
+  applyCamera();
+  animate();
+
+  mark(5, 100);
+  setTimeout(() => {
+    const b = $('boot');
+    b.style.opacity = '0';
+    setTimeout(() => {
+      b.remove();
+      openPanel('DEL', 'DEL', current.section,
+        `${current.name} · ${current.city}, ${current.region}`, current.render());
+    }, 720);
+  }, 780);
+})();
+
+function bootS_fail(err) {
+  const b = $('boot');
+  b.innerHTML = `<div class="w">
+    <div class="t" style="color:#ff5f56">PREFLIGHT FAILED</div>
+    <div class="cmd" style="color:#ff5f56">&gt; coastline topology unavailable</div>
+    <div class="ln on" style="opacity:1">${String(err.message || err)}</div>
+    <div class="ln on" style="opacity:1;margin-top:10px">
+      This file must be served over HTTP — <span style="color:var(--tertiary)">data/land-110m.json</span>
+      cannot be fetched from a <span style="color:var(--tertiary)">file://</span> URL.
+    </div>
+    <div class="ln on" style="opacity:1">Run <span style="color:var(--tertiary)">python3 -m http.server</span> in the prototypes folder.</div>
+  </div>`;
+}
+</script>
+
+<!-- ═════════════════════════════════════════════
+     INTEGRATION NOTES
+
+     FILES
+       src/data/airports.ts                 code / name / city / lat / lon /
+                                            section / badge / route
+       src/components/globe/FlightGlobe.tsx scene, earth, beacons, aircraft
+       src/components/globe/FlightHUD.tsx   strip, board, instruments, panel
+       public/data/land-110m.json           54 KB, vendored (already here)
+
+     Give each airport a `route` ('/about', '/projects', …) instead of inline
+     HTML. Then clicking a beacon calls navigate(route) and flies there, and
+     the arrival panel renders the EXISTING section component — About.tsx,
+     Projects.tsx, Skills.tsx stay the single source of truth. This prototype
+     duplicates their copy only because it has no React to lean on.
+
+     KEEP EVERY SECTION REACHABLE WITHOUT THE GLOBE
+     Ship it as a layer over the current routes, not a replacement:
+       · /about, /projects … keep working exactly as now — SEO, crawlers,
+         screen readers, recruiters on locked-down machines
+       · globe is the landing experience with a visible "skip to site" control
+       · deep links (/projects#rag-based-ai) still resolve without a flight
+
+     WEIGHT
+       three.js  ~150 KB gz, code-split behind React.lazy
+       coastline  20.6 KB gz
+       textures   generated at runtime (~350 ms on a laptop, once)
+     Everything else is procedural. Compare escovilla.dev at 27 MB.
+
+     PERF NOTE
+     Texture generation is a long synchronous task. It's already split across
+     setTimeout yields here; in React, do it in the same pattern (or move the
+     noise passes to an OffscreenCanvas worker) so the main thread stays
+     responsive during boot.
+     ═════════════════════════════════════════════ -->
+</body>
+</html>

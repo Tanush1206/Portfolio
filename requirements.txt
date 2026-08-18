@@ -1,0 +1,5 @@
+# Offline embedding bake for Ask My Portfolio.
+# Run once, commit the output, never embed the corpus at runtime.
+sentence-transformers>=3.0
+scikit-learn>=1.4
+numpy>=1.26

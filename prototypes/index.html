@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype — Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#131313; --on:#e2e2e2; --var:#c7c4d8; --primary:#c3c0ff; --tertiary:#4edea3; --outline:#918fa1; --amber:#ffbd2e; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); color: var(--on); font-family:'JetBrains Mono',monospace;
+    -webkit-font-smoothing: antialiased; padding: 60px 20px 90px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .lbl { font-size:10px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--tertiary); }
+  h1 { font-family:'Space Grotesk',sans-serif; font-size:clamp(30px,6vw,54px); font-weight:700;
+       text-transform:uppercase; letter-spacing:-.03em; color:#fff; margin:14px 0 22px; line-height:1.04; }
+  .lede { font-size:13px; line-height:1.95; color:var(--var); max-width:64ch; margin-bottom:14px; }
+  .lede b { color: var(--primary); }
+  code { background:rgba(255,255,255,.05); padding:2px 6px; font-size:10.5px; color:var(--tertiary); }
+  .rule { height:1px; background:rgba(255,255,255,.08); margin:42px 0; }
+
+  a.card {
+    display:block; padding:28px 30px; text-decoration:none; color:inherit;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); transition:all .3s;
+  }
+  a.card:hover { border-color:rgba(78,222,163,.45); transform:translateY(-2px); }
+  .card .top { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .card h2 { font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; text-transform:uppercase; color:#fff; }
+  a.card:hover h2 { color: var(--tertiary); }
+  .card .desc { font-size:12.5px; line-height:1.9; color:var(--var); margin:14px 0 20px; max-width:70ch; }
+  .card .go { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--tertiary); }
+  .meta { display:flex; flex-wrap:wrap; gap:1px; background:rgba(255,255,255,.07); margin-bottom:18px; }
+  .meta div { background:#171717; padding:11px 14px; flex:1 1 140px; }
+  .meta .k { font-size:8px; letter-spacing:.12em; text-transform:uppercase; color:var(--outline); margin-bottom:5px; }
+  .meta .v { font-size:11px; color:var(--primary); }
+  .meta .v.good { color:var(--tertiary); }
+  .badge { display:inline-block; font-size:8.5px; letter-spacing:.14em; text-transform:uppercase;
+           padding:4px 9px; color:var(--tertiary); border:1px solid rgba(78,222,163,.35); background:rgba(78,222,163,.07); }
+  ul { margin:14px 0 0 18px; }
+  li { font-size:11.5px; line-height:2.05; color:var(--var); }
+  li b { color: var(--primary); }
+  .gone { font-size:11px; line-height:1.9; color:var(--outline); }
+  .gone s { opacity:.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="lbl">Review // aviation direction</span>
+  <h1>Flight Log</h1>
+  <p class="lede">
+    The site's sections as airports on a 3D globe. Pick a destination and an aircraft
+    flies the great-circle route while the camera tracks it; arrival opens that section's
+    real content behind an aviation HUD.
+  </p>
+  <p class="lede">
+    <b>Zero downloaded assets.</b> The continents are value noise thresholded on a
+    Fibonacci sphere, the aircraft is 18 primitives, and three.js is pinned to
+    <code>0.160.0</code>.
+  </p>
+
+  <div class="rule"></div>
+
+  <a class="card" href="./aviation-portfolio.html">
+    <span class="badge">Current prototype</span>
+    <div class="top" style="margin-top:16px">
+      <h2>Aviation Portfolio</h2>
+    </div>
+    <p class="desc">
+      Eight airports, one per section. <b style="color:var(--amber)">DEL</b> (New Delhi) is home base
+      and opens on load; <b style="color:var(--tertiary)">JAI</b> is BITS Pilani,
+      <b style="color:var(--tertiary)">BLR</b> is AIESEC Bengaluru and
+      <b style="color:var(--tertiary)">CAI</b> is the CYPARTA client in Cairo — all badged
+      ON-SITE because they're genuinely in your history. The rest are badged SECTOR so the
+      metaphor never reads as a résumé claim.
+    </p>
+    <div class="meta">
+      <div><div class="k">Geo_Math</div><div class="v good">Real great-circle</div></div>
+      <div><div class="k">Assets</div><div class="v good">0 files</div></div>
+      <div><div class="k">Mobile</div><div class="v good">Tap to fly</div></div>
+      <div><div class="k">Three.js</div><div class="v good">0.160.0 pinned</div></div>
+    </div>
+    <span class="go">Open prototype &gt;</span>
+  </a>
+
+  <div class="rule"></div>
+
+  <span class="lbl" style="color:var(--outline)">What to check</span>
+  <ul>
+    <li>Click <b>SFO</b> from DEL — the route arcs over the <b>Arctic</b>, because that's genuinely the great circle. Heading reads 016°.</li>
+    <li>Distances and ETE are real: DEL→SFO computes 12,382 km against a published 12,376 km.</li>
+    <li>Watch the aircraft <b>bank into the turn</b> and roll out on final; contrail dissolves behind it.</li>
+    <li>Drag to take manual camera control — it releases automatically on the next departure.</li>
+    <li>Labels hide on the far side of the globe; land dots fade on the limb.</li>
+    <li>Resize narrow — the departures board becomes a horizontal scroller.</li>
+  </ul>
+
+  <div class="rule"></div>
+
+  <span class="lbl" style="color:var(--outline)">Removed</span>
+  <p class="gone" style="margin-top:12px">
+    <s>embedding-explorer.html · hero-3d.html · walkable-lab.html</s> — deleted as asked.
+  </p>
+
+</div>
+</body>
+</html>
