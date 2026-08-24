@@ -19,8 +19,6 @@ export const experiences: ExperienceEntry[] = [
     company:  '@AIESEC_in_Bengaluru',
     location: 'Bengaluru, India',
     highlights: [
-      'Tracked and reported departmental **KPIs**, using performance data to steer team priorities.',
-      'Managed the applicant pipeline end to end, monitoring **stage-by-stage conversion** and flagging drop-off points to leadership.',
       '[OCT-JAN] Managed operations for the **Outgoing Global Volunteer** department, facilitating international leadership opportunities.',
       '[FEB-MAR] Transitioned to the **Incoming Global Volunteer** department, overseeing project management and intern integration.',
       'Led cross-functional coordination to hit targets and expand programme reach across the Bengaluru entity.',

@@ -1,152 +1,131 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from './components/Navigation';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Education from './components/Education';
-import Experience from './components/Experience';
-import Projects from './components/Projects';
-import Contact from './components/Contact';
-import Certificates from './components/Certificates';
-import { FaGithub, FaLinkedinIn, FaXTwitter, FaInstagram } from 'react-icons/fa6';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import HeroSection from './components/HeroSection';
+import MenuOverlay from './components/MenuOverlay';
+import HomeScreen from './components/HomeScreen';
+import SiteLayout from './components/SiteLayout';
+import ProjectsPage from './components/ProjectsPage';
+import AboutPage from './components/AboutPage';
+import ExperiencePage from './components/ExperiencePage';
+import ContactPage from './components/ContactPage';
+import NotFoundPage from './components/NotFoundPage';
 import ScrollToTop from './components/ScrollToTop';
-import NotFound from './components/NotFound';
-import RouteMeta from './components/RouteMeta';
-import { personalInfo } from './data/personal';
 
-const socialLinks = [
-  { label: 'GitHub', href: personalInfo.github, Icon: FaGithub },
-  { label: 'LinkedIn', href: personalInfo.linkedin, Icon: FaLinkedinIn },
-  { label: 'X (Twitter)', href: personalInfo.twitter, Icon: FaXTwitter },
-  { label: 'Instagram', href: personalInfo.instagram, Icon: FaInstagram },
-];
+// The gate is a first-impression, not a toll booth: once a visitor has walked
+// through it they skip it on refresh, but only for this long.
+const KNOWN_ROUTES = ['/', '/projects', '/about', '/experience', '/contact'];
 
-// Security Master Switch: Defaults to true if not set.
-const SECURITY_ENABLED = import.meta.env.VITE_SECURITY_ENABLED !== 'false';
+const GATE_TTL = 10 * 60 * 1000;
+const GATE_KEY = 'portfolio:gate-entered-at';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  React.useEffect(() => {
-    if (!SECURITY_ENABLED) return;
-
-    // Discourage casual image/source grabbing. Deliberately does NOT block
-    // copy (Ctrl+C) or text selection — recruiters need to copy the email
-    // address, project names and links, and blocking that costs far more
-    // than it protects on a site whose source is public anyway.
-    const handleContextMenu = (e: MouseEvent) => {
-      // Allow right-click inside form fields so paste/spellcheck still work.
-      if ((e.target as HTMLElement)?.closest('input, textarea')) return;
-      e.preventDefault();
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
-      const mod = e.ctrlKey || e.metaKey;
-      // View-source and save-page.
-      if (mod && !e.shiftKey && (key === 'u' || key === 's')) e.preventDefault();
-      // Devtools is Ctrl+Shift+I / Ctrl+Shift+J, never a bare Ctrl+I.
-      if (mod && e.shiftKey && (key === 'i' || key === 'j')) e.preventDefault();
-    };
-
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-black text-on-surface font-body-lg selection:bg-primary/30 overflow-x-hidden w-full relative">
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-primary focus:text-background focus:font-code-snippet focus:text-sm focus:uppercase focus:tracking-widest"
-      >
-        Skip to content
-      </a>
-
-      <Navigation />
-
-      <main id="main-content" className="relative z-10">
-        {children}
-      </main>
-
-      {/* Floating Action Button - Direct Email */}
-      <div className="fixed bottom-24 right-6 md:bottom-8 md:right-8 z-50">
-        <a
-          href="mailto:tanushthakran.work@gmail.com"
-          className="bg-primary text-background p-3 md:p-4 flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all rounded-none"
-          title="Direct Email"
-        >
-          <span className="material-symbols-outlined text-sm md:text-base">mail</span>
-        </a>
-      </div>
-
-      <footer className="w-full bg-surface border-t border-white/5 py-12 md:py-section-gap mt-12 md:mt-section-gap relative z-20">
-        <div className="w-full flex flex-col md:flex-row justify-between items-center px-margin-safe max-w-container-max mx-auto text-center md:text-left gap-8">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-[#131313] border-2 border-primary/40 flex items-center justify-center">
-              <span className="font-code-snippet text-lg text-primary font-bold animate-pulse">{">_"}</span>
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="font-headline-md text-sm md:text-base text-white tracking-widest uppercase leading-none">PORTFOLIO</span>
-              <span className="font-code-snippet text-[10px] text-primary/60 tracking-tighter uppercase mt-1">ft. TANUSH THAKRAN</span>
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-6">
-            <div className="flex flex-wrap justify-center gap-8 md:gap-12 text-on-surface items-center">
-              {socialLinks.map(({ label, href, Icon }) => (
-                <a
-                  key={label}
-                  className="hover:text-primary transition-all cursor-pointer opacity-70 hover:opacity-100 hover:scale-110"
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  title={label}
-                >
-                  <Icon size={20} aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-            <a
-              href={personalInfo.resume}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-code-snippet text-[10px] md:text-label-caps text-primary/80 hover:text-primary uppercase tracking-widest border border-primary/30 hover:border-primary px-4 py-2 transition-all"
-            >
-              [ DOWNLOAD_RESUME.PDF ]
-            </a>
-          </div>
-          <div className="font-code-snippet text-[8px] md:text-label-caps text-tertiary opacity-80 uppercase tracking-widest font-bold">
-            © 2026 TANUSH THAKRAN.
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
+/** Storage throws in private mode and when site data is blocked. */
+const gatePassedRecently = () => {
+  try {
+    const raw = window.localStorage.getItem(GATE_KEY);
+    if (!raw) return false;
+    const enteredAt = Number(raw);
+    return Number.isFinite(enteredAt) && Date.now() - enteredAt < GATE_TTL;
+  } catch {
+    return false;
+  }
 };
 
+const rememberGateEntry = () => {
+  try {
+    window.localStorage.setItem(GATE_KEY, String(Date.now()));
+  } catch {
+    // Nothing to do — the visitor simply sees the gate again next time.
+  }
+};
+
+const CURTAIN_IN = 700;
+// The curtain lifts as the home screen mounts so its fade-rise animations
+// play in view rather than behind black.
+const CURTAIN_HOLD = 0;
+
 function App() {
+  const [view, setView] = useState<'gate' | 'home'>(() => {
+    // A dead link should land on the 404, not behind the gate.
+    if (!KNOWN_ROUTES.includes(window.location.pathname)) return 'home';
+    return gatePassedRecently() ? 'home' : 'gate';
+  });
+  const [curtain, setCurtain] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const timers = useRef<number[]>([]);
+
+  const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Opening the gate: black curtain wipes in, the view swaps behind it, then
+  // it lifts on the chosen page. The router only mounts once the gate is open,
+  // so the address bar is set first and BrowserRouter reads it on mount.
+  const openGate = useCallback((path = '/') => {
+    rememberGateEntry();
+    setMenuOpen(false);
+    setCurtain(true);
+    timers.current.push(
+      window.setTimeout(() => {
+        if (path !== window.location.pathname) {
+          window.history.replaceState(null, '', path);
+        }
+        setView('home');
+      }, CURTAIN_IN),
+      window.setTimeout(() => setCurtain(false), CURTAIN_IN + CURTAIN_HOLD),
+    );
+  }, []);
+
+  useEffect(() => () => timers.current.forEach(window.clearTimeout), []);
+
+  // Lock the page while the gate overlay owns the viewport.
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMenu();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen, closeMenu]);
+
   return (
-    <Router>
-      <ScrollToTop />
-      <RouteMeta />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Hero />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/skills" element={<Skills />} />
-          <Route path="/education" element={<Education />} />
-          <Route path="/experience" element={<Experience />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/certificates" element={<Certificates />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <div className="bg-black">
+      {view === 'gate' ? (
+        <>
+          <Navbar menuOpen={menuOpen} onToggle={toggleMenu} onEnter={() => openGate('/')} />
+          <HeroSection onOpen={() => openGate('/')} locked={menuOpen} />
+          <MenuOverlay open={menuOpen} onClose={closeMenu} onNavigate={openGate} />
+        </>
+      ) : (
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route element={<SiteLayout />}>
+              <Route path="/" element={<HomeScreen />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/experience" element={<ExperiencePage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      )}
+
+      <div
+        className={`fixed inset-0 z-[60] bg-black transition-opacity ease-overlay ${
+          curtain ? 'duration-700' : 'duration-500'
+        } ${
+          curtain ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+    </div>
   );
 }
 
