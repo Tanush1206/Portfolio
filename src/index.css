@@ -36,6 +36,23 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Anyone who has asked for less motion gets the layout without the movement.
+   The JS-driven effects (gate zoom, card scaling, boomerang playback) check
+   the same query themselves. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -125,12 +142,15 @@ html {
 }
 
 /* ── 404 screen ─────────────────────────────────────────────────────── */
+/* Self-hosted: the previous source was an undocumented Figma URL that served
+   a gzipped TrueType file while the rule claimed woff2. Variable weight axis,
+   so the range is declared rather than a single weight. */
 @font-face {
-  font-family: 'Geist Mono:SemiBold';
+  font-family: 'Geist Mono';
   font-style: normal;
-  font-weight: 600;
+  font-weight: 100 900;
   font-display: swap;
-  src: url('https://static.figma.com/font/GeistMono_wght__1') format('woff2');
+  src: url('/fonts/GeistMono-Variable.ttf') format('truetype');
 }
 
 .nf-page {
@@ -172,7 +192,7 @@ html {
    carry the site's serif. */
 .nf-message {
   margin: 0;
-  font-family: 'Geist Mono:SemiBold', ui-monospace, SFMono-Regular, monospace;
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
   font-size: 24px;
   font-weight: 600;
   line-height: 1.1;

@@ -7,6 +7,8 @@ import { Link, useLocation } from 'react-router-dom';
 const NAV_ITEMS: { label: string; to?: string; href?: string }[] = [
   { label: 'Home', to: '/' },
   { label: 'Work', to: '/projects' },
+  { label: 'Skills', to: '/skills' },
+  { label: 'Certificates', to: '/certificates' },
   { label: 'About', to: '/about' },
   { label: 'Experience', to: '/experience' },
   { label: 'Contact', to: '/contact' },
@@ -42,7 +44,7 @@ const HomeNav = () => {
           Tanush Thakran
         </Link>
 
-        <nav className="hidden md:flex items-center gap-5 lg:gap-8">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
           {NAV_ITEMS.map((item) => {
             const active = item.to === pathname;
             const className = 'text-sm transition-colors duration-300 hover:!text-black';
@@ -67,7 +69,7 @@ const HomeNav = () => {
 
         <Link
           to="/contact"
-          className="hidden md:inline-block rounded-full px-6 py-2.5 text-sm text-white transition-transform duration-300 hover:scale-[1.03]"
+          className="hidden lg:inline-block rounded-full px-6 py-2.5 text-sm text-white transition-transform duration-300 hover:scale-[1.03]"
           style={{ backgroundColor: INK }}
         >
           Get in touch
@@ -77,7 +79,7 @@ const HomeNav = () => {
           type="button"
           aria-label="Open menu"
           onClick={() => setMenuOpen(true)}
-          className="md:hidden flex flex-col items-end gap-1.5 p-1"
+          className="lg:hidden flex flex-col items-end gap-1.5 p-1"
         >
           <span className="w-6 h-[1.5px]" style={{ backgroundColor: INK }} />
           <span className="w-4 h-[1.5px]" style={{ backgroundColor: INK }} />
@@ -86,7 +88,7 @@ const HomeNav = () => {
       </header>
 
       <div
-        className={`md:hidden fixed inset-0 z-50 bg-white flex flex-col transition-opacity duration-500 ease-menu ${
+        className={`lg:hidden fixed inset-0 z-50 bg-white flex flex-col transition-opacity duration-500 ease-menu ${
           menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
       >

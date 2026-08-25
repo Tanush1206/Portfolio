@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 const VIDEO_SRC =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260819_212700_3bb9329b-5c50-4257-a09b-ca85cf3654a3.mp4';
@@ -24,6 +25,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpen, locked = false }) => 
   const [mounted, setMounted] = useState(false);
   const [progress, setProgress] = useState(0);
   const entered = useRef(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const timer = window.setTimeout(() => setMounted(true), 300);
@@ -69,12 +71,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpen, locked = false }) => 
       lastTouchY = null;
     };
 
+    // Keyboard equivalent: the gate must not be scroll-only.
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (['Enter', ' ', 'Spacebar'].includes(event.key)) {
+        event.preventDefault();
+        enter();
+        return;
+      }
+      if (['ArrowDown', 'PageDown'].includes(event.key)) {
+        event.preventDefault();
+        advance(0.34);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
+      window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
@@ -95,7 +112,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpen, locked = false }) => 
     <section className="relative w-full h-screen overflow-hidden flex items-end justify-center">
       <div
         style={{
-          transform: `scale(${1 + progress * (MAX_ZOOM - 1)})`,
+          transform: reducedMotion
+            ? undefined
+            : `scale(${1 + progress * (MAX_ZOOM - 1)})`,
           transformOrigin: ZOOM_ORIGIN,
         }}
         className={`absolute inset-0 transition-transform duration-300 ease-out ${
@@ -130,8 +149,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onOpen, locked = false }) => 
           style={{ ...delay(900), ...foregroundFade }}
           className={`mt-8 text-white/50 text-xs tracking-[0.2em] uppercase transition-[opacity,transform] duration-[900ms] ease-entrance ${entranceClass}`}
         >
-          Scroll to enter
+          Scroll or press Enter to continue
         </p>
+
+        <button
+          type="button"
+          onClick={enter}
+          style={{ ...delay(1100), ...foregroundFade }}
+          className={`mt-6 rounded-full border border-white/25 px-6 py-2.5 text-sm text-white/90 transition-[opacity,transform,colors] duration-[900ms] ease-entrance hover:border-white/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${entranceClass}`}
+        >
+          Enter
+        </button>
       </div>
     </section>
   );

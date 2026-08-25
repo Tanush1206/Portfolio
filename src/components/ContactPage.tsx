@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { personalInfo } from '../data/personal';
 import { PageHeader, Panel } from './pageChrome';
@@ -11,6 +11,10 @@ import { INK, MUTED } from './pageText';
 const EMAILJS_SERVICE_ID = 'service_5rxokx8';
 const EMAILJS_TEMPLATE_ID = 'template_3f867zk';
 const EMAILJS_PUBLIC_KEY = 'JfWCL7VqanzAZ6JiR';
+
+// Bots fill every field they find; a human never sees this one.
+const HONEYPOT = 'company_website';
+const MIN_FILL_MS = 3000;
 
 type Fields = { name: string; email: string; message: string };
 type FieldErrors = Partial<Record<keyof Fields, string>>;
@@ -40,6 +44,7 @@ const ContactPage = () => {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const openedAt = useRef(Date.now());
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -50,6 +55,15 @@ const ContactPage = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    // Silently drop obvious bots: a filled honeypot, or a form completed
+    // faster than any human could read it.
+    const trap = new FormData(event.target as HTMLFormElement).get(HONEYPOT);
+    if (trap || Date.now() - openedAt.current < MIN_FILL_MS) {
+      setStatus('success');
+      setForm(EMPTY);
+      return;
+    }
 
     const nextErrors = validate(form);
     setErrors(nextErrors);
@@ -114,6 +128,11 @@ const ContactPage = () => {
           </p>
 
           <form onSubmit={handleSubmit} noValidate className="mt-8">
+            <div aria-hidden="true" className="absolute left-[-9999px] w-px h-px overflow-hidden">
+              <label htmlFor={HONEYPOT}>Company website</label>
+              <input id={HONEYPOT} name={HONEYPOT} type="text" tabIndex={-1} autoComplete="off" />
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label htmlFor="name" className="block text-xs mb-2" style={{ color: MUTED }}>

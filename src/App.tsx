@@ -9,13 +9,23 @@ import ProjectsPage from './components/ProjectsPage';
 import AboutPage from './components/AboutPage';
 import ExperiencePage from './components/ExperiencePage';
 import ContactPage from './components/ContactPage';
+import SkillsPage from './components/SkillsPage';
+import CertificatesPage from './components/CertificatesPage';
 import NotFoundPage from './components/NotFoundPage';
 import SmallScreenNotice from './components/SmallScreenNotice';
 import ScrollToTop from './components/ScrollToTop';
 
 // The gate is a first-impression, not a toll booth: once a visitor has walked
 // through it they skip it on refresh, but only for this long.
-const KNOWN_ROUTES = ['/', '/projects', '/about', '/experience', '/contact'];
+const KNOWN_ROUTES = [
+  '/',
+  '/projects',
+  '/skills',
+  '/certificates',
+  '/about',
+  '/experience',
+  '/contact',
+];
 
 const GATE_TTL = 10 * 60 * 1000;
 const GATE_KEY = 'portfolio:gate-entered-at';
@@ -112,6 +122,8 @@ function App() {
             <Route element={<SiteLayout />}>
               <Route path="/" element={<HomeScreen />} />
               <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/skills" element={<SkillsPage />} />
+              <Route path="/certificates" element={<CertificatesPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/experience" element={<ExperiencePage />} />
               <Route path="/contact" element={<ContactPage />} />

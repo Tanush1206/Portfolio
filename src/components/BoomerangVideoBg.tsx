@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 type Props = {
   src: string;
@@ -15,6 +16,7 @@ export default function BoomerangVideoBg({ src, className }: Props) {
   const displayCanvasRef = useRef<HTMLCanvasElement>(null);
   const [framesReady, setFramesReady] = useState(false);
   const framesRef = useRef<HTMLCanvasElement[]>([]);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -114,6 +116,12 @@ export default function BoomerangVideoBg({ src, className }: Props) {
     canvas.width = first.width;
     canvas.height = first.height;
 
+    // Reduced motion: paint one frame and stop.
+    if (reducedMotion) {
+      ctx.drawImage(frames[Math.floor(frames.length / 2)], 0, 0);
+      return;
+    }
+
     let index = 0;
     let direction = 1;
     let last = performance.now();
@@ -137,7 +145,7 @@ export default function BoomerangVideoBg({ src, className }: Props) {
     };
     rafId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(rafId);
-  }, [framesReady]);
+  }, [framesReady, reducedMotion]);
 
   return (
     <div className={className ?? 'absolute inset-0 w-full h-full'}>

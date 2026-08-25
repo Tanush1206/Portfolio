@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useScroll } from 'framer-motion';
 import type { Project } from '../data/projects';
 import ProjectCard, { CARD_OFFSET_STEP } from './ProjectCard';
+import { usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 interface ProjectStackProps {
   items: Project[];
@@ -19,6 +20,7 @@ const DECK_QUERY = '(min-width: 768px)';
 
 const ProjectStack = ({ items }: ProjectStackProps) => {
   const container = useRef<HTMLDivElement>(null);
+  const reducedMotion = usePrefersReducedMotion();
   const [stacked, setStacked] = useState(
     () => typeof window !== 'undefined' && window.matchMedia(DECK_QUERY).matches,
   );
@@ -49,7 +51,7 @@ const ProjectStack = ({ items }: ProjectStackProps) => {
           project={project}
           index={index}
           progress={scrollYProgress}
-          stacked={stacked}
+          stacked={stacked && !reducedMotion}
           // Each card starts shrinking once the next one begins its approach.
           range={[index * (1 / items.length), 1]}
           targetScale={1 - (items.length - 1 - index) * 0.03}

@@ -3,6 +3,8 @@ import React from 'react';
 const NAV_LINKS = [
   { label: 'Home', path: '/' },
   { label: 'Work', path: '/projects' },
+  { label: 'Skills', path: '/skills' },
+  { label: 'Certificates', path: '/certificates' },
   { label: 'About', path: '/about' },
   { label: 'Experience', path: '/experience' },
   { label: 'Contact', path: '/contact' },
@@ -22,7 +24,7 @@ const MenuOverlay: React.FC<MenuOverlayProps> = ({ open, onClose, onNavigate }) 
       open ? 'opacity-100 visible' : 'opacity-0 invisible'
     }`}
   >
-    <nav className="flex flex-col items-center gap-8">
+    <nav className="flex flex-col items-center gap-6 md:gap-7">
       {NAV_LINKS.map((link, index) => (
         <button
           key={link.label}
@@ -32,7 +34,7 @@ const MenuOverlay: React.FC<MenuOverlayProps> = ({ open, onClose, onNavigate }) 
             onNavigate(link.path);
           }}
           style={{ transitionDelay: open ? `${150 + index * 80}ms` : '0ms' }}
-          className={`text-white font-instrument text-4xl md:text-6xl hover:opacity-60 transition-[opacity,transform] duration-[600ms] ease-overlay ${
+          className={`text-white font-instrument text-3xl sm:text-4xl md:text-5xl hover:opacity-60 transition-[opacity,transform] duration-[600ms] ease-overlay ${
             open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
           }`}
         >
