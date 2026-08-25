@@ -10,6 +10,7 @@ import AboutPage from './components/AboutPage';
 import ExperiencePage from './components/ExperiencePage';
 import ContactPage from './components/ContactPage';
 import NotFoundPage from './components/NotFoundPage';
+import SmallScreenNotice from './components/SmallScreenNotice';
 import ScrollToTop from './components/ScrollToTop';
 
 // The gate is a first-impression, not a toll booth: once a visitor has walked
@@ -96,6 +97,8 @@ function App() {
 
   return (
     <div className="bg-black">
+      <SmallScreenNotice />
+
       {view === 'gate' ? (
         <>
           <Navbar menuOpen={menuOpen} onToggle={toggleMenu} onEnter={() => openGate('/')} />
