@@ -1,42 +1,47 @@
 import { Link } from 'react-router-dom';
+import { personalInfo } from '../data/personal';
 
-const NOT_FOUND_VIDEO =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260801_001207_ec20d138-aa45-4b2b-ab8c-bdc71607f240.mp4';
-
+/**
+ * Rendered outside SiteLayout on purpose: a dead link should not come with
+ * a working nav bar wrapped around it. It gets its own minimal chrome.
+ */
 const NotFoundPage = () => (
-  <main className="nf-page">
-    <video
-      className="nf-video"
-      src={NOT_FOUND_VIDEO}
-      autoPlay
-      loop
-      muted
-      playsInline
-      aria-hidden="true"
-    />
-
-    <Link
-      to="/"
-      className="absolute top-10 left-1/2 -translate-x-1/2 z-10 font-instrument text-white text-2xl tracking-tight"
-    >
-      Tanush Thakran
-    </Link>
-
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-[min(100%-2.5rem,560px)] flex flex-col items-center text-center gap-7 sm:gap-9">
-      <h1 className="nf-404 font-instrument">404</h1>
-
-      <div className="w-full max-w-[425px] h-px bg-white/60" />
-
-      <p className="nf-message">
-        The path may be broken, but the journey isn&apos;t. Let&apos;s get you back.
-      </p>
-
-      <Link
-        to="/"
-        className="rounded-full bg-white px-8 py-3.5 text-sm font-medium text-black transition-transform duration-300 hover:scale-[1.03]"
-      >
-        Back to home
+  <main data-theme="dark" className="section grid min-h-[100svh] place-items-center px-5">
+    <div className="w-full max-w-xl">
+      <Link to="/" className="text-[15px] font-medium tracking-tight">
+        {personalInfo.name}
       </Link>
+
+      <p className="display mt-14 text-[clamp(4rem,20vw,10rem)]">404</p>
+
+      <div className="mt-10 border-t border-line pt-8">
+        <p className="text-lg">This page does not exist.</p>
+        <p className="mt-3 text-[15px] leading-relaxed text-muted">
+          The link may be broken, or the page may have moved. Everything else is still where you
+          left it.
+        </p>
+      </div>
+
+      <div className="mt-12 flex flex-wrap gap-3">
+        <Link to="/" className="group btn">
+          Back to home
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          >
+            →
+          </span>
+        </Link>
+        <Link to="/projects" className="group btn-ghost">
+          See the work
+          <span
+            aria-hidden="true"
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          >
+            →
+          </span>
+        </Link>
+      </div>
     </div>
   </main>
 );

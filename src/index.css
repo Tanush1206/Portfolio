@@ -2,6 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════
+   THEME PAIR
+
+   The page is not one colour scheme — it alternates. Full-bleed sections
+   carry data-theme="light" or "dark" and redefine the same four tokens,
+   so a section is dark or light by declaration and every component inside
+   it inherits without knowing which it is in.
+
+   Channels are stored raw, not hex, so Tailwind's opacity modifiers
+   (text-muted/60, border-line/40) keep working through var().
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --paper: 246 246 246;
+  --ink: 17 17 20;
+
+  /* Default to light so anything rendered outside a section still reads. */
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --muted: 86 86 88;
+  --line: 234 236 240;
+  --bg-raw: 246 246 246;
+  --fg-raw: 17 17 20;
+}
+
+[data-theme='light'] {
+  --bg: 246 246 246;
+  --fg: 17 17 20;
+  --muted: 86 86 88;
+  --line: 234 236 240;
+
+  /* Same two values again under names nothing else reassigns. A rule that
+     wants to swap bg and fg cannot read them from --bg and --fg while it
+     is redefining those — that is a cycle, and the browser throws the
+     whole declaration out. These are the fixed points to swap around. */
+  --bg-raw: 246 246 246;
+  --fg-raw: 17 17 20;
+}
+
+[data-theme='dark'] {
+  --bg: 17 17 20;
+  --fg: 246 246 246;
+  --muted: 189 189 189;
+  --line: 37 37 37;
+
+  --bg-raw: 17 17 20;
+  --fg-raw: 246 246 246;
+}
+
 @layer base {
   *,
   *::before,
@@ -14,31 +62,245 @@
   html,
   body {
     /* clip, not hidden: overflow:hidden on html/body makes them a scroll
-       container and breaks position:sticky in the work section. */
+       container and breaks position:sticky in the project deck. */
     overflow-x: clip;
   }
 
+  html {
+    scroll-behavior: smooth;
+    /* Anchors clear the sticky header rather than hiding under it. */
+    scroll-padding-top: 88px;
+  }
+
   body {
-    background-color: #000000;
-    color: #ffffff;
-    @apply w-full;
-    position: relative;
+    background-color: rgb(var(--ink));
+    color: rgb(var(--fg));
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     -webkit-overflow-scrolling: touch;
+    position: relative;
+    width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
     @apply break-words;
+  }
+
+  /* One focus treatment site-wide, so nothing is reachable by keyboard
+     without being visible — and it works on either theme. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--fg));
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: rgb(var(--fg));
+    color: rgb(var(--bg));
   }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+/* Self-hosted variable face for the mono accents. SIL Open Font License. */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/GeistMono-Variable.ttf') format('truetype');
 }
 
-/* Anyone who has asked for less motion gets the layout without the movement.
-   The JS-driven effects (gate zoom, card scaling, boomerang playback) check
-   the same query themselves. */
+@layer components {
+  /* A full-bleed band. Paints its own theme, so sections stack into
+     alternating light and dark without any parent coordinating them. */
+  .section {
+    position: relative;
+    background-color: rgb(var(--bg));
+    color: rgb(var(--fg));
+  }
+
+  /* Small uppercase mono label. This is the tech signal in an otherwise
+     monochrome grotesk design — it does the work colour would. */
+  .kicker {
+    font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(var(--muted));
+  }
+
+  /* Display type: tight tracking is what separates a headline from body
+     copy set in the same family. */
+  .display {
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+  }
+
+  /* Solid button, inverted against whatever theme it sits in — no colour
+     needed, and it reads correctly on both. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    background-color: rgb(var(--fg));
+    color: rgb(var(--bg));
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.6rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    border: 1px solid rgb(var(--line));
+    color: rgb(var(--fg));
+    transition: border-color 0.3s ease;
+  }
+  .btn-ghost:hover { border-color: rgb(var(--fg) / 0.5); }
+
+  /* Link that draws its own underline left to right on hover. */
+  .link-grow {
+    background-image: linear-gradient(rgb(var(--fg)), rgb(var(--fg)));
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-grow:hover { background-size: 100% 1px; }
+
+  /* ── HOVER INVERSION ───────────────────────────────────────────────
+     A panel that turns itself inside out under the pointer. It does not
+     paint a colour: it swaps the band's own tokens, so the same class
+     inverts correctly on a light band and on a dark one, and everything
+     inside follows without knowing it happened.
+
+     Custom properties do not interpolate, but the properties that read
+     them do — so declaring the transition on the descendants is what
+     makes the flip a sweep rather than a jump. */
+  /* The card has to declare its own colour, not inherit the band's.
+     `.section` sets `color: rgb(var(--fg))` on itself, and what descendants
+     inherit is that already-computed value — swapping --fg down here cannot
+     retint it, because the declaration lives on an ancestor. Elements with
+     a colour rule of their own (.kicker, text-muted) flipped correctly;
+     a bare heading kept the band's ink and vanished into the inverted
+     card. Re-declaring it here puts every child back under this token. */
+  .flip-hover {
+    color: rgb(var(--fg));
+  }
+
+  .flip-hover,
+  .flip-hover * {
+    transition: background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .flip-hover:hover {
+    --bg: var(--fg-raw);
+    --fg: var(--bg-raw);
+    --muted: var(--bg-raw);
+    --line: var(--bg-raw);
+  }
+
+  /* ── CURSOR PILL ───────────────────────────────────────────────────
+     A dot that trails the pointer and widens into a label over anything
+     carrying data-mouse-content. Fixed, unclickable, and above
+     everything — including the mobile drawer — so it is never occluded
+     by the thing it is describing.
+
+     It composites in `difference` rather than picking a colour: the pill
+     is white, so it inverts whatever band it happens to be over, and the
+     label is black, so it leaves that band untouched and reads as the
+     page showing through a hole. One rule, correct on light and dark,
+     with nothing to keep in sync as it crosses the boundary. */
+  .mouse-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background-color: #ffffff;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0);
+    transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease,
+      scale 0.18s ease;
+  }
+  .mouse-follower.is-pressed { scale: 0.75; }
+
+  .mouse-content {
+    position: absolute;
+    top: 50%;
+    left: 22px;
+    transform: translateY(-50%);
+    font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #000000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  /* The dot the label sits beside is the pill's own left edge, drawn as a
+     hole rather than a second element. */
+  .mouse-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -13px;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background-color: #000000;
+    transform: translateY(-50%);
+  }
+
+  /* Coarse pointers have no cursor to follow. */
+  @media (hover: none), (pointer: coarse) {
+    .mouse-follower { display: none; }
+  }
+}
+
+@layer utilities {
+  .font-mono-accent {
+    font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+}
+
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Anyone who has asked for less motion gets the layout without the movement. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -48,161 +310,5 @@ html {
     transition-duration: 0.01ms !important;
   }
 
-  html {
-    scroll-behavior: auto;
-  }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.35);
-}
-
-/* Selection color */
-::selection {
-  background-color: rgba(0, 0, 0, 0.12);
-}
-
-@layer utilities {
-  .font-instrument {
-    font-family: 'Instrument Serif', serif;
-  }
-}
-
-/* Self-hosted face. Drop HelveticaNeue-Roman.woff2/.woff into public/fonts/
-   to activate it — until then .font-helvetica-neue falls back down the stack. */
-@font-face {
-  font-family: 'Helvetica Neue Roman';
-  src: url('/fonts/HelveticaNeue-Roman.woff2') format('woff2'),
-       url('/fonts/HelveticaNeue-Roman.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@layer base {
-  /* Inter is the global default; class-based faces (.font-instrument,
-     .font-helvetica-neue) outrank this universal selector. */
-  * {
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  }
-}
-
-@layer utilities {
-  .font-helvetica-neue {
-    font-family: 'Helvetica Neue Roman', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
-}
-
-@layer components {
-  .liquid-glass {
-    background: rgba(255, 255, 255, 0.01);
-    background-blend-mode: luminosity;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: none;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .liquid-glass::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1.4px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.45) 0%,
-      rgba(255, 255, 255, 0.15) 20%,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0) 60%,
-      rgba(255, 255, 255, 0.15) 80%,
-      rgba(255, 255, 255, 0.45) 100%
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-}
-
-/* ── 404 screen ─────────────────────────────────────────────────────── */
-/* Self-hosted: the previous source was an undocumented Figma URL that served
-   a gzipped TrueType file while the rule claimed woff2. Variable weight axis,
-   so the range is declared rather than a single weight. */
-@font-face {
-  font-family: 'Geist Mono';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('/fonts/GeistMono-Variable.ttf') format('truetype');
-}
-
-.nf-page {
-  position: relative;
-  min-height: 100svh;
-  background-color: #000000;
-  overflow-x: hidden;
-}
-
-.nf-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Gradient numerals. The bottom padding gives the baseline room so the glyphs
-   are never cropped, and the right padding cancels the negative tracking's
-   trailing space so the figure stays optically centred. */
-.nf-404 {
-  margin: 0;
-  font-size: clamp(140px, 26vw, 300px);
-  line-height: 0.9;
-  letter-spacing: -0.0256em;
-  padding-right: 0.0256em;
-  padding-bottom: 0.08em;
-  background: linear-gradient(
-    247.3282658084845deg,
-    rgb(255, 255, 255) 2.5334%,
-    rgba(255, 255, 255, 0.4) 93.612%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* The message keeps its original mono treatment; the numerals and wordmark
-   carry the site's serif. */
-.nf-message {
-  margin: 0;
-  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -2px;
-  color: #ffffff;
-}
-
-@media (max-width: 640px) {
-  .nf-message {
-    font-size: clamp(16px, 4.5vw, 20px);
-    letter-spacing: -1.3px;
-  }
+  html { scroll-behavior: auto; }
 }

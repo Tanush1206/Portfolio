@@ -1,20 +1,29 @@
 import { Outlet } from 'react-router-dom';
-import HomeNav from './HomeNav';
-import PageBackground from './PageBackground';
+import MouseFollower from './fx/MouseFollower';
+import RouteFade from './fx/RouteFade';
 import SiteFooter from './SiteFooter';
+import SiteHeader from './SiteHeader';
 
 /**
- * Shared chrome for the real pages. The 404 sits outside this layout so it
- * renders as a bare full-viewport screen, with no nav, footer or backdrop.
+ * Chrome shared by every real route. The 404 renders outside this on
+ * purpose, so a dead link does not get a working nav bar around it.
+ *
+ * The header is fixed rather than sticky: it has to sit *over* the bands so
+ * it can read the theme of whichever one is beneath it, which a sticky bar
+ * in normal flow cannot do.
+ *
+ * The cursor pill is mounted once, here, and listens at the document. Any
+ * element anywhere in the tree can drive it by carrying data-mouse-content,
+ * which keeps the effect out of the components that use it.
  */
 const SiteLayout = () => (
-  <div className="relative bg-white">
-    <PageBackground />
-    <div className="relative z-10">
-      <HomeNav />
+  <div className="relative min-h-[100svh]">
+    <SiteHeader />
+    <RouteFade>
       <Outlet />
-      <SiteFooter />
-    </div>
+    </RouteFade>
+    <SiteFooter />
+    <MouseFollower />
   </div>
 );
 

@@ -1,18 +1,16 @@
 import { motion, useTransform, type MotionValue } from 'framer-motion';
 import type { Project } from '../data/projects';
 
-const INK = '#000000';
-const MUTED = '#6F6F6F';
-
 /** How far each successive card sits below the one before it, in px. */
 export const CARD_OFFSET_STEP = 28;
 
-// The data still carries SCREAMING_SNAKE titles from the terminal-era UI.
-const readable = (title: string) => title.replace(/_/g, ' ');
+// The data still carries SCREAMING_SNAKE labels from the terminal-era UI.
+const readable = (value: string) => value.replace(/_/g, ' ');
 
 interface ProjectCardProps {
   project: Project;
   index: number;
+  total: number;
   progress: MotionValue<number>;
   range: [number, number];
   targetScale: number;
@@ -23,12 +21,16 @@ interface ProjectCardProps {
 const ProjectCard = ({
   project,
   index,
+  total,
   progress,
   range,
   targetScale,
   stacked,
 }: ProjectCardProps) => {
   const scale = useTransform(progress, range, [1, targetScale]);
+
+  const hasSource = project.sourceUrl && project.sourceUrl !== '#';
+  const hasDemo = project.demoUrl && project.demoUrl !== '#';
 
   return (
     // pointer-events-none while stacked: the full-width sticky boxes overlap
@@ -37,8 +39,8 @@ const ProjectCard = ({
     <div
       className={
         stacked
-          ? 'min-h-[85vh] flex items-center justify-center sticky top-32 px-6 py-6 pointer-events-none'
-          : 'flex justify-center px-6 pb-5'
+          ? 'pointer-events-none sticky top-28 flex min-h-[86vh] items-center justify-center px-5 py-6 sm:px-8'
+          : 'flex justify-center px-5 pb-5 sm:px-8'
       }
     >
       <motion.article
@@ -47,64 +49,71 @@ const ProjectCard = ({
             ? { scale, top: `${index * CARD_OFFSET_STEP}px`, transformOrigin: 'top' }
             : undefined
         }
-        className={`relative flex flex-col w-full max-w-5xl rounded-3xl bg-white border border-black/10 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.25)] px-7 py-9 sm:px-12 sm:py-12 md:px-16 md:py-14 ${
+        className={`relative flex w-full max-w-5xl flex-col border border-line bg-bg p-7 sm:p-12 md:p-16 ${
           stacked ? 'pointer-events-auto' : ''
         }`}
       >
-        <div className="flex items-center justify-between gap-4 text-xs sm:text-sm" style={{ color: MUTED }}>
-          <span>{String(index + 1).padStart(2, '0')}</span>
-          <span>{project.status.replace(/_/g, ' ')}</span>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-line pb-6">
+          <span className="kicker tabular">
+            {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+          </span>
+          <span className="kicker">{readable(project.status)}</span>
         </div>
 
+        {/* Reserved so a two-word title and a five-word one produce cards of
+            the same height in the stack. */}
         <h3
-          className="font-instrument mt-5 sm:mt-7 text-3xl sm:text-5xl md:text-6xl leading-[0.95] min-h-[1.9em]"
-          style={{ color: INK, letterSpacing: '-0.0256em' }}
+          className="display mt-8 text-[clamp(1.75rem,4.5vw,3.25rem)]"
+          style={{ minHeight: '1.9em' }}
         >
           {readable(project.title)}
         </h3>
 
-        {/* Full copy, no clamp. The reserved height keeps every card the same
-            size regardless of how long its description runs. */}
-        <p
-          className="mt-5 sm:mt-6 max-w-3xl text-sm sm:text-base leading-relaxed sm:min-h-[11.375em] md:min-h-[16.25em]"
-          style={{ color: MUTED }}
-        >
+        {/* Reserved on the wider breakpoints for the same reason: the
+            shortest description here is 174 characters, the longest 946. */}
+        <p className="mt-6 max-w-3xl text-[15px] leading-[1.75] text-muted sm:min-h-[12em] md:min-h-[14.5em]">
           {project.description}
         </p>
 
-        <div className="mt-6 sm:mt-8 flex flex-wrap gap-2">
-          {project.tags.slice(0, 4).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-black/10 px-3 py-1 text-[11px] sm:text-xs"
-              style={{ color: MUTED }}
-            >
-              {tag.replace(/_/g, ' ')}
+        <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2">
+          {project.tags.map((tag) => (
+            <span key={tag} className="kicker">
+              {readable(tag)}
             </span>
           ))}
         </div>
 
-        <div className="mt-auto pt-8 sm:pt-10 flex flex-wrap items-center gap-3">
-          <a
-            href={project.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full px-6 py-2.5 text-sm text-white transition-transform duration-300 hover:scale-[1.03]"
-            style={{ backgroundColor: INK }}
-          >
-            View source
-          </a>
-          {project.demoUrl && project.demoUrl !== '#' && (
-            <a
-              href={project.demoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full border border-black/15 px-6 py-2.5 text-sm transition-colors duration-300 hover:border-black/40"
-              style={{ color: INK }}
-            >
+        <div className="mt-auto flex flex-wrap items-center gap-3 pt-10">
+          {hasDemo && (
+            <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="group btn">
               Live demo
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                →
+              </span>
             </a>
           )}
+
+          {hasSource && (
+            <a
+              href={project.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group btn-ghost"
+            >
+              View source
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                →
+              </span>
+            </a>
+          )}
+
+          {!hasSource && !hasDemo && <span className="kicker">Private repository</span>}
         </div>
       </motion.article>
     </div>

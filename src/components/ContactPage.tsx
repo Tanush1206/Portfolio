@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { personalInfo } from '../data/personal';
-import { PageHeader, Panel } from './pageChrome';
-import { INK, MUTED } from './pageText';
+import { ButtonAnchor, Kicker, PageHead, Reveal, Section, Shell } from './ui';
 
 // ─────────────────────────────────────────────
 // EMAILJS CONFIG — the same account the deployed site sends through.
@@ -104,161 +103,155 @@ const ContactPage = () => {
   };
 
   const fieldClass = (field: keyof Fields) =>
-    `w-full rounded-xl border bg-white px-4 py-3 text-sm outline-none transition-colors duration-200 ${
-      errors[field] ? 'border-red-500' : 'border-black/15 focus:border-black'
+    `w-full border-b bg-transparent py-3 text-[15px] outline-none transition-colors duration-300 placeholder:text-muted/60 ${
+      errors[field] ? 'border-red-400' : 'border-line focus:border-fg'
     }`;
 
   return (
-    <main className="w-full pt-16 md:pt-24 pb-24 md:pb-32">
-      <PageHeader
-        eyebrow={`${personalInfo.location} — ${personalInfo.timezone}`}
-        title="Let us talk."
-      />
+    <main className="w-full">
+      <Section theme="dark" className="pb-24 md:pb-32">
+        <PageHead
+          index="06"
+          label={`${personalInfo.location} — ${personalInfo.timezone}`}
+          title="Get in touch"
+          lede={personalInfo.statusText}
+        />
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 mt-12 md:mt-16 grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
-        <Panel className="lg:col-span-2">
-          <h2
-            className="font-instrument text-2xl sm:text-3xl leading-[0.95]"
-            style={{ color: INK, letterSpacing: '-0.0256em' }}
-          >
-            Send a message
-          </h2>
-          <p className="mt-2 text-sm" style={{ color: MUTED }}>
-            It arrives straight in my inbox, and replies go back to the address you give.
-          </p>
-
-          <form onSubmit={handleSubmit} noValidate className="mt-8">
-            <div aria-hidden="true" className="absolute left-[-9999px] w-px h-px overflow-hidden">
-              <label htmlFor={HONEYPOT}>Company website</label>
-              <input id={HONEYPOT} name={HONEYPOT} type="text" tabIndex={-1} autoComplete="off" />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label htmlFor="name" className="block text-xs mb-2" style={{ color: MUTED }}>
-                  Your name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Jane Doe"
-                  aria-invalid={Boolean(errors.name)}
-                  aria-describedby={errors.name ? 'name-error' : undefined}
-                  className={fieldClass('name')}
-                  style={{ color: INK }}
-                />
-                {errors.name && (
-                  <p id="name-error" className="mt-2 text-xs text-red-600">
-                    {errors.name}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-xs mb-2" style={{ color: MUTED }}>
-                  Your email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="jane@company.com"
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'email-error' : undefined}
-                  className={fieldClass('email')}
-                  style={{ color: INK }}
-                />
-                {errors.email && (
-                  <p id="email-error" className="mt-2 text-xs text-red-600">
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-5">
-              <label htmlFor="message" className="block text-xs mb-2" style={{ color: MUTED }}>
-                Message
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows={6}
-                value={form.message}
-                onChange={handleChange}
-                placeholder="What would you like to talk about?"
-                aria-invalid={Boolean(errors.message)}
-                aria-describedby={errors.message ? 'message-error' : undefined}
-                className={`${fieldClass('message')} resize-y`}
-                style={{ color: INK }}
-              />
-              {errors.message && (
-                <p id="message-error" className="mt-2 text-xs text-red-600">
-                  {errors.message}
-                </p>
-              )}
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <button
-                type="submit"
-                disabled={status === 'sending'}
-                className="rounded-full px-8 py-3.5 text-sm text-white transition-transform duration-300 hover:scale-[1.03] disabled:opacity-60 disabled:hover:scale-100"
-                style={{ backgroundColor: INK }}
-              >
-                {status === 'sending' ? 'Sending...' : 'Send message'}
-              </button>
-
-              <p aria-live="polite" className="text-sm">
-                {status === 'success' && (
-                  <span className="text-green-700">Sent. I will get back to you shortly.</span>
-                )}
-                {status === 'error' && <span className="text-red-600">{errorMessage}</span>}
-              </p>
-            </div>
-          </form>
-        </Panel>
-
-        <Panel>
-          <p className="text-sm leading-relaxed" style={{ color: MUTED }}>
-            {personalInfo.statusText}
-          </p>
-
-          <ul className="mt-8 space-y-5">
-            {CHANNELS.map((channel) => (
-              <li key={channel.label}>
-                <p className="text-xs" style={{ color: MUTED }}>
-                  {channel.label}
-                </p>
-                <a
-                  href={channel.href}
-                  target={channel.href.startsWith('mailto:') ? undefined : '_blank'}
-                  rel="noopener noreferrer"
-                  className="text-sm underline decoration-black/20 underline-offset-4 transition-colors duration-300 hover:decoration-black"
-                  style={{ color: INK }}
+        <Shell className="mt-20">
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-8">
+            <Reveal className="lg:col-span-7">
+              <form onSubmit={handleSubmit} noValidate className="relative">
+                <div
+                  aria-hidden="true"
+                  className="absolute left-[-9999px] h-px w-px overflow-hidden"
                 >
-                  {channel.value}
-                </a>
-              </li>
-            ))}
-          </ul>
+                  <label htmlFor={HONEYPOT}>Company website</label>
+                  <input
+                    id={HONEYPOT}
+                    name={HONEYPOT}
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
 
-          <a
-            href={personalInfo.resume}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-block rounded-full border border-black/15 px-6 py-2.5 text-sm transition-colors duration-300 hover:border-black/40"
-            style={{ color: INK }}
-          >
-            Download résumé
-          </a>
-        </Panel>
-      </div>
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="name" className="kicker mb-2 block">
+                      Your name
+                    </label>
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      value={form.name}
+                      onChange={handleChange}
+                      placeholder="Jane Doe"
+                      aria-invalid={Boolean(errors.name)}
+                      aria-describedby={errors.name ? 'name-error' : undefined}
+                      className={fieldClass('name')}
+                    />
+                    {errors.name && (
+                      <p id="name-error" className="mt-2 text-xs text-red-400">
+                        {errors.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="kicker mb-2 block">
+                      Your email
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="jane@company.com"
+                      aria-invalid={Boolean(errors.email)}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
+                      className={fieldClass('email')}
+                    />
+                    {errors.email && (
+                      <p id="email-error" className="mt-2 text-xs text-red-400">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <label htmlFor="message" className="kicker mb-2 block">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={6}
+                    value={form.message}
+                    onChange={handleChange}
+                    placeholder="What would you like to talk about?"
+                    aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? 'message-error' : undefined}
+                    className={`${fieldClass('message')} resize-y`}
+                  />
+                  {errors.message && (
+                    <p id="message-error" className="mt-2 text-xs text-red-400">
+                      {errors.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-10 flex flex-wrap items-center gap-6">
+                  <button type="submit" disabled={status === 'sending'} className="group btn">
+                    {status === 'sending' ? 'Sending…' : 'Send message'}
+                    <span
+                      aria-hidden="true"
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </button>
+
+                  <p aria-live="polite" className="text-sm">
+                    {status === 'success' && <span>Sent. I will get back to you shortly.</span>}
+                    {status === 'error' && (
+                      <span className="text-red-400">{errorMessage}</span>
+                    )}
+                  </p>
+                </div>
+              </form>
+            </Reveal>
+
+            <Reveal delay={0.1} className="lg:col-span-4 lg:col-start-9">
+              <Kicker>Channels</Kicker>
+
+              <ul className="mt-8 border-t border-line">
+                {CHANNELS.map((channel) => (
+                  <li key={channel.label}>
+                    <a
+                      href={channel.href}
+                      target={channel.href.startsWith('mailto:') ? undefined : '_blank'}
+                      rel="noopener noreferrer"
+                      className="group flex items-baseline justify-between gap-4 border-b border-line py-4"
+                    >
+                      <span className="kicker">{channel.label}</span>
+                      <span className="truncate text-sm text-muted transition-colors duration-300 group-hover:text-fg">
+                        {channel.value}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10">
+                <ButtonAnchor href={personalInfo.resume}>Download résumé</ButtonAnchor>
+              </div>
+            </Reveal>
+          </div>
+        </Shell>
+      </Section>
     </main>
   );
 };

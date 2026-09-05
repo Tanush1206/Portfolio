@@ -1,108 +1,96 @@
-import { personalInfo } from '../data/personal';
 import { educationEntries } from '../data/education';
-import { PageHeader, Panel } from './pageChrome';
-import { INK, MUTED, readable } from './pageText';
+import { personalInfo } from '../data/personal';
+import LineReveal from './fx/LineReveal';
+import { ButtonAnchor, Kicker, PageHead, Reveal, Section, SectionHead, Shell } from './ui';
+
+const readable = (value: string) => value.replace(/_/g, ' ');
+const pad = (value: number) => String(value).padStart(2, '0');
 
 const AboutPage = () => (
-  <main className="w-full pt-16 md:pt-24 pb-24 md:pb-32">
-    <PageHeader eyebrow={personalInfo.role} title="A little about me." />
+  <main className="w-full">
+    <Section theme="dark" className="pb-24 md:pb-32">
+      <PageHead index="04" label="Profile" title="About" />
 
-    <div className="max-w-7xl mx-auto px-6 sm:px-8 mt-12 md:mt-16 grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
-      <Panel className="lg:col-span-2">
-        <p className="text-base sm:text-lg leading-relaxed" style={{ color: MUTED }}>
-          {personalInfo.bio}
-        </p>
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <a
-            href={personalInfo.resume}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full px-6 py-2.5 text-sm text-white transition-transform duration-300 hover:scale-[1.03]"
-            style={{ backgroundColor: INK }}
-          >
-            Download résumé
-          </a>
-          <a
-            href={personalInfo.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-black/15 px-6 py-2.5 text-sm transition-colors duration-300 hover:border-black/40"
-            style={{ color: INK }}
-          >
-            GitHub
-          </a>
-          <a
-            href={personalInfo.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-black/15 px-6 py-2.5 text-sm transition-colors duration-300 hover:border-black/40"
-            style={{ color: INK }}
-          >
-            LinkedIn
-          </a>
-        </div>
-      </Panel>
+      <Shell className="mt-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
+          <Reveal className="lg:col-span-7">
+            <p className="text-[17px] leading-[1.8] sm:text-xl">{personalInfo.bio}</p>
 
-      <Panel>
-        <dl className="space-y-5 text-sm">
-          {[
-            ['Based in', personalInfo.location],
-            ['Timezone', personalInfo.timezone],
-            ['Focus', personalInfo.tagline],
-          ].map(([label, value]) => (
-            <div key={label}>
-              <dt style={{ color: MUTED }}>{label}</dt>
-              <dd className="mt-1" style={{ color: INK }}>
-                {value}
-              </dd>
+            <div className="mt-12 flex flex-wrap gap-3">
+              <ButtonAnchor href={personalInfo.resume} tone="solid">
+                Résumé
+              </ButtonAnchor>
+              <ButtonAnchor href={personalInfo.github}>GitHub</ButtonAnchor>
+              <ButtonAnchor href={personalInfo.linkedin}>LinkedIn</ButtonAnchor>
             </div>
-          ))}
-        </dl>
-      </Panel>
-    </div>
+          </Reveal>
 
-    <div className="max-w-7xl mx-auto px-6 sm:px-8 mt-16 md:mt-24">
-      <h2
-        className="font-instrument text-3xl sm:text-4xl md:text-5xl leading-[0.95]"
-        style={{ color: INK, letterSpacing: '-0.0256em' }}
-      >
-        Education
-      </h2>
-
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-        {educationEntries.map((entry) => (
-          <Panel key={entry.index}>
-            <div className="flex items-center justify-between gap-4 text-xs" style={{ color: MUTED }}>
-              <span>{entry.index}</span>
-              <span>{entry.period}</span>
-            </div>
-            <h3
-              className="font-instrument mt-4 text-2xl sm:text-3xl leading-[0.95]"
-              style={{ color: INK, letterSpacing: '-0.0256em' }}
-            >
-              {readable(entry.institution)}
-            </h3>
-            <p className="mt-2 text-sm" style={{ color: INK }}>
-              {readable(entry.degree)}
-            </p>
-            <p className="mt-4 text-sm leading-relaxed" style={{ color: MUTED }}>
-              {entry.description}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {entry.tags.slice(0, 4).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-black/10 px-3 py-1 text-[11px]"
-                  style={{ color: MUTED }}
-                >
-                  {readable(tag)}
-                </span>
+          <Reveal delay={0.1} className="lg:col-span-4 lg:col-start-9">
+            <dl className="divide-y divide-line border-y border-line">
+              {[
+                ['Role', personalInfo.role],
+                ['Based', personalInfo.location],
+                ['Timezone', personalInfo.timezone],
+                ['Availability', 'Open to roles'],
+              ].map(([label, value]) => (
+                <div key={label} className="flex items-baseline justify-between gap-6 py-4">
+                  <dt className="kicker">{label}</dt>
+                  <dd className="text-right text-sm">{value}</dd>
+                </div>
               ))}
-            </div>
-          </Panel>
-        ))}
-      </div>
-    </div>
+            </dl>
+
+            <Kicker className="mt-10">Focus</Kicker>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{personalInfo.tagline}</p>
+          </Reveal>
+        </div>
+      </Shell>
+    </Section>
+
+    <Section theme="light" className="py-24 md:py-32">
+      <Shell>
+        <SectionHead
+          label="Education"
+          title="Training"
+          aside={`${pad(educationEntries.length)} entries`}
+        />
+
+        <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line md:grid-cols-2">
+          {educationEntries.map((entry, index) => (
+            <Reveal key={entry.index} delay={index * 0.08} className="bg-bg">
+              <div className="flip-hover h-full bg-bg p-8 sm:p-10">
+                <div className="flex items-baseline justify-between gap-4 border-b border-line pb-5">
+                  <span className="kicker tabular">{entry.index}</span>
+                  <span className="kicker tabular">{entry.period}</span>
+                </div>
+
+                <LineReveal
+                  as="h3"
+                  text={readable(entry.institution)}
+                  className="display mt-8 text-[clamp(1.35rem,3vw,2rem)]"
+                />
+
+                <p className="mt-4 text-sm">
+                  {readable(entry.degree)}
+                </p>
+
+                <p className="mt-6 text-sm leading-relaxed text-muted">{entry.description}</p>
+
+                {entry.tags.length > 0 && (
+                  <div className="mt-8 flex flex-wrap gap-x-4 gap-y-2">
+                    {entry.tags.map((tag) => (
+                      <span key={tag} className="kicker">
+                        {readable(tag)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Shell>
+    </Section>
   </main>
 );
 

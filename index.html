@@ -12,7 +12,7 @@
     <!-- Icons & theme -->
     <link rel="icon" type="image/png" href="/images/logo.png" />
     <link rel="apple-touch-icon" href="/images/logo.png" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#111114" />
     <meta name="color-scheme" content="dark" />
 
     <!-- Open Graph (LinkedIn, WhatsApp, Facebook, Slack, Discord) -->
@@ -35,10 +35,19 @@
     <meta name="twitter:image:alt" content="Tanush Thakran — AI/ML Engineer" />
     <meta name="twitter:creator" content="@tanush65556130" />
 
+    <!-- Inter carries the whole design; Geist Mono is self-hosted and used
+         only for the small uppercase labels. Instrument Serif is gone with
+         the serif design it belonged to. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preload" href="/fonts/GeistMono-Variable.ttf" as="font" type="font/ttf" crossorigin />
+
+    <!-- Paint the page ground before the stylesheet lands, or a dark hero
+         opens on a white flash. -->
+    <style>
+      html { background-color: #111114; }
+    </style>
 
     <!-- Structured data: helps Google show your name, role and links directly -->
     <script type="application/ld+json">
