@@ -16,7 +16,7 @@ const pad = (value: number) => String(value).padStart(2, '0');
 
 // Six, matching the density the reference uses for a selected-works grid:
 // enough to show range, few enough that each one still gets looked at.
-const SELECTED = projects.slice(0, 6);
+const SELECTED = projects.slice(0, 4);
 
 // The strongest credential leads the list, so it is the one worth featuring.
 const HEADLINE_CERT = certificates[0];
