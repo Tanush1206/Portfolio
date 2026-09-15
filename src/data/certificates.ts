@@ -12,6 +12,15 @@ export interface CertificateEntry {
 // the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
+    title: "ChatGPT Prompt Engineering for Developers",
+    issuer: "DeepLearning.AI · OpenAI",
+    date: "SEP 2026",
+    id: "DLAI-CHATGPT-PROMPT-ENGINEERING-2026",
+    link: "https://www.deeplearning.ai/accomplishments/99604059-97ce-4ff6-87b7-25dae0299fcf?_gl=1*zefe20*_gcl_au*MTQzNzc4NzI3OS4xNzg1NjA4NTU3*_ga*MTk2OTkwNTU2Ny4xNzg1MTQwMjQz*_ga_FR2MZ1VLMS*czE3ODk0Njc1NjAkbzIzJGcxJHQxNzg5NDc1Njg2JGozMyRsMCRoMA..&usp=sharing",
+    image: "/certs/chatgpt_prompt_engineering.png",
+    logo: "/certs/deeplearning_ai_logo.png"
+  },
+  {
     title: "Intermediate Machine Learning",
     issuer: "Kaggle",
     date: "SEP 2026",
