@@ -16,15 +16,16 @@ const CertificatesPage = () => (
       <Shell className="mt-20">
         <div className="grid grid-cols-1 gap-px overflow-hidden border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
           {certificates.map((certificate, index) => (
-            <Reveal key={certificate.id} delay={(index % 3) * 0.07} className="bg-bg">
+            <Reveal
+              key={certificate.id}
+              delay={(index % 3) * 0.07}
+              className="bg-bg"
+            >
               <a
                 href={certificate.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-mouse-content={`Verify with ${certificate.issuer.split(' · ')[0]}`}
-                // The card inverts wholesale under the pointer by swapping
-                // the band's tokens, so it reads as a panel being selected
-                // rather than as a link being tinted.
+                data-mouse-content={`Verify with ${certificate.issuer1}`}
                 className="group flip-hover flex h-full flex-col bg-bg"
               >
                 {certificate.image && (
@@ -33,36 +34,66 @@ const CertificatesPage = () => (
                       src={certificate.image}
                       alt={`${certificate.title} certificate`}
                       loading="lazy"
-                      // Certificates are scans in wildly different aspect
-                      // ratios; contain keeps every one whole.
                       className="h-44 w-full object-contain p-6 transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   </div>
                 )}
 
                 <div className="flex flex-1 flex-col p-7">
+                  {/* Issuers */}
                   <div className="flex items-center gap-3">
-                    {certificate.logo && (
+                    {certificate.logo1 && (
                       <img
-                        src={certificate.logo}
+                        src={certificate.logo1}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
                         className="h-5 w-5 shrink-0 object-contain"
                       />
                     )}
-                    <span className="kicker truncate">{certificate.issuer}</span>
-                    <span className="kicker tabular ml-auto shrink-0">{certificate.date}</span>
+
+                    <span className="kicker truncate">
+                      {certificate.issuer1}
+                    </span>
+
+                    {certificate.issuer2 && (
+                      <>
+                        <span className="kicker">·</span>
+
+                        {certificate.logo2 && (
+                          <img
+                            src={certificate.logo2}
+                            alt=""
+                            aria-hidden="true"
+                            loading="lazy"
+                            className="h-5 w-5 shrink-0 object-contain"
+                          />
+                        )}
+
+                        <span className="kicker truncate">
+                          {certificate.issuer2}
+                        </span>
+                      </>
+                    )}
+
+                    <span className="kicker tabular ml-auto shrink-0">
+                      {certificate.date}
+                    </span>
                   </div>
 
                   <h2 className="mt-6 text-lg leading-snug">
                     {certificate.title}
                   </h2>
 
-                  <p className="kicker mt-3 break-all">ID {certificate.id}</p>
+                  <p className="kicker mt-3 break-all">
+                    ID {certificate.id}
+                  </p>
 
                   <div className="mt-auto flex items-center justify-between pt-8">
-                    <span className="kicker tabular">{pad(index + 1)}</span>
+                    <span className="kicker tabular">
+                      {pad(index + 1)}
+                    </span>
+
                     <span className="kicker transition-transform duration-300 group-hover:translate-x-1">
                       View credential ↗
                     </span>
