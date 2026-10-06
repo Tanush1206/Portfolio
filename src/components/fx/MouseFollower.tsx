@@ -30,8 +30,12 @@ const MouseFollower = () => {
     const label = labelRef.current;
     if (!pill || !label) return undefined;
 
-    const target = { x: -100, y: -100 };
-    const eased = { x: -100, y: -100 };
+    // `s` is the press scale. It lives in the same transform, after the
+    // translate: the CSS `scale` property applies before `transform`, so it
+    // would scale the translation too and throw the pill toward the
+    // viewport's top-left corner on every click.
+    const target = { x: -100, y: -100, s: 1 };
+    const eased = { x: -100, y: -100, s: 1 };
 
     let raf = 0;
     let previous = performance.now();
@@ -43,7 +47,8 @@ const MouseFollower = () => {
       const k = 1 - Math.exp(-dt / TAU);
       eased.x += (target.x - eased.x) * k;
       eased.y += (target.y - eased.y) * k;
-      pill.style.transform = `translate3d(${eased.x}px, ${eased.y}px, 0) translate(-50%, -50%)`;
+      eased.s += (target.s - eased.s) * k;
+      pill.style.transform = `translate3d(${eased.x}px, ${eased.y}px, 0) translate(-50%, -50%) scale(${eased.s})`;
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
@@ -84,8 +89,8 @@ const MouseFollower = () => {
     };
 
     // A pressed cursor should acknowledge the press.
-    const onDown = () => pill.classList.add('is-pressed');
-    const onUp = () => pill.classList.remove('is-pressed');
+    const onDown = () => { target.s = 0.75; };
+    const onUp = () => { target.s = 1; };
     const onOut = (event: MouseEvent) => {
       if (event.relatedTarget === null) pill.style.opacity = '0';
     };
