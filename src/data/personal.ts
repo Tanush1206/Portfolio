@@ -6,7 +6,7 @@ export const personalInfo = {
   name:        'Tanush Thakran',
   role:        'AI/ML Engineer',
   tagline:     'Machine Learning • Retrieval Systems • Python • SQL • Power BI',
-  bio:         'A Computer Science undergraduate working across data, applied ML and software engineering, currently pursuing an B.Sc. in Computer Science at BITS Pilani. I have trained a learning-to-rank model on 3.35M rows with a controlled ablation log, traced a retailer\'s margin problem (public Superstore dataset) to a specific discount threshold with SQL and Power BI, built a fully offline RAG pipeline over course videos, and shipped a production mobile app for a logistics client in Cairo. Comfortable owning a problem end to end — raw data through to recommendation, or schema through to deployment.',
+  bio:         'A Computer Science undergraduate working across data, applied ML and software engineering, currently pursuing a B.Sc. in Computer Science at BITS Pilani. I have trained a learning-to-rank model on 3.35M rows with a controlled ablation log, traced a retailer\'s margin problem (public Superstore dataset) to a specific discount threshold with SQL and Power BI, built a fully offline RAG pipeline over course videos, and shipped a production mobile app for a logistics client in Cairo. Comfortable owning a problem end to end — raw data through to recommendation, or schema through to deployment.',
   location:    'New Delhi, India',
   timezone:    'GMT+5:30',
   email:       'tanushthakran.work@gmail.com',

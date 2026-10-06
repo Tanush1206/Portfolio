@@ -22,7 +22,7 @@ export const educationEntries: EducationEntry[] = [
     institution: 'BITS_Pilani',
     period:      '2024 >> 2028',
     degree:      'B.Sc._in_Computer_Science',
-    description: 'Currently pursuing an B.Sc. in Computer Science at BITS Pilani (CGPA 7.64). Coursework spans algorithms, data structures, database systems, operating systems, computer networks, system design, statistics and deep learning, backed by 200+ LeetCode problems solved for data structures and algorithms practice.',
+    description: 'Currently pursuing a B.Sc. in Computer Science at BITS Pilani (CGPA 7.64). Coursework spans algorithms, data structures, database systems, operating systems, computer networks, system design, statistics and deep learning, backed by 200+ LeetCode problems solved for data structures and algorithms practice.',
     tags:        ['STATISTICS', 'DEEP_LEARNING', 'DATABASE_SYSTEMS', 'ALGORITHMS', 'SYSTEM_DESIGN', 'DSA_200+_LEETCODE'],
     status:      'CREDENTIAL_ACTIVE',
     statusIcon:  'verified',
