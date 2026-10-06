@@ -49,7 +49,6 @@ export const certificates: CertificateEntry[] = [
   {
     title: "Intermediate Machine Learning",
     issuer1: "Kaggle",
-    issuer2: "#",
     date: "SEP 2026",
     id: "KAGGLE-INTERMEDIATE-ML-2026",
     link: "/certs/Intermediate_Machine_Learning.png",

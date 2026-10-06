@@ -26,7 +26,7 @@ export const projects: Project[] = [
   {
     id: "pokemon-tcg-move-prediction",
     title: "POKEMON_TCG_MOVE_PREDICTION",
-    description: `A move-prediction model for Pokémon TCG built on ~3.35M rows, using LightGBM trained with a LambdaRank objective to rank candidate moves rather than just classify them. Splits were built leakage-safe so no future-game information could bleed into training, and every design choice was checked against an ablation log rather than assumed — isolating which features actually drove performance. The result was a +0.054 accuracy gain over the baseline, arrived at through systematic ablation rather than one-shot tuning.`,
+    description: `A behaviour-cloning model that predicts which legal move a winning agent chooses in recorded Pokémon TCG AI battles, trained on 3.35M candidate rows with 83 features. Each decision is a variable-length menu of options, so it is framed as learning-to-rank — LightGBM's LGBMRanker with a LambdaRank objective — rather than classification. Splits are made by episode, never by row, so turns from the same game never sit on both sides of the split. The final model reaches 57.4% top-1 accuracy on 50,649 held-out decisions against a 21.7% random baseline (2.65x), and the true move is in its top 3 88% of the time. A 7-run experiment log on a fixed test set isolated what mattered: the largest single gain (+0.054) came from reverse-engineering undocumented option indices to recover which card each move refers to, while a matched-volume control showed that filtering for "stronger" episodes did not help at all.`,
     tags: [
       "PYTHON",
       "LIGHTGBM",
@@ -34,6 +34,7 @@ export const projects: Project[] = [
       "FEATURE_ENGINEERING",
       "ABLATION_STUDY",
       "MODEL_EVALUATION",
+      "LEARNING_TO_RANK",
     ],
     sourceUrl: "https://github.com/Tanush1206/pokemon-tcg-move-prediction",
     demoUrl: "#",
@@ -44,13 +45,12 @@ export const projects: Project[] = [
   {
     id: "rag-based-ai",
     title: "RAG_BASED_AI",
-    description: `A fully offline Retrieval-Augmented QA pipeline that turns course videos into a searchable knowledge base and answers natural-language questions grounded strictly in retrieved transcript context — no external APIs, every model runs locally. The end-to-end flow chains ffmpeg audio extraction, timestamped Whisper transcription, chunking, and embedding generation via a local bge-m3 model, followed by top-k retrieval over cosine similarity. Chunk size and overlap were tuned against a manually labelled question set so retrieval quality was measured rather than assumed. Only the highest-scoring chunks reach a local deepseek-r1 LLM through Ollama, with prompts that constrain every answer to a cited video, title and timestamp — making responses traceable and hallucination-resistant by construction. A crash that surfaced only at scale was root-caused by profiling embedding batch sizes and fixed by restructuring requests into chunked batches.`,
+    description: `A fully offline Retrieval-Augmented QA pipeline that turns Hindi-language course videos into a searchable English knowledge base — no external APIs, every model runs locally. The flow chains ffmpeg audio extraction, Whisper large-v2 transcription with translation into timestamped segments, and embedding of each segment with a local bge-m3 model. A question is embedded the same way, the top 5 segments are retrieved by cosine similarity, and only those reach a local deepseek-r1 LLM through Ollama. The prompt instructs the model to answer only from the retrieved segments, cite the video number, title and timestamp, and say so when the answer isn't there — which reduces hallucination and keeps answers traceable to the source. Embedding a long course initially crashed the Ollama runner mid-request; the cause was oversized single requests, fixed by sending segments in fixed-size batches.`,
     tags: [
       "PYTHON",
       "RAG",
       "EMBEDDINGS",
       "VECTOR_SEARCH",
-      "RETRIEVAL_EVALUATION",
       "WHISPER",
       "LOCAL_LLM",
     ],
@@ -63,7 +63,7 @@ export const projects: Project[] = [
   {
     id: "llm-utility-lab",
     title: "LLM_UTILITY_LAB",
-    description: `A modular LLM utility application for text summarization and context-aware question answering, built in Python with the Groq API through its OpenAI-compatible interface. The system separates LLM client communication, prompt construction, summarization, Q&A, response modelling and evaluation into independent modules, while tracking input, output and total token usage for every request. Context-aware Q&A is explicitly grounded in user-provided context to reduce unsupported answers, and a dedicated evaluation runner measures live LLM responses against predefined cases. The project also includes automated pytest coverage for validation, prompting and evaluation logic, making it an evaluation-driven LLM application rather than a simple API wrapper.`,
+    description: `A modular LLM utility application for text summarization and context-aware question answering, built in Python with the Groq API through its OpenAI-compatible interface. The system separates LLM client communication, prompt construction, summarization, Q&A, response modelling and evaluation into independent modules, while tracking input, output and total token usage for every request. Context-aware Q&A is explicitly grounded in user-provided context to reduce unsupported answers. A dedicated evaluation runner scores live responses against a small set of predefined cases, saves each run with its model, temperature and prompt version, and flags any case that regresses from pass to fail between runs. It is served as a FastAPI service in Docker, deployed on Render, with 58 pytest tests running in GitHub Actions CI.`,
     tags: [
       "PYTHON",
       "LLM_APPLICATION",
@@ -74,6 +74,7 @@ export const projects: Project[] = [
       "LLM_EVALUATION",
       "TOKEN_TRACKING",
       "PYTEST",
+      "FASTAPI",
     ],
     sourceUrl: "https://github.com/Tanush1206/llm-utility-lab",
     demoUrl: "https://llm-utility-lab.onrender.com/docs",
@@ -84,7 +85,7 @@ export const projects: Project[] = [
   {
     id: "customer-churn-prediction",
     title: "CUSTOMER_CHURN_PREDICTION",
-    description: `An end-to-end telecom customer churn prediction system built with scikit-learn and deployed as an interactive Streamlit application. The pipeline handles numerical scaling and categorical encoding through a leakage-safe ColumnTransformer, compares Logistic Regression, Random Forest and Gradient Boosting, and tunes the final classifier using 5-fold cross-validation. Instead of relying on the default 0.50 decision threshold, a 0.30 threshold was selected through cross-validation to prioritize churn recall, achieving 75.1% recall and 84.1% ROC-AUC on the held-out test set. The deployed interface also exposes feature-level model contributions to explain why a customer was flagged as high or low risk.`,
+    description: `An end-to-end telecom customer churn prediction system built with scikit-learn and deployed as an interactive Streamlit application. The pipeline handles numerical scaling and categorical encoding through a leakage-safe ColumnTransformer and compares Logistic Regression, Random Forest and Gradient Boosting. Logistic Regression was kept — within 0.003 ROC-AUC of Gradient Boosting and directly interpretable — and its regularisation was tuned with 5-fold cross-validation on the training set. Instead of the default 0.50 decision threshold, a 0.30 threshold was chosen by maximising F1 on out-of-fold training predictions, never on the test set. On the held-out test set that lifts churn recall from 55.9% to 75.1% at 51.8% precision, with 84.1% ROC-AUC. The deployed interface also exposes feature-level model contributions to explain why a customer was flagged as high or low risk.`,
     tags: [
       "PYTHON",
       "SCIKIT_LEARN",
@@ -105,7 +106,7 @@ export const projects: Project[] = [
   {
     id: "superstore-analysis",
     title: "SUPERSTORE_PROFITABILITY_ANALYSIS",
-    description: `A SQL and Power BI investigation into whether a retailer's margin problem came from product mix or from pricing. Across 9,994 transactions ($2.3M revenue, 793 customers), SQL bucketing showed margin holds at 29.5% undiscounted but turns negative past a 25% discount and reaches −77% beyond 40% — converting a vague concern into a specific policy threshold. The pattern was validated independently at sub-category, region, category and customer level, with window-function and CTE queries covering YoY growth, cohort retention and RFM segmentation. Delivered as an interactive Power BI dashboard with DAX measures and cross-filtering, alongside a recommendation worth an estimated $35K in recoverable annual profit.`,
+    description: `A SQL and Power BI investigation, on the public Sample Superstore dataset, into whether a retailer's margin problem came from product mix or from pricing. Across 9,994 line items (5,009 orders, $2.3M revenue, 793 customers), SQL bucketing showed margin holds at 29.5% undiscounted but turns negative past a 25% discount and reaches −77% beyond 40% — converting a vague concern into a specific policy threshold. The pattern was validated independently at sub-category, region, category and customer level, with window-function and CTE queries covering YoY growth, cohort retention and RFM segmentation. Delivered as an interactive Power BI dashboard with DAX measures and cross-filtering, alongside a recommendation estimated at ~$35K in recoverable annual profit, assuming order volume holds, with a single-region test proposed to measure that before rollout.`,
     tags: [
       "SQL",
       "POSTGRESQL",
@@ -124,9 +125,9 @@ export const projects: Project[] = [
   {
     id: "videocaptionmaker",
     title: "VIDEO_CAPTION_MAKER",
-    description: `A production SaaS platform that puts a speech-to-text ML workload behind a real service. GPU-accelerated Whisper transcription runs on Celery workers so long-running inference never blocks the API, with ChromaDB holding vector representations of the generated transcripts. The system spans six Docker Compose services — Next.js 14 frontend, FastAPI backend, workers, Redis, PostgreSQL and ChromaDB — over an async SQLAlchemy data layer with Alembic migrations. Security was designed in from the first commit: httpOnly JWT cookies, bcrypt, CORS policy and upload validation, with auth built before the upload path existed.`,
+    description: `A full-stack captioning app, feature-complete and awaiting deployment, that puts a speech-to-text ML workload behind a real service. GPU-accelerated faster-whisper transcription runs on a Celery worker so long-running inference never blocks the API, and transcripts are embedded into ChromaDB for semantic search and Gemini-backed Q&A grounded in the retrieved captions. The system spans six Docker Compose services — Next.js 14 frontend, FastAPI backend, worker, Redis, PostgreSQL and ChromaDB — over an async SQLAlchemy data layer with Alembic migrations, with a caption editor, styling and burned-in video export built on top. Security was designed in from the first milestone: httpOnly JWT cookies, bcrypt, rate limiting, CORS policy and upload validation, backed by 188 backend tests.`,
     tags: [
-      "ML_IN_PRODUCTION",
+      "ML_SERVING",
       "WHISPER",
       "PYTHON",
       "FASTAPI",
@@ -136,7 +137,7 @@ export const projects: Project[] = [
     ],
     sourceUrl: "https://github.com/Tanush1206/video-caption-maker",
     demoUrl: "#",
-    status: "Production_SaaS",
+    status: "Pre_Deployment",
     pathLabel: "SRC: /saas/video-caption-maker",
     layout: "featured",
   },
@@ -144,24 +145,13 @@ export const projects: Project[] = [
     id: "pactpal",
     title: "PactPal",
     description:
-      "An NLP contract-analysis platform that rewrites dense legal language into plain English for non-expert readers. Text processing and summarisation models drive the pipeline end to end, cutting measured reading time by roughly 30% for the users it was tested with — a usability gain quantified against real documents rather than estimated.",
-    tags: ["PYTHON", "NLP", "TEXT_PROCESSING", "REACT"],
+      "A contract-simplification web app that rewrites dense legal language into plain English for non-expert readers. A React frontend sends uploaded documents to a Node.js/Express backend, which splits them into sections and has Gemini 2.5 Flash (via Vertex AI) summarise each one, then combines the results into a single plain-language guide, with clause-level explanations on demand.",
+    tags: ["LLM_APPLICATION", "GEMINI", "VERTEX_AI", "NODE.JS", "REACT"],
     sourceUrl: "https://github.com/Tanush1206/PactPal",
     demoUrl: "https://pactpal-frontend.onrender.com/",
-    status: "NLP_Platform",
+    status: "LLM_Web_App",
     pathLabel: "SRC: /ml/pactpal",
     imgAlt: "PactPal",
     layout: "wide",
-  },
-  {
-    id: "atw",
-    title: "ATW_MOBILE",
-    description: `A driver and medic coordination app shipped to a logistics client in Cairo, built around real-time GPS telemetry. Full trip-lifecycle event data — request, acceptance, live status, completion — is modelled into a clean, queryable operational record, with state kept consistent across concurrent users on a live database.`,
-    tags: ["REAL_TIME_DATA", "EVENT_MODELLING", "FLUTTER", "FIREBASE"],
-    sourceUrl: "https://github.com/NeuralSynth/cyparta-atw-frontend-android",
-    demoUrl: "#",
-    status: "Shipped_Production",
-    pathLabel: "SRC: /deploy/atw-mobile",
-    layout: "compact",
   },
 ];
