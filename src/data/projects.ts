@@ -76,7 +76,7 @@ export const projects: Project[] = [
       "PYTEST",
     ],
     sourceUrl: "https://github.com/Tanush1206/llm-utility-lab",
-    demoUrl: "#",
+    demoUrl: "https://llm-utility-lab.onrender.com/docs",
     status: "LLM_Application",
     pathLabel: "SRC: /llm/llm-utility-lab",
     layout: "terminal",
