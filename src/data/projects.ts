@@ -26,7 +26,7 @@ export const projects: Project[] = [
   {
     id: "pokemon-tcg-move-prediction",
     title: "POKEMON_TCG_MOVE_PREDICTION",
-    description: `A behaviour-cloning model that predicts which legal move a winning agent chooses in recorded Pokémon TCG AI battles, trained on 3.35M candidate rows with 83 features. Each decision is a variable-length menu of options, so it is framed as learning-to-rank — LightGBM's LGBMRanker with a LambdaRank objective — rather than classification. Splits are made by episode, never by row, so turns from the same game never sit on both sides of the split. The final model reaches 57.4% top-1 accuracy on 50,649 held-out decisions against a 21.7% random baseline (2.65x), and the true move is in its top 3 88% of the time. A 7-run experiment log on a fixed test set isolated what mattered: the largest single gain (+0.054) came from reverse-engineering undocumented option indices to recover which card each move refers to, while a matched-volume control showed that filtering for "stronger" episodes did not help at all.`,
+    description: `A behaviour-cloning model that predicts which legal move a winning agent chooses in recorded Pokémon TCG AI battles, trained on 3.35M rows from 4,604 recorded games, with 83 features. Each decision is a variable-length menu of options, so it is framed as learning-to-rank — LightGBM's LGBMRanker with a LambdaRank objective — rather than classification. Splits are made by episode (70/15/15 for train, validation and test), never by row, so turns from the same game never sit on both sides of the split. The final model reaches 57.4% top-1 accuracy on 50,649 held-out decisions against a 21.7% random baseline (2.65x), and the true move is in its top 3 88% of the time. A 7-run experiment log on a fixed test set isolated what mattered: the largest single gain (+0.054) came from reverse-engineering undocumented option indices to recover which card each move refers to, while a matched-volume control showed that filtering for "stronger" episodes did not help at all.`,
     tags: [
       "PYTHON",
       "LIGHTGBM",
@@ -63,7 +63,7 @@ export const projects: Project[] = [
   {
     id: "llm-utility-lab",
     title: "LLM_UTILITY_LAB",
-    description: `A modular LLM utility application for text summarization and context-aware question answering, built in Python with the Groq API through its OpenAI-compatible interface. The system separates LLM client communication, prompt construction, summarization, Q&A, response modelling and evaluation into independent modules, while tracking input, output and total token usage for every request. Context-aware Q&A is explicitly grounded in user-provided context to reduce unsupported answers. A dedicated evaluation runner scores live responses against a small set of predefined cases, saves each run with its model, temperature and prompt version, and flags any case that regresses from pass to fail between runs. It is served as a FastAPI service in Docker, deployed on Render, with 58 pytest tests running in GitHub Actions CI.`,
+    description: `A modular LLM utility application for text summarization and context-aware question answering, built in Python with the Groq API through its OpenAI-compatible interface. The system separates LLM client communication, prompt construction, summarization, Q&A, response modelling and evaluation into independent modules, while tracking input, output and total token usage for every request. Context-aware Q&A is explicitly grounded in user-provided context to reduce unsupported answers. A dedicated evaluation runner scores live responses against a small suite of three predefined cases, saves each run with its model, temperature and prompt version, and flags any case that regresses from pass to fail between runs. It is served as a FastAPI service in Docker, deployed on Render, with 58 pytest tests running in GitHub Actions CI.`,
     tags: [
       "PYTHON",
       "LLM_APPLICATION",
@@ -85,7 +85,7 @@ export const projects: Project[] = [
   {
     id: "customer-churn-prediction",
     title: "CUSTOMER_CHURN_PREDICTION",
-    description: `An end-to-end telecom customer churn prediction system built with scikit-learn and deployed as an interactive Streamlit application. The pipeline handles numerical scaling and categorical encoding through a leakage-safe ColumnTransformer and compares Logistic Regression, Random Forest and Gradient Boosting. Logistic Regression was kept — within 0.003 ROC-AUC of Gradient Boosting and directly interpretable — and its regularisation was tuned with 5-fold cross-validation on the training set. Instead of the default 0.50 decision threshold, a 0.30 threshold was chosen by maximising F1 on out-of-fold training predictions, never on the test set. On the held-out test set that lifts churn recall from 55.9% to 75.1% at 51.8% precision, with 84.1% ROC-AUC. The deployed interface also exposes feature-level model contributions to explain why a customer was flagged as high or low risk.`,
+    description: `An end-to-end telecom customer churn prediction system built with scikit-learn and deployed as an interactive Streamlit application. The pipeline handles numerical scaling and categorical encoding through a leakage-safe ColumnTransformer and compares Logistic Regression, Random Forest and Gradient Boosting on held-out data. Logistic Regression was kept — within 0.003 ROC-AUC of Gradient Boosting and directly interpretable — and its regularisation was tuned with 5-fold cross-validation on the training set. Instead of the default 0.50 decision threshold, a 0.30 threshold was chosen by maximising F1 on out-of-fold training predictions. On the held-out test set that lifts churn recall from 55.9% to 75.1% at 51.8% precision, with 84.1% ROC-AUC. The deployed interface also exposes feature-level model contributions to explain why a customer was flagged as high or low risk.`,
     tags: [
       "PYTHON",
       "SCIKIT_LEARN",
@@ -106,14 +106,12 @@ export const projects: Project[] = [
   {
     id: "superstore-analysis",
     title: "SUPERSTORE_PROFITABILITY_ANALYSIS",
-    description: `A SQL and Power BI investigation, on the public Sample Superstore dataset, into whether a retailer's margin problem came from product mix or from pricing. Across 9,994 line items (5,009 orders, $2.3M revenue, 793 customers), SQL bucketing showed margin holds at 29.5% undiscounted but turns negative past a 25% discount and reaches −77% beyond 40% — converting a vague concern into a specific policy threshold. The pattern was validated independently at sub-category, region, category and customer level, with window-function and CTE queries covering YoY growth, cohort retention and RFM segmentation. Delivered as an interactive Power BI dashboard with DAX measures and cross-filtering, alongside a recommendation estimated at ~$35K in recoverable annual profit, assuming order volume holds, with a single-region test proposed to measure that before rollout.`,
+    description: `A Power BI investigation, on the public Sample Superstore dataset, into whether a retailer's margin problem came from product mix or from pricing. Across 9,994 line items (5,009 orders, $2.3M revenue, 793 customers, 2014–2017), margin holds at 29.5% undiscounted but turns negative past a 25% discount and reaches −77% beyond 40% — converting a vague concern into a specific policy threshold. Central region discounts 24.0% on average for a 7.9% margin against West's 10.9% for 14.9%, and the pattern holds at sub-category, region and category level. Delivered as an interactive Power BI dashboard with DAX measures and cross-filtering, alongside a recommendation worth an estimated $35K over the four years of data, assuming order volume holds, with a single-region test proposed to measure that before rollout. Data preparation caught a Windows-1252 encoding failure and a silent US-date parsing trap, and the load was reconciled against independently computed control totals.`,
     tags: [
-      "SQL",
-      "POSTGRESQL",
       "POWER_BI",
       "DAX",
-      "COHORT_ANALYSIS",
-      "RFM_SEGMENTATION",
+      "POWER_QUERY",
+      "DATA_VALIDATION",
       "BUSINESS_RECOMMENDATION",
     ],
     sourceUrl: "https://github.com/Tanush1206/superstore-powerbi-analysis",
@@ -125,7 +123,7 @@ export const projects: Project[] = [
   {
     id: "videocaptionmaker",
     title: "VIDEO_CAPTION_MAKER",
-    description: `A full-stack captioning app, feature-complete and awaiting deployment, that puts a speech-to-text ML workload behind a real service. GPU-accelerated faster-whisper transcription runs on a Celery worker so long-running inference never blocks the API, and transcripts are embedded into ChromaDB for semantic search and Gemini-backed Q&A grounded in the retrieved captions. The system spans six Docker Compose services — Next.js 14 frontend, FastAPI backend, worker, Redis, PostgreSQL and ChromaDB — over an async SQLAlchemy data layer with Alembic migrations, with a caption editor, styling and burned-in video export built on top. Security was designed in from the first milestone: httpOnly JWT cookies, bcrypt, rate limiting, CORS policy and upload validation, backed by 188 backend tests.`,
+    description: `A full-stack captioning app, feature-complete and awaiting deployment, that puts a speech-to-text ML workload behind a real service. GPU-accelerated faster-whisper (large-v3) transcription runs on a Celery worker so long-running inference never blocks the API, and transcripts are embedded into ChromaDB for semantic search and Gemini-backed Q&A grounded in the retrieved captions, which declines to answer when nothing relevant is found. The system spans six Docker Compose services — Next.js 14 frontend, FastAPI backend, worker, Redis, PostgreSQL and ChromaDB — over an async SQLAlchemy data layer with Alembic migrations, with a caption editor, styling and burned-in video export built on top. Security was designed in from the first milestone: httpOnly JWT cookies, bcrypt, rate limiting, CORS policy and upload validation, backed by 250+ backend tests.`,
     tags: [
       "ML_SERVING",
       "WHISPER",
@@ -145,7 +143,7 @@ export const projects: Project[] = [
     id: "pactpal",
     title: "PactPal",
     description:
-      "A contract-simplification web app that rewrites dense legal language into plain English for non-expert readers. A React frontend sends uploaded documents to a Node.js/Express backend, which splits them into sections and has Gemini 2.5 Flash (via Vertex AI) summarise each one, then combines the results into a single plain-language guide, with clause-level explanations on demand.",
+      "A contract-simplification web app that rewrites dense legal language into plain English for non-expert readers. A React frontend sends the text of an uploaded contract to a Node.js/Express backend, which splits long documents into chunks, has Gemini 2.5 Flash (via Vertex AI) summarise each one, and combines the results into a single plain-language guide. A second endpoint extracts the key clauses as 4–5 grouped points, each with a low, medium or high risk rating, a practical tip and example clauses.",
     tags: ["LLM_APPLICATION", "GEMINI", "VERTEX_AI", "NODE.JS", "REACT"],
     sourceUrl: "https://github.com/Tanush1206/PactPal",
     demoUrl: "https://pactpal-frontend.onrender.com/",
@@ -153,5 +151,16 @@ export const projects: Project[] = [
     pathLabel: "SRC: /ml/pactpal",
     imgAlt: "PactPal",
     layout: "wide",
+  },
+  {
+    id: "atw",
+    title: "ATW_MOBILE",
+    description: `A driver and medic coordination app shipped to a logistics client in Cairo, built around real-time GPS telemetry. Full trip-lifecycle event data — request, acceptance, live status, completion — is modelled into a clean, queryable operational record, with state kept consistent across concurrent users on a live database.`,
+    tags: ["REAL_TIME_DATA", "EVENT_MODELLING", "FLUTTER", "FIREBASE"],
+    sourceUrl: "https://github.com/NeuralSynth/cyparta-atw-frontend-android",
+    demoUrl: "#",
+    status: "Shipped_Production",
+    pathLabel: "SRC: /deploy/atw-mobile",
+    layout: "compact",
   },
 ];
