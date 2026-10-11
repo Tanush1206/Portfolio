@@ -19,7 +19,7 @@ export const certificates: CertificateEntry[] = [
     issuer2: "DeepLearning.AI",
     date: "OCT 2026",
     id: "LLAMAINDEX-BUILDING-AGENTIC-RAG-2026",
-    link: "/certs/Building_Agentic_RAG_with_Llamaindex.png",
+    link: "https://www.deeplearning.ai/accomplishments/316bfdf9-6b78-4956-bf40-6e81e8619eed?accomplishmentId=316bfdf9-6b78-4956-bf40-6e81e8619eed&usp=sharing",
     image: "/certs/Building_Agentic_RAG_with_Llamaindex.png",
     logo1: "/logos/llamaindex.png",
     logo2: "/logos/deeplearning_ai_logo.png",
