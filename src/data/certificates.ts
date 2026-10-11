@@ -14,6 +14,17 @@ export interface CertificateEntry {
 // the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
+    title: "LangChain for LLM Application Development",
+    issuer1: "LangChain",
+    issuer2: "DeepLearning.AI",
+    date: "OCT 2026",
+    id: "LANGCHAIN-LLM-APPLICATION-DEVELOPMENT-2026",
+    link: "https://www.deeplearning.ai/accomplishments/867d4d73-f2d1-4e44-a5f2-a146dc1a9c00?accomplishmentId=867d4d73-f2d1-4e44-a5f2-a146dc1a9c00&usp=sharing",
+    image: "/certs/LangChain_for_LLM_Application_Development.png",
+    logo1: "/logos/langsmith-color.png",
+    logo2: "/logos/deeplearning_ai_logo.png",
+  },
+  {
     title: "LangChain Chat with Your Data",
     issuer1: "LangChain",
     issuer2: "DeepLearning.AI",
@@ -22,7 +33,7 @@ export const certificates: CertificateEntry[] = [
     link: "https://www.deeplearning.ai/accomplishments/4a45dfb4-10c0-49e4-9f70-c9251cceaeed?accomplishmentId=4a45dfb4-10c0-49e4-9f70-c9251cceaeed&usp=sharing",
     image: "/certs/Langchain_Chat_with_your_data.png",
     logo1: "/logos/langsmith-color.png",
-    logo2: "/logos/deeplearning_ai_logo.png"
+    logo2: "/logos/deeplearning_ai_logo.png",
   },
   {
     title: "Building Systems with the ChatGPT API",
@@ -33,7 +44,7 @@ export const certificates: CertificateEntry[] = [
     link: "https://www.deeplearning.ai/accomplishments/cc8941c2-057d-4c71-8aa1-8cba24c4c0ee?accomplishmentId=cc8941c2-057d-4c71-8aa1-8cba24c4c0ee&usp=sharing",
     image: "/certs/building_systems_chatgpt_api.png",
     logo1: "/logos/openai.svg",
-    logo2: "/logos/deeplearning_ai_logo.png"
+    logo2: "/logos/deeplearning_ai_logo.png",
   },
   {
     title: "ChatGPT Prompt Engineering for Developers",
@@ -44,7 +55,7 @@ export const certificates: CertificateEntry[] = [
     link: "https://www.deeplearning.ai/accomplishments/99604059-97ce-4ff6-87b7-25dae0299fcf?_gl=1*zefe20*_gcl_au*MTQzNzc4NzI3OS4xNzg1NjA4NTU3*_ga*MTk2OTkwNTU2Ny4xNzg1MTQwMjQz*_ga_FR2MZ1VLMS*czE3ODk0Njc1NjAkbzIzJGcxJHQxNzg5NDc1Njg2JGozMyRsMCRoMA..&usp=sharing",
     image: "/certs/chatgpt_prompt_engineering.png",
     logo1: "/logos/openai.svg",
-    logo2: "/logos/deeplearning_ai_logo.png"
+    logo2: "/logos/deeplearning_ai_logo.png",
   },
   {
     title: "Intermediate Machine Learning",
@@ -64,7 +75,7 @@ export const certificates: CertificateEntry[] = [
     link: "https://coursera.org/verify/HT81EXPD6MPV",
     image: "/certs/Coursera_advanced_ml.png",
     logo1: "/logos/stanford.jpg",
-    logo2: "/logos/deeplearning_ai_logo.png"
+    logo2: "/logos/deeplearning_ai_logo.png",
   },
   {
     title: "Supervised Machine Learning: Regression and Classification",
@@ -75,7 +86,7 @@ export const certificates: CertificateEntry[] = [
     link: "https://coursera.org/verify/ZHUIYS3KNBLB",
     image: "/certs/coursera_supervised_ml.png",
     logo1: "/logos/stanford.jpg",
-    logo2: "/logos/deeplearning_ai_logo.png"
+    logo2: "/logos/deeplearning_ai_logo.png",
   },
   {
     title: "Google Analytics Certification",
