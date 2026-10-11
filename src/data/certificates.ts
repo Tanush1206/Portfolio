@@ -14,6 +14,17 @@ export interface CertificateEntry {
 // the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
+    title: "Functions, Tools and Agents with LangChain",
+    issuer1: "LangChain",
+    issuer2: "DeepLearning.AI",
+    date: "OCT 2026",
+    id: "LANGCHAIN-FUNCTIONS-TOOLS-AGENTS-2026",
+    link: "https://www.deeplearning.ai/accomplishments/1f7664ec-d761-48c5-a35a-5a9aa088caff?accomplishmentId=1f7664ec-d761-48c5-a35a-5a9aa088caff&usp=sharing",
+    image: "/certs/Functions,Tools_and_Agents_with_LangChain.png",
+    logo1: "/logos/langsmith-color.png",
+    logo2: "/logos/deeplearning_ai_logo.png",
+  },
+  {
     title: "LangChain for LLM Application Development",
     issuer1: "LangChain",
     issuer2: "DeepLearning.AI",
