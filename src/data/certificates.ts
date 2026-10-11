@@ -14,6 +14,17 @@ export interface CertificateEntry {
 // the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
+    title: "Building Agentic RAG with LlamaIndex",
+    issuer1: "LlamaIndex",
+    issuer2: "DeepLearning.AI",
+    date: "OCT 2026",
+    id: "LLAMAINDEX-BUILDING-AGENTIC-RAG-2026",
+    link: "/certs/Building_Agentic_RAG_with_Llamaindex.png",
+    image: "/certs/Building_Agentic_RAG_with_Llamaindex.png",
+    logo1: "/logos/llamaindex.png",
+    logo2: "/logos/deeplearning_ai_logo.png",
+  },
+  {
     title: "Functions, Tools and Agents with LangChain",
     issuer1: "LangChain",
     issuer2: "DeepLearning.AI",
