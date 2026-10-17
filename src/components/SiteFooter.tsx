@@ -152,6 +152,14 @@ const SiteFooter = () => {
               >
                 Résumé
               </a>
+              <a
+                href={personalInfo.portfolio}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="kicker transition-opacity duration-300 hover:opacity-100"
+              >
+                Portfolio
+              </a>
               <Link
                 to="/contact"
                 className="kicker transition-opacity duration-300 hover:opacity-100"

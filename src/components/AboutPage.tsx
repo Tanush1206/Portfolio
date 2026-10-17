@@ -20,6 +20,7 @@ const AboutPage = () => (
               <ButtonAnchor href={personalInfo.resume} tone="solid">
                 Résumé
               </ButtonAnchor>
+              <ButtonAnchor href={personalInfo.portfolio}>Portfolio</ButtonAnchor>
               <ButtonAnchor href={personalInfo.github}>GitHub</ButtonAnchor>
               <ButtonAnchor href={personalInfo.linkedin}>LinkedIn</ButtonAnchor>
             </div>

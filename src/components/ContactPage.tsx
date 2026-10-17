@@ -245,8 +245,9 @@ const ContactPage = () => {
                 ))}
               </ul>
 
-              <div className="mt-10">
+              <div className="mt-10 flex flex-wrap gap-3">
                 <ButtonAnchor href={personalInfo.resume}>Download résumé</ButtonAnchor>
+                <ButtonAnchor href={personalInfo.portfolio}>Download portfolio</ButtonAnchor>
               </div>
             </Reveal>
           </div>
