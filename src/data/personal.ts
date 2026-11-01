@@ -6,7 +6,7 @@ export const personalInfo = {
   name:        'Tanush Thakran',
   role:        'AI/ML Engineer',
   tagline:     'Machine Learning • Retrieval Systems • Python • SQL • Power BI',
-  bio:         'A Computer Science undergraduate working across data, applied ML and software engineering, currently pursuing an B.Sc. in Computer Science at BITS Pilani. I have traced a retailer\'s margin problem to a specific discount threshold in Power BI (public Superstore dataset), built a fully offline RAG pipeline that cites the video and timestamp behind every answer, and shipped a mobile app for a logistics client in Cairo. Comfortable owning a problem end to end — raw data through to recommendation, or schema through to deployment.',
+  bio:         'A Computer Science undergraduate working across data, applied ML and software engineering, currently pursuing an Integrated B.Sc. in Computer Science at BITS Pilani. I have traced a retailer\'s margin problem to a specific discount threshold in SQL and Power BI (public Superstore dataset), built a fully offline RAG pipeline that cites the video and timestamp behind every answer, and built the complete Flutter frontend of a mobile app for a logistics client in Cairo during an internship. Comfortable owning a problem end to end — raw data through to recommendation, or schema through to deployment.',
   location:    'New Delhi, India',
   timezone:    'GMT+5:30',
   email:       'tanushthakran.work@gmail.com',
@@ -15,12 +15,11 @@ export const personalInfo = {
   twitter:     'https://x.com/tanush65556130',
   instagram:   'https://www.instagram.com/tanushhh__12',
   resume:      '/docs/TanushThakranResume.pdf',
-  portfolio:   '/docs/Portfolio%20ft.%20Tanush%20Thakran.pdf',
   statusText:  "If there's any suitable role for me, don't hesitate. I'm open to communication on all channels. Let's discuss how I can contribute to your team or project.",
 };
 
 export const heroStats = [
-  { label: 'Projects_Built', value: '8' },
+  { label: 'Projects_Built', value: '7' },
   { label: 'Core_Stack', value: 'Python + SQL + ML' },
   { label: 'Availability', value: 'Open' },
 ];

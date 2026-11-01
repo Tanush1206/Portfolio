@@ -32,11 +32,10 @@ export const experiences: ExperienceEntry[] = [
     location: 'Cairo , EGYPT',
     projectLink: '/projects#atw', // Linking to the projects page with a hash to trigger highlighting
     highlights: [
-      'Modelled full **trip-lifecycle event data** — request, acceptance, live status, completion — producing a clean, queryable operational record.',
-      'Worked with **real-time GPS telemetry** streams, handling ingestion, state updates and consistency across concurrent users.',
-      'Engineered post-trip EMS (Emergency Medical Services) reporting modules with **validation rules protecting data integrity** across high-criticality logistics records.',
-      'Developed the **Driver & Medic** mobile application end to end, shipped to a logistics client in Cairo.',
+      'Built the complete **Flutter frontend** of the **Driver & Medic** mobile application, every screen from start to finish.',
+      'Implemented the **trip-lifecycle** screens — request, acceptance, live status, completion — and the **real-time GPS tracking** views.',
+      'Built the post-trip EMS (Emergency Medical Services) reporting modules, with **validation rules protecting data integrity** across high-criticality logistics records.',
     ],
-    tech: ['REAL_TIME_DATA', 'EVENT_MODELLING', 'DATA_INTEGRITY', 'FLUTTER', 'FIREBASE'],
+    tech: ['FLUTTER', 'FIREBASE', 'REAL_TIME_DATA', 'MOBILE_UI', 'DATA_INTEGRITY'],
   },
 ];
