@@ -150,7 +150,7 @@ const SiteFooter = () => {
                 rel="noopener noreferrer"
                 className="kicker transition-opacity duration-300 hover:opacity-100"
               >
-                Résumé
+                Resume
               </a>
               <a
                 href={personalInfo.portfolio}

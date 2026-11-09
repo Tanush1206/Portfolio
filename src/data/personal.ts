@@ -4,7 +4,7 @@
 
 export const personalInfo = {
   name:        'Tanush Thakran',
-  role:        'AI/ML Engineer',
+  role:        'Engineer',
   tagline:     'Machine Learning • Retrieval Systems • Python • SQL • Power BI',
   bio:         'A Computer Science undergraduate working across data, applied ML and software engineering, currently pursuing an Integrated B.Sc. in Computer Science at BITS Pilani. I have traced a retailer\'s margin problem to a specific discount threshold in SQL and Power BI (public Superstore dataset), built a fully offline RAG pipeline that cites the video and timestamp behind every answer, and built the complete Flutter frontend of a mobile app for a logistics client in Cairo during an internship. Comfortable owning a problem end to end — raw data through to recommendation, or schema through to deployment.',
   location:    'New Delhi, India',
