@@ -14,7 +14,6 @@ export const coreLanguages = [
 ];
 
 export const frameworks = [
-  { name: 'LIGHTGBM',       label: 'Learning_to_Rank'       },
   { name: 'EMBEDDINGS_RAG', label: 'Vector_Retrieval'       },
   { name: 'SCIKIT_LEARN',   label: 'Modelling'              },
   { name: 'WHISPER_OLLAMA', label: 'Local_LLM_Stack'        },
@@ -23,13 +22,11 @@ export const frameworks = [
   { name: 'POWER_BI_DAX',   label: 'BI_Dashboards'          },
   { name: 'FASTAPI',        label: 'ML_Serving'             },
   { name: 'REACT_NEXT.JS',  label: 'App_Layer'              },
-  { name: 'NODE_EXPRESS',   label: 'Web_Backend'            },
-  { name: 'FLUTTER_FIREBASE', label: 'Mobile_App'           },
 ];
 
 export const devTools = [
-  'POWER_BI', 'STREAMLIT', 'CHROMADB', 'CELERY_REDIS', 'DOCKER',
-  'GITHUB_ACTIONS', 'GIT', 'GITHUB', 'VERCEL', 'RENDER', 'CURSOR', 'COPILOT',
+  'JUPYTER', 'POWER_BI', 'GOOGLE_ANALYTICS_4', 'CHROMADB',
+  'DOCKER', 'GIT', 'GITHUB', 'VERCEL', 'RENDER', 'CURSOR', 'COPILOT',
 ];
 
 export const domainFocus = [
