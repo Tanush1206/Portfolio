@@ -14,6 +14,16 @@ export interface CertificateEntry {
 // the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
+    title: "Introduction to Model Context Protocol",
+    issuer1: "Claude Academy",
+    issuer2: "Anthropic",
+    date: "NOV 2026",
+    id: "1bbbd36b2b0d2ba6ff46acff36b3debf",
+    link: "https://academy.claude.com/verify/1bbbd36b2b0d2ba6ff46acff36b3debf",
+    image: "/certs/Introduction_to_Model_Context_Protocol.png",
+    logo1: "/logos/anthropic_logo.png",
+  },
+  {
     title: "Building Agentic RAG with LlamaIndex",
     issuer1: "LlamaIndex",
     issuer2: "DeepLearning.AI",
