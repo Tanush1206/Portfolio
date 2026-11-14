@@ -14,6 +14,16 @@ export interface CertificateEntry {
 // the cards render in array order.
 export const certificates: CertificateEntry[] = [
   {
+    title: "Building with the Claude API",
+    issuer1: "Claude Academy",
+    issuer2: "Anthropic",
+    date: "NOV 2026",
+    id: "391d3b2bfd59d753e327795fa11d5cba",
+    link: "https://academy.claude.com/verify/391d3b2bfd59d753e327795fa11d5cba",
+    image: "/certs/Building_with_the_Claude_API.png",
+    logo1: "/logos/anthropic_logo.png",
+  },
+  {
     title: "Model Context Protocol: Advanced Topics",
     issuer1: "Claude Academy",
     issuer2: "Anthropic",
